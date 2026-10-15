@@ -10,10 +10,18 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/apps/mobile/src/lib/database.types.ts"
 MODE="${1:-write}"
 
-TMP="$(mktemp -t neuropeak-types)"
-trap 'rm -f "$TMP"' EXIT
+WORK_DIR="$(mktemp -d)"
+TMP="$WORK_DIR/database.types.ts"
+trap 'rm -rf "$WORK_DIR"' EXIT
 
 "$ROOT/scripts/with-temp-db.sh" node "$ROOT/scripts/generate-db-types.mjs" "$TMP"
+
+# Üretilen dosya da deponun geri kalanıyla aynı biçimde durur, böylece
+# format kontrolü ile tip kontrolü birbirine düşmez.
+# Deponun kendi prettier'ı ve yapılandırması kullanılır; geçici dosya depo
+# dışında olduğu için yapılandırma yolu açıkça verilir.
+"$ROOT/node_modules/.bin/prettier" --config "$ROOT/.prettierrc.json" \
+  --log-level warn --write "$TMP" >/dev/null
 
 if [[ "$MODE" == "--check" ]]; then
   if ! diff -q "$TMP" "$OUT" >/dev/null 2>&1; then
