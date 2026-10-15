@@ -16,8 +16,9 @@ import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { Icon } from '@/components/icons';
 import { ScoreReveal } from '@/components/test/score-reveal';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
-import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
+import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
+import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
 
 type Phase = 'intro' | 'running' | 'result';
 
@@ -31,6 +32,7 @@ export default function TestRunnerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const { recordTestFinished } = useProgress();
 
   const test = findTest(id ?? '');
 
@@ -71,8 +73,10 @@ export default function TestRunnerScreen() {
 
       await saveTestResult(stored);
       await enqueueMutation({ kind: 'test_result', payload: stored });
+      // XP, yıldız, seri ve günlük görevler tek kapıdan işlenir.
+      await recordTestFinished(score.iq);
     },
-    [test],
+    [recordTestFinished, test],
   );
 
   const answer = useCallback(

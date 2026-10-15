@@ -4,8 +4,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
-import { USER } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
+import { useProgress } from '@/lib/progress/context';
 
 /**
  * Her sekmenin üstündeki bar: ekran başlığı, yıldız bakiyesi, PRO rozeti
@@ -15,6 +15,7 @@ export function AppHeader({ title }: { title: string }) {
   const theme = useTheme();
   const router = useRouter();
   const { isPro } = usePro();
+  const { state } = useProgress();
 
   return (
     <View style={styles.row}>
@@ -24,7 +25,7 @@ export function AppHeader({ title }: { title: string }) {
 
       <View style={[styles.pill, { backgroundColor: theme.colors.surface }]}>
         <Icon name="star" color={theme.colors.brand} size={16} filled />
-        <Text variant="caption">{USER.starBalance}</Text>
+        <Text variant="caption">{state.stars}</Text>
       </View>
 
       {!isPro && (
