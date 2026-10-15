@@ -12,11 +12,27 @@ neuropeak/
 │   ├── mobile/          # Expo (React Native) — iOS + Android
 │   └── admin/           # Next.js admin panel (CMS + CRM + Analitik)
 ├── packages/
-│   └── core/            # Skorlama motoru, seviye üreticiler, paylaşılan tipler
+│   ├── core/            # Skorlama motoru, seviye üreticiler, paylaşılan tipler
+│   └── ui/              # Tasarım token'ları ve temalar
 └── supabase/            # Şema, migration'lar, Edge Functions
 ```
 
-`packages/ui` (tasarım token'ları) PR#2'de, `packages/content` (soru bankası) PR#19'da eklenecek.
+`packages/content` (soru bankası) PR#19'da eklenecek.
+
+## Tasarım sistemi
+
+Renk, boşluk, yarıçap, tipografi, gölge ve hareket token'larının tek kaynağı `packages/ui`'dir.
+
+- **Mobil** token'ları doğrudan içe aktarır; bileşenler `apps/mobile/src/components/ui` altındadır.
+- **Panel** aynı token'ları Tailwind teması olarak kullanır. `apps/admin/src/app/tokens.css` üretilen bir dosyadır, elle düzenlenmez:
+
+```bash
+npm run tokens:css --workspace @neuropeak/ui
+```
+
+CI, dosyanın token'larla uyumlu olduğunu `tokens:check` ile doğrular.
+
+Uygulama cihazın açık/koyu tercihini takip etmez: menü, test ve profil ekranları açık, oyun ekranları koyu temadadır. Oyun ekranları kendilerini `<ThemeProvider name="dark">` ile sarar.
 
 ## Gereksinimler
 
