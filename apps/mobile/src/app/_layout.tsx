@@ -5,13 +5,14 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import { fontFamily } from '@neuropeak/ui';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ThemeProvider } from '@/components/ui';
+import { ThemeProvider, useTheme } from '@/components/ui';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -39,9 +40,33 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <Stack screenOptions={{ headerShown: false }} />
+          <RootStack />
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function RootStack() {
+  const theme = useTheme();
+
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.colors.background },
+        headerStyle: { backgroundColor: theme.colors.background },
+        headerTintColor: theme.colors.textPrimary,
+        headerTitleStyle: { fontFamily: fontFamily.semibold, fontSize: 17 },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="settings"
+        options={{ headerShown: true, title: 'Ayarlar', presentation: 'modal' }}
+      />
+      <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
+    </Stack>
   );
 }
