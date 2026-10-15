@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ThemeProvider, useTheme } from '@/components/ui';
+import { ProProvider } from '@/lib/billing/context';
 import { loadOnboardingState } from '@/lib/onboarding';
 import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
 import { useSyncBootstrap } from '@/lib/sync/use-sync';
@@ -52,9 +53,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-            <RootStack />
-          </OnboardingGateProvider>
+          <ProProvider>
+            <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+              <RootStack />
+            </OnboardingGateProvider>
+          </ProProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -90,6 +93,7 @@ function RootStack() {
         />
         <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
         <Stack.Screen name="test/[id]" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
       </Stack.Protected>
     </Stack>
   );

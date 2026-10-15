@@ -10,6 +10,7 @@ import { Icon } from '@/components/icons';
 import { HeroOrbit } from '@/components/onboarding/hero-orbit';
 import { OptionRow } from '@/components/onboarding/option-row';
 import { StepProgress } from '@/components/onboarding/step-progress';
+import { PaywallView } from '@/components/paywall/paywall-view';
 import { Button, ProgressBar, Text, tapFeedback, useTheme } from '@/components/ui';
 import { CATEGORY_LABELS } from '@/data/placeholder';
 import { useOnboardingGate } from '@/lib/onboarding-context';
@@ -33,6 +34,7 @@ const STEPS = [
   'habit',
   'plan',
   'notifications',
+  'paywall',
 ] as const;
 
 type StepId = (typeof STEPS)[number];
@@ -89,11 +91,12 @@ export default function OnboardingScreen() {
         payload: finalAnswers,
         dedupeKey: 'self',
       });
-      // Kapı açılınca Stack.Protected sekmelere geçirir.
-      // Paywall PR#7'de bu akışın sonuna eklenecek.
-      setCompleted(true);
+      setSaving(false);
+      // Cevaplar kaydedildi; son adım paywall. Kapı ancak oradan çıkınca
+      // açılır, böylece onboarding yarıda kalmış sayılmaz.
+      goNext();
     },
-    [answers, setCompleted],
+    [answers, goNext],
   );
 
   const requestNotifications = useCallback(async () => {
@@ -124,6 +127,17 @@ export default function OnboardingScreen() {
         : [...current.focusAreas, category],
     }));
   };
+
+  // Paywall kendi tam ekranını çizer; onboarding kabuğunun dışında kalır.
+  if (step === 'paywall') {
+    return (
+      <PaywallView
+        variant="onboarding"
+        onDismiss={() => setCompleted(true)}
+        onPurchased={() => setCompleted(true)}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: theme.colors.background }]}>
