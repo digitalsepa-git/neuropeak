@@ -12,11 +12,11 @@ neuropeak/
 │   ├── mobile/          # Expo (React Native) — iOS + Android
 │   └── admin/           # Next.js admin panel (CMS + CRM + Analitik)
 ├── packages/
-│   ├── core/            # Skorlama motoru, seviye üreticiler, paylaşılan tipler
-│   ├── ui/              # Tasarım token'ları
-│   └── content/         # Soru bankası seed dosyaları
+│   └── core/            # Skorlama motoru, seviye üreticiler, paylaşılan tipler
 └── supabase/            # Şema, migration'lar, Edge Functions
 ```
+
+`packages/ui` (tasarım token'ları) PR#2'de, `packages/content` (soru bankası) PR#19'da eklenecek.
 
 ## Gereksinimler
 
@@ -30,13 +30,13 @@ neuropeak/
 npm install
 ```
 
-| Komut | Açıklama |
-|---|---|
-| `npm run dev:mobile` | Expo geliştirme sunucusunu başlatır |
-| `npm run dev:admin` | Admin paneli `localhost:3000` üzerinde başlatır |
-| `npm run lint` | Tüm workspace'lerde ESLint |
-| `npm run typecheck` | Tüm workspace'lerde TypeScript kontrolü |
-| `npm run test` | Birim testleri |
+| Komut                | Açıklama                                        |
+| -------------------- | ----------------------------------------------- |
+| `npm run dev:mobile` | Expo geliştirme sunucusunu başlatır             |
+| `npm run dev:admin`  | Admin paneli `localhost:3000` üzerinde başlatır |
+| `npm run lint`       | Tüm workspace'lerde ESLint                      |
+| `npm run typecheck`  | Tüm workspace'lerde TypeScript kontrolü         |
+| `npm run test`       | Birim testleri                                  |
 
 ## Çalışma düzeni
 

@@ -19,22 +19,22 @@ Referans uygulamadan farkımız: IQ Masters bir "test uygulaması + yanına oyun
 
 ## 2. Teknoloji Kararları
 
-| Katman | Seçim | Not |
-|---|---|---|
-| Mobil | **React Native + Expo (SDK 54+)** | Tek kod tabanı iOS + Android |
-| Navigasyon | Expo Router (file-based) | |
-| Dil | TypeScript (strict) | |
-| Animasyon | Reanimated 3 + Skia + Lottie | Oyun render'ı Skia ile |
-| State | Zustand + TanStack Query | |
-| Yerel depolama | MMKV + expo-sqlite | Offline cache |
-| Backend | **Supabase** (Postgres + Auth + Storage + Edge Functions + RLS) | |
-| Admin panel | **Next.js 15 (App Router) + Vercel** | Monorepo içinde |
-| Ödeme | **RevenueCat** + App Store / Play Billing | |
-| Reklam | **AdMob** (banner + interstitial + rewarded) | Feature flag ile kontrol |
-| Push | Expo Push Notifications | Panelden segment gönderimi |
-| i18n | i18next — **TR + EN** (AR/ES/PT altyapısı hazır) | |
-| Analitik | Supabase event tablosu (kendi dashboard'umuz) + RevenueCat webhook | 3. parti maliyeti yok |
-| CI/CD | GitHub Actions (lint + typecheck + test) + EAS Build | |
+| Katman         | Seçim                                                              | Not                          |
+| -------------- | ------------------------------------------------------------------ | ---------------------------- |
+| Mobil          | **React Native + Expo (SDK 54+)**                                  | Tek kod tabanı iOS + Android |
+| Navigasyon     | Expo Router (file-based)                                           |                              |
+| Dil            | TypeScript (strict)                                                |                              |
+| Animasyon      | Reanimated 3 + Skia + Lottie                                       | Oyun render'ı Skia ile       |
+| State          | Zustand + TanStack Query                                           |                              |
+| Yerel depolama | MMKV + expo-sqlite                                                 | Offline cache                |
+| Backend        | **Supabase** (Postgres + Auth + Storage + Edge Functions + RLS)    |                              |
+| Admin panel    | **Next.js 15 (App Router) + Vercel**                               | Monorepo içinde              |
+| Ödeme          | **RevenueCat** + App Store / Play Billing                          |                              |
+| Reklam         | **AdMob** (banner + interstitial + rewarded)                       | Feature flag ile kontrol     |
+| Push           | Expo Push Notifications                                            | Panelden segment gönderimi   |
+| i18n           | i18next — **TR + EN** (AR/ES/PT altyapısı hazır)                   |                              |
+| Analitik       | Supabase event tablosu (kendi dashboard'umuz) + RevenueCat webhook | 3. parti maliyeti yok        |
+| CI/CD          | GitHub Actions (lint + typecheck + test) + EAS Build               |                              |
 
 ### Monorepo yapısı
 
@@ -59,34 +59,37 @@ neuropeak/
 ### Renkler
 
 **Açık tema (menü, testler, profil)**
-| Rol | Değer |
-|---|---|
-| Zemin | `#F6F5FB` |
-| Kart | `#FFFFFF` |
-| Ana metin | `#15111F` |
-| İkincil metin | `#6F6A80` |
+
+| Rol            | Değer     |
+| -------------- | --------- |
+| Zemin          | `#F6F5FB` |
+| Kart           | `#FFFFFF` |
+| Ana metin      | `#15111F` |
+| İkincil metin  | `#6F6A80` |
 | Birincil (mor) | `#6C3BF4` |
-| Birincil koyu | `#5429D6` |
-| Ayraç | `#ECEAF4` |
+| Birincil koyu  | `#5429D6` |
+| Ayraç          | `#ECEAF4` |
 
 **Koyu tema (oyun ekranları)**
-| Rol | Değer |
-|---|---|
-| Zemin | `#120E20` |
-| Yüzey | `#1C1733` |
+
+| Rol                | Değer     |
+| ------------------ | --------- |
+| Zemin              | `#120E20` |
+| Yüzey              | `#1C1733` |
 | Yükseltilmiş yüzey | `#272047` |
-| Metin | `#F4F2FF` |
+| Metin              | `#F4F2FF` |
 
 **Kategori aksanları** (oyun kartları, beyin haritası eksenleri)
-| Kategori | Renk |
-|---|---|
-| Hafıza | `#3B82F6` mavi |
-| Odaklanma | `#F59E0B` turuncu |
-| Mantık | `#8B5CF6` mor |
-| Matematik | `#10B981` yeşil |
-| Görsel-Uzamsal | `#EC4899` pembe |
-| Hız | `#EF4444` kırmızı |
-| Sözel | `#14B8A6` turkuaz |
+
+| Kategori       | Renk              |
+| -------------- | ----------------- |
+| Hafıza         | `#3B82F6` mavi    |
+| Odaklanma      | `#F59E0B` turuncu |
+| Mantık         | `#8B5CF6` mor     |
+| Matematik      | `#10B981` yeşil   |
+| Görsel-Uzamsal | `#EC4899` pembe   |
+| Hız            | `#EF4444` kırmızı |
+| Sözel          | `#14B8A6` turkuaz |
 
 ### Diğer
 
@@ -105,13 +108,13 @@ Logo ve uygulama ikonu vektörel (SVG) olarak üretilecek. Test/oyun kart görse
 
 ## 4. Bilgi Mimarisi — 5 Sekme
 
-| Sekme | İçerik |
-|---|---|
+| Sekme         | İçerik                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **Ana Sayfa** | Günlük görevler (3), seri sayacı, günün önerilen oyunu/testi, NeuroPeak skoru özeti, lig durumu kartı, devam eden seviye |
-| **Oyunlar** | 7 kategori × 28 oyun, filtre çipleri, her oyunda seviye ilerlemesi ve en yüksek skor |
-| **Testler** | 11 test, kategori filtreleri (Popüler / IQ Testleri / Eğlence / Profil) |
-| **İlerleme** | Beyin haritası radar grafiği, NeuroPeak skoru geçmişi, kategori bazlı istatistikler, rozet vitrini, test geçmişi |
-| **Lig** | Haftalık lig tablosu (30 kişilik grup), terfi/düşme bölgeleri, global ve ülke sıralaması |
+| **Oyunlar**   | 7 kategori × 28 oyun, filtre çipleri, her oyunda seviye ilerlemesi ve en yüksek skor                                     |
+| **Testler**   | 11 test, kategori filtreleri (Popüler / IQ Testleri / Eğlence / Profil)                                                  |
+| **İlerleme**  | Beyin haritası radar grafiği, NeuroPeak skoru geçmişi, kategori bazlı istatistikler, rozet vitrini, test geçmişi         |
+| **Lig**       | Haftalık lig tablosu (30 kişilik grup), terfi/düşme bölgeleri, global ve ülke sıralaması                                 |
 
 Üst bar: yıldız bakiyesi · PRO rozeti · ayarlar.
 
@@ -120,23 +123,28 @@ Logo ve uygulama ikonu vektörel (SVG) olarak üretilecek. Test/oyun kart görse
 ## 5. Oyunlaştırma Sistemi
 
 ### 5.1 XP ve Seviye
+
 - Her oyun seansı ve test XP kazandırır
 - Zorluk çarpanı: Kolay ×1.0 · Orta ×1.25 · Zor ×2.25
 - Kullanıcı seviyesi 1–100, logaritmik eğri
 - Seviye atlamada tam ekran kutlama + yıldız ödülü
 
 ### 5.2 Günlük Seri (Streak)
+
 - Günde en az 1 oyun veya test → seri devam
 - 3 / 7 / 14 / 30 / 100 gün kilometre taşlarında özel ödül
 - **Seri dondurma:** 1 gün kaçırmayı affeder, yıldızla satın alınır (PRO'da aylık 2 ücretsiz)
 
 ### 5.3 Beyin Haritası (5 eksen)
+
 Radar grafiği: **Hafıza · Odaklanma · Mantık · Hız · Problem Çözme**, her eksen 0–100.
 
 **NeuroPeak Skoru** = bu 5 eksenin ağırlıklı ortalaması. Oynadıkça büyür, oynamayınca haftada %1 azalır (geri gelme motivasyonu). Paylaşılabilir görsel kart olarak dışa aktarılır — organik yayılımın ana motoru.
 
 ### 5.4 Rozetler
+
 ~40 rozet, 4 kademeli (Bronz/Gümüş/Altın/Platin):
+
 - İlerleme rozetleri ("100 seviye tamamla")
 - Ustalık rozetleri ("Stroop'ta 50 doğru üst üste")
 - Seri rozetleri
@@ -144,6 +152,7 @@ Radar grafiği: **Hafıza · Odaklanma · Mantık · Hız · Problem Çözme**, 
 - Gizli rozetler (sürpriz tetikleyiciler)
 
 ### 5.5 Lig Sistemi
+
 - 6 kademe: **Bronz → Gümüş → Altın → Platin → Elmas → Efsane**
 - Her hafta pazartesi 00:00'da 30 kişilik gruplara dağıtım
 - Haftalık XP'ye göre sıralama. İlk 10 terfi, son 5 düşer
@@ -152,17 +161,19 @@ Radar grafiği: **Hafıza · Odaklanma · Mantık · Hız · Problem Çözme**, 
 - Ayrıca **global** ve **ülke bazlı** NeuroPeak skoru sıralaması
 
 ### 5.6 Yıldız Ekonomisi
-| Kazanma | Harcama |
-|---|---|
-| Oyun/test tamamlama | İpucu (oyun içi) |
-| Günlük görevler (3/gün) | Geri al / seviye atla |
-| Günlük giriş takvimi (7 günlük döngü) | Seri dondurma |
-| Ödüllü reklam izleme | Avatar / tema kilidi açma |
-| Seviye atlama, rozet | |
+
+| Kazanma                               | Harcama                   |
+| ------------------------------------- | ------------------------- |
+| Oyun/test tamamlama                   | İpucu (oyun içi)          |
+| Günlük görevler (3/gün)               | Geri al / seviye atla     |
+| Günlük giriş takvimi (7 günlük döngü) | Seri dondurma             |
+| Ödüllü reklam izleme                  | Avatar / tema kilidi açma |
+| Seviye atlama, rozet                  |                           |
 
 PRO üyelikte yıldız harcaması yok — tüm yardımlar sınırsız.
 
 ### 5.7 Günlük Görevler
+
 Her gün 3 görev, gece yarısı yenilenir. Örnek: "2 hafıza oyunu oyna", "500 XP kazan", "Bir testi tamamla". Üçünü bitirince bonus sandık.
 
 ---
@@ -172,60 +183,67 @@ Her gün 3 görev, gece yarısı yenilenir. Örnek: "2 hafıza oyunu oyna", "500
 > Yapı: **Seviyeli** oyunlar prosedürel üretilmiş (seed'li, herkeste aynı) uzun seviye listesine sahip. **Süreli** oyunlar 45–60 saniyelik skor modunda, lider tablosuna bağlı.
 
 ### Hafıza (5)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 1 | Kart Eşleme | Seviyeli | Klasik hafıza kartları, artan grid boyutu |
-| 2 | N-Geri | Süreli | N-back; 1-back'ten başlar, performansa göre yükselir |
-| 3 | Işık Dizisi | Sonsuz | Simon tarzı, her turda bir uzayan dizi |
-| 4 | Sayı Menzili | Adaptif | Digit span — doğru oldukça uzayan sayı dizisi |
-| 5 | Nerede Kaldı? | Seviyeli | Izgarada yanıp sönen hücrelerin konumunu hatırlama |
+
+| #   | Oyun          | Yapı     | Açıklama                                             |
+| --- | ------------- | -------- | ---------------------------------------------------- |
+| 1   | Kart Eşleme   | Seviyeli | Klasik hafıza kartları, artan grid boyutu            |
+| 2   | N-Geri        | Süreli   | N-back; 1-back'ten başlar, performansa göre yükselir |
+| 3   | Işık Dizisi   | Sonsuz   | Simon tarzı, her turda bir uzayan dizi               |
+| 4   | Sayı Menzili  | Adaptif  | Digit span — doğru oldukça uzayan sayı dizisi        |
+| 5   | Nerede Kaldı? | Seviyeli | Izgarada yanıp sönen hücrelerin konumunu hatırlama   |
 
 ### Odaklanma / Dikkat (5)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 6 | Renk Tuzağı | Süreli | Stroop testi — kelime/renk çelişkisi |
-| 7 | Farklı Olanı Bul | Süreli | Izgarada tek farklı tonu bulma, zorlaşan kontrast |
-| 8 | Simge Avı | Süreli | Schulte tablosu — sırayla hedefleri bulma |
-| 9 | Dur / Geç | Süreli | Go/No-Go — dürtü kontrolü |
-| 10 | Çoklu Takip | Seviyeli | Hareket eden nesneler arasında hedefleri takip etme |
+
+| #   | Oyun             | Yapı     | Açıklama                                            |
+| --- | ---------------- | -------- | --------------------------------------------------- |
+| 6   | Renk Tuzağı      | Süreli   | Stroop testi — kelime/renk çelişkisi                |
+| 7   | Farklı Olanı Bul | Süreli   | Izgarada tek farklı tonu bulma, zorlaşan kontrast   |
+| 8   | Simge Avı        | Süreli   | Schulte tablosu — sırayla hedefleri bulma           |
+| 9   | Dur / Geç        | Süreli   | Go/No-Go — dürtü kontrolü                           |
+| 10  | Çoklu Takip      | Seviyeli | Hareket eden nesneler arasında hedefleri takip etme |
 
 ### Mantık & Problem Çözme (6)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 11 | Matris Bulmaca | Seviyeli | Raven tarzı 3×3 örüntü tamamlama |
-| 12 | Sıvı Sıralama | Seviyeli | Ball sort / renk ayırma, prosedürel üretim |
-| 13 | Tek Çizgi | Seviyeli | Kalemi kaldırmadan şekli çizme (Euler yolu) |
-| 14 | Bağlantı | Seviyeli | Aynı renk noktaları çakışmadan bağlama (flow) |
-| 15 | Doğru Yolu Seç | Seviyeli | Labirent / yön mantığı |
-| 16 | Mantık Zinciri | Seviyeli | "Eğer–ise" çıkarım bulmacaları |
+
+| #   | Oyun           | Yapı     | Açıklama                                      |
+| --- | -------------- | -------- | --------------------------------------------- |
+| 11  | Matris Bulmaca | Seviyeli | Raven tarzı 3×3 örüntü tamamlama              |
+| 12  | Sıvı Sıralama  | Seviyeli | Ball sort / renk ayırma, prosedürel üretim    |
+| 13  | Tek Çizgi      | Seviyeli | Kalemi kaldırmadan şekli çizme (Euler yolu)   |
+| 14  | Bağlantı       | Seviyeli | Aynı renk noktaları çakışmadan bağlama (flow) |
+| 15  | Doğru Yolu Seç | Seviyeli | Labirent / yön mantığı                        |
+| 16  | Mantık Zinciri | Seviyeli | "Eğer–ise" çıkarım bulmacaları                |
 
 ### Matematik (4)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 17 | Hızlı İşlem | Süreli | 60 saniyede maksimum doğru işlem |
-| 18 | Sayı Dizisi | Seviyeli | Örüntüyü bul, eksik sayıyı tamamla |
-| 19 | Terazi | Seviyeli | Eşitliği kurma / denge bulmacası |
-| 20 | Hedef Sayı | Seviyeli | 4 sayı ve 4 işlemle hedefe ulaşma (24 oyunu) |
+
+| #   | Oyun        | Yapı     | Açıklama                                     |
+| --- | ----------- | -------- | -------------------------------------------- |
+| 17  | Hızlı İşlem | Süreli   | 60 saniyede maksimum doğru işlem             |
+| 18  | Sayı Dizisi | Seviyeli | Örüntüyü bul, eksik sayıyı tamamla           |
+| 19  | Terazi      | Seviyeli | Eşitliği kurma / denge bulmacası             |
+| 20  | Hedef Sayı  | Seviyeli | 4 sayı ve 4 işlemle hedefe ulaşma (24 oyunu) |
 
 ### Görsel-Uzamsal (4)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 21 | Şekil Döndürme | Süreli | Zihinsel rotasyon — aynı mı, ayna mı? |
-| 22 | Katla-Aç | Seviyeli | Kağıt katlama / delme tahmini |
-| 23 | Parça Birleştir | Seviyeli | Tangram / blok yerleştirme |
-| 24 | Gölge Eşleştir | Süreli | Nesne–siluet eşleştirme |
+
+| #   | Oyun            | Yapı     | Açıklama                              |
+| --- | --------------- | -------- | ------------------------------------- |
+| 21  | Şekil Döndürme  | Süreli   | Zihinsel rotasyon — aynı mı, ayna mı? |
+| 22  | Katla-Aç        | Seviyeli | Kağıt katlama / delme tahmini         |
+| 23  | Parça Birleştir | Seviyeli | Tangram / blok yerleştirme            |
+| 24  | Gölge Eşleştir  | Süreli   | Nesne–siluet eşleştirme               |
 
 ### Hız / Refleks (2)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 25 | Reaksiyon | Süreli | Saf tepki süresi ölçümü, milisaniye hassasiyeti |
-| 26 | Hızlı Karar | Süreli | Sembol karşılaştırma — büyük/küçük, aynı/farklı |
+
+| #   | Oyun        | Yapı   | Açıklama                                        |
+| --- | ----------- | ------ | ----------------------------------------------- |
+| 25  | Reaksiyon   | Süreli | Saf tepki süresi ölçümü, milisaniye hassasiyeti |
+| 26  | Hızlı Karar | Süreli | Sembol karşılaştırma — büyük/küçük, aynı/farklı |
 
 ### Sözel (2)
-| # | Oyun | Yapı | Açıklama |
-|---|---|---|---|
-| 27 | Kelime Avı | Seviyeli | Anagram / harflerden kelime üretme (TR + EN sözlük) |
-| 28 | Sözel Analoji | Seviyeli | "A : B :: C : ?" ilişki kurma |
+
+| #   | Oyun          | Yapı     | Açıklama                                            |
+| --- | ------------- | -------- | --------------------------------------------------- |
+| 27  | Kelime Avı    | Seviyeli | Anagram / harflerden kelime üretme (TR + EN sözlük) |
+| 28  | Sözel Analoji | Seviyeli | "A : B :: C : ?" ilişki kurma                       |
 
 Her oyun ekranının ortak iskeleti: üst bar (duraklat · seviye · skor · reklamsız · ses) → talimat balonu → oyun alanı → alt araç çubuğu (ipucu · geri al, yıldız bakiyesi ile).
 
@@ -235,24 +253,26 @@ Oyun öncesi brifing ekranı: oyun ikonu, zorluk seçimi (Kolay / Orta / Zor + X
 
 ## 7. Testler — 11 Test
 
-| Test | Soru | Süre | Erişim |
-|---|---|---|---|
-| **Temel IQ Testi** | 20 | ~10 dk | Ücretsiz (giriş testi) |
-| **İleri IQ Testi** | 60 | ~18 dk | PRO |
-| **Görsel IQ Testi** | 30 | ~12 dk | PRO |
-| **Sayısal IQ Testi** | 30 | ~12 dk | PRO |
-| **Sözel IQ Testi** | 25 | ~10 dk | PRO |
-| **Hızlı IQ Testi** | 12 | ~5 dk | PRO |
-| **Mantıksal Akıl Yürütme** | 25 | ~10 dk | PRO |
-| **Beyin Yaşı Testi** | 15 + 2 mini oyun | ~8 dk | PRO |
-| **Zihin Arketipi** | 24 | ~7 dk | PRO |
-| **Odaklanma Profili** | 20 | ~8 dk | PRO |
-| **Kişilik Haritası** | 30 | ~10 dk | PRO |
+| Test                       | Soru             | Süre   | Erişim                 |
+| -------------------------- | ---------------- | ------ | ---------------------- |
+| **Temel IQ Testi**         | 20               | ~10 dk | Ücretsiz (giriş testi) |
+| **İleri IQ Testi**         | 60               | ~18 dk | PRO                    |
+| **Görsel IQ Testi**        | 30               | ~12 dk | PRO                    |
+| **Sayısal IQ Testi**       | 30               | ~12 dk | PRO                    |
+| **Sözel IQ Testi**         | 25               | ~10 dk | PRO                    |
+| **Hızlı IQ Testi**         | 12               | ~5 dk  | PRO                    |
+| **Mantıksal Akıl Yürütme** | 25               | ~10 dk | PRO                    |
+| **Beyin Yaşı Testi**       | 15 + 2 mini oyun | ~8 dk  | PRO                    |
+| **Zihin Arketipi**         | 24               | ~7 dk  | PRO                    |
+| **Odaklanma Profili**      | 20               | ~8 dk  | PRO                    |
+| **Kişilik Haritası**       | 30               | ~10 dk | PRO                    |
 
 ### Soru tipleri
+
 Matris/örüntü · sayı dizisi · şekil analojisi · sözel analoji · mantık çıkarımı · uzamsal rotasyon · kodlama/şifre · sınıflandırma (farklı olanı bul) · aritmetik akıl yürütme
 
 ### Skorlama motoru
+
 **Norm tabanlı standart skor** — ortalama 100, standart sapma 15.
 
 ```
@@ -267,8 +287,10 @@ yüzdelik_dilim = Φ(z) × 100
 - Sonuç ekranı: animasyonlu skor sayacı → yüzdelik dilim ("%87'sinden daha iyisin") → çan eğrisi üzerinde konum → alt boyut barları → **paylaş** butonu → detaylı rapor (PRO kilidi)
 
 ### Yasal
+
 Her test sonucunda ve mağaza açıklamasında görünür ibare:
-> *Bu test eğlence ve zihinsel egzersiz amaçlıdır. Klinik veya psikometrik bir teşhis aracı değildir.*
+
+> _Bu test eğlence ve zihinsel egzersiz amaçlıdır. Klinik veya psikometrik bir teşhis aracı değildir._
 
 ---
 
@@ -288,21 +310,24 @@ Her test sonucunda ve mağaza açıklamasında görünür ibare:
 ## 9. Para Kazanma
 
 ### Planlar (RevenueCat)
-| Plan | Fiyat (TR) | Not |
-|---|---|---|
-| Haftalık | ~₺349,99 | 3 gün ücretsiz deneme |
-| Yıllık | ~₺999,99 | Haftalığa bölünmüş gösterilir, "%94 tasarruf" |
-| Yıllık (indirimli) | ~₺199,99 | Sadece çıkış kuponu ekranında |
+
+| Plan               | Fiyat (TR) | Not                                           |
+| ------------------ | ---------- | --------------------------------------------- |
+| Haftalık           | ~₺349,99   | 3 gün ücretsiz deneme                         |
+| Yıllık             | ~₺999,99   | Haftalığa bölünmüş gösterilir, "%94 tasarruf" |
+| Yıllık (indirimli) | ~₺199,99   | Sadece çıkış kuponu ekranında                 |
 
 Fiyatlar ülke bazlı ayarlanır (TR/AR/BR ucuz, US/EU/UK yüksek).
 
 ### Paywall noktaları
+
 1. **Onboarding sonu** — 3 gün ücretsiz deneme, geçilebilir
 2. **Test sonucu** — skor görünür, **detaylı rapor kilitli**
 3. **Çıkış kuponu** — paywall kapatılınca tek seferlik %80 indirim, geri sayımlı
 4. **Özellik kapıları** — İleri testler, reklamsız mod, sınırsız yıldız, beyin haritası geçmişi
 
 ### Ücretsiz katman
+
 - Tüm 28 oyun oynanabilir (reklamlı)
 - Temel IQ Testi tam erişim: **skor + yüzdelik dilim görünür**, detaylı rapor kilitli
 - Günde 3 ödüllü reklam ile yıldız kazanımı
@@ -310,6 +335,7 @@ Fiyatlar ülke bazlı ayarlanır (TR/AR/BR ucuz, US/EU/UK yüksek).
 - Banner (menü ekranları) + interstitial (her 3 oyun seansında bir)
 
 ### PRO
+
 Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve ipucu · beyin haritası geçmişi ve trend grafiği · özel avatar/tema · aylık 2 ücretsiz seri dondurma
 
 ---
@@ -319,6 +345,7 @@ Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve 
 **Erişim:** Tek admin hesabı, Supabase Auth (e-posta + şifre). Rol altyapısı (admin/editör/görüntüleyici) baştan kurulur, ileride ekip eklenebilir.
 
 ### 10.1 CMS — İçerik Yönetimi
+
 - **Testler:** oluştur / düzenle / yayından kaldır, sıralama, kategori, erişim seviyesi (free/PRO)
 - **Sorular:** zengin editör, şık yönetimi, doğru cevap, zorluk ağırlığı, açıklama metni, görsel yükleme, **TR/EN çeviri alanları yan yana**
 - **Telefon önizlemesi:** soruyu gerçek cihaz mockup'ında anında gör
@@ -327,6 +354,7 @@ Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve 
 - **Sürüm geçmişi:** her değişiklik kayıtlı, geri alınabilir
 
 ### 10.2 CRM — Kullanıcı Yönetimi
+
 - Kullanıcı listesi: filtre + arama (ülke, plan, seviye, son görülme)
 - Kullanıcı detayı: test geçmişi, beyin haritası, seviye, seri, yıldız bakiyesi, abonelik durumu ve ödeme geçmişi
 - **Segment oluşturucu:** "3 gündür girmeyenler", "denemesi bitmiş ama abone olmamışlar", "Elmas ligdekiler"
@@ -334,6 +362,7 @@ Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve 
 - Manuel müdahale: yıldız hediye et, PRO hediye et, hesap dondur
 
 ### 10.3 Analitik Dashboard
+
 - DAU / WAU / MAU, yeni kullanıcı
 - Retention eğrisi (D1 / D7 / D30)
 - **Onboarding funnel** — hangi adımda düşüyorlar
@@ -343,6 +372,7 @@ Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve 
 - Gelir: MRR, deneme dönüşümü, iptal oranı (RevenueCat webhook)
 
 ### 10.4 Uzaktan Kontrol
+
 - **Feature flag:** her oyunu/testi/özelliği uygulama güncellemesi olmadan aç-kapat
 - **Paywall yönetimi:** başlık, alt metin, indirim oranı, geri sayım süresi, görsel varyant
 - **A/B test:** iki varyantı yüzde dağılımıyla canlıya al, sonuçları dashboard'da karşılaştır
@@ -356,6 +386,7 @@ Reklamsız · tüm testler · tüm detaylı raporlar · sınırsız yıldız ve 
 Tüm içerik (test soruları, oyun seviye parametreleri, metinler) **geliştirme sırasında AI ile üretilip** kalite kontrolünden geçirilerek veritabanına yüklenir. Panelde canlı AI üretimi yok — panel düzenleme, yayınlama ve yönetim için.
 
 **Hedef hacim (V1):**
+
 - ~900 test sorusu (11 test × ortalama 80 soru havuzu, her oturumda rastgele alt küme)
 - Her soru TR + EN
 - Oyun seviyeleri prosedürel üretilir — seed'li, sonsuz, her cihazda aynı
@@ -366,14 +397,14 @@ Tüm içerik (test soruları, oyun seviye parametreleri, metinler) **geliştirme
 
 ## 12. Push Bildirim Stratejisi
 
-| Tür | Tetikleyici | Örnek |
-|---|---|---|
-| Seri hatırlatma | Günlük 20:00 (kullanıcının aktif saatine göre) | "7 günlük serin bitmek üzere!" |
-| Günlük görev | Sabah 10:00 | "Bugünün 3 görevi hazır" |
-| Yeni içerik | Panelden manuel | "Yeni test: Görsel Hafıza" |
-| Lig | Sıralama değişimi, hafta sonu | "Sıralaman 12'ye düştü" |
-| Win-back | 7 gün inaktif | "Beyin skorun düşüyor, geri dön" |
-| Kampanya | Panelden segment seçimi | "Sana özel %80 indirim" |
+| Tür             | Tetikleyici                                    | Örnek                            |
+| --------------- | ---------------------------------------------- | -------------------------------- |
+| Seri hatırlatma | Günlük 20:00 (kullanıcının aktif saatine göre) | "7 günlük serin bitmek üzere!"   |
+| Günlük görev    | Sabah 10:00                                    | "Bugünün 3 görevi hazır"         |
+| Yeni içerik     | Panelden manuel                                | "Yeni test: Görsel Hafıza"       |
+| Lig             | Sıralama değişimi, hafta sonu                  | "Sıralaman 12'ye düştü"          |
+| Win-back        | 7 gün inaktif                                  | "Beyin skorun düşüyor, geri dön" |
+| Kampanya        | Panelden segment seçimi                        | "Sana özel %80 indirim"          |
 
 Frekans sınırı: günde en fazla 2 bildirim.
 
@@ -389,27 +420,27 @@ Frekans sınırı: günde en fazla 2 bildirim.
 
 ### PR Yol Haritası
 
-| PR | İçerik |
-|---|---|
-| **#1** | Monorepo kurulumu, Expo + Next.js iskeleti, TypeScript, lint, CI |
-| **#2** | Tasarım sistemi: renk/tipografi/boşluk token'ları, temel bileşenler (buton, kart, çip, modal, progress) |
-| **#3** | Navigasyon + 5 sekme iskeleti, boş ekranlar, üst bar |
-| **#4** | Onboarding akışı (8 adım) + animasyonlar |
-| **#5** | Supabase şeması, RLS, auth (opsiyonel hesap), offline sync katmanı |
-| **#6** | Skorlama motoru + Temel IQ Testi uçtan uca (soru → sonuç ekranı) |
-| **#7** | Paywall ekranları (3 nokta) + RevenueCat entegrasyonu |
-| **#8** | Oyunlaştırma çekirdeği: XP, seviye, seri, yıldız, günlük görevler |
-| **#9–#15** | Mini oyunlar (kategori kategori, her PR'da 3-5 oyun) |
-| **#16** | Beyin haritası + İlerleme sekmesi |
-| **#17** | Lig sistemi + lider tabloları |
-| **#18** | Rozet sistemi |
-| **#19** | Kalan 10 test + içerik yükleme |
-| **#20** | AdMob entegrasyonu + feature flag |
-| **#21** | Admin panel: CMS |
-| **#22** | Admin panel: CRM + push |
-| **#23** | Admin panel: Analitik + uzaktan kontrol |
-| **#24** | i18n EN tamamlama, mağaza varlıkları, ikon, ekran görüntüleri |
-| **#25** | Yayın hazırlığı: TestFlight, gizlilik politikası, App Store metinleri |
+| PR         | İçerik                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| **#1**     | Monorepo kurulumu, Expo + Next.js iskeleti, TypeScript, lint, CI                                        |
+| **#2**     | Tasarım sistemi: renk/tipografi/boşluk token'ları, temel bileşenler (buton, kart, çip, modal, progress) |
+| **#3**     | Navigasyon + 5 sekme iskeleti, boş ekranlar, üst bar                                                    |
+| **#4**     | Onboarding akışı (8 adım) + animasyonlar                                                                |
+| **#5**     | Supabase şeması, RLS, auth (opsiyonel hesap), offline sync katmanı                                      |
+| **#6**     | Skorlama motoru + Temel IQ Testi uçtan uca (soru → sonuç ekranı)                                        |
+| **#7**     | Paywall ekranları (3 nokta) + RevenueCat entegrasyonu                                                   |
+| **#8**     | Oyunlaştırma çekirdeği: XP, seviye, seri, yıldız, günlük görevler                                       |
+| **#9–#15** | Mini oyunlar (kategori kategori, her PR'da 3-5 oyun)                                                    |
+| **#16**    | Beyin haritası + İlerleme sekmesi                                                                       |
+| **#17**    | Lig sistemi + lider tabloları                                                                           |
+| **#18**    | Rozet sistemi                                                                                           |
+| **#19**    | Kalan 10 test + içerik yükleme                                                                          |
+| **#20**    | AdMob entegrasyonu + feature flag                                                                       |
+| **#21**    | Admin panel: CMS                                                                                        |
+| **#22**    | Admin panel: CRM + push                                                                                 |
+| **#23**    | Admin panel: Analitik + uzaktan kontrol                                                                 |
+| **#24**    | i18n EN tamamlama, mağaza varlıkları, ikon, ekran görüntüleri                                           |
+| **#25**    | Yayın hazırlığı: TestFlight, gizlilik politikası, App Store metinleri                                   |
 
 ---
 

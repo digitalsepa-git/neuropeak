@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+.expo/
+ios/
+android/
+*.lock
+package-lock.json
+apps/mobile/assets/
+apps/admin/public/
+
+# Üretilen tip tanımları
+next-env.d.ts
+expo-env.d.ts
