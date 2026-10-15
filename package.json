@@ -1,0 +1,29 @@
+{
+  "name": "neuropeak",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NeuroPeak: IQ Arena — oyunlaştırılmış IQ testi ve beyin antrenmanı uygulaması",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:mobile": "npm run start --workspace @neuropeak/mobile",
+    "dev:admin": "npm run dev --workspace @neuropeak/admin",
+    "build:admin": "npm run build --workspace @neuropeak/admin",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.4"
+  }
+}

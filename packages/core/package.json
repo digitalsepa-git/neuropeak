@@ -1,0 +1,22 @@
+{
+  "name": "@neuropeak/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Paylaşılan alan modeli, skorlama motoru ve yardımcılar",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "typescript-eslint": "^8.71.2"
+  }
+}
