@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon } from '@/components/icons';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import { USER } from '@/data/placeholder';
+import { usePro } from '@/lib/billing/context';
 
 /**
  * Her sekmenin üstündeki bar: ekran başlığı, yıldız bakiyesi, PRO rozeti
@@ -13,6 +14,7 @@ import { USER } from '@/data/placeholder';
 export function AppHeader({ title }: { title: string }) {
   const theme = useTheme();
   const router = useRouter();
+  const { isPro } = usePro();
 
   return (
     <View style={styles.row}>
@@ -25,13 +27,13 @@ export function AppHeader({ title }: { title: string }) {
         <Text variant="caption">{USER.starBalance}</Text>
       </View>
 
-      {!USER.isPro && (
+      {!isPro && (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="PRO'ya geç"
           onPress={() => {
             tapFeedback();
-            // Paywall PR#7'de bağlanacak.
+            router.push({ pathname: '/paywall', params: { variant: 'generic' } });
           }}
           style={[styles.pill, { backgroundColor: theme.colors.brand }]}
         >

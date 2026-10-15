@@ -8,6 +8,7 @@ import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
+import { usePro } from '@/lib/billing/context';
 
 const FILTERS = [
   { id: 'all', label: 'Tümü' },
@@ -72,16 +73,17 @@ export default function TestsScreen() {
 function TestCard({ test }: { test: PlaceholderTest }) {
   const theme = useTheme();
   const router = useRouter();
+  const { isPro } = usePro();
 
   return (
     <Card
       accessibilityLabel={test.title}
       onPress={() => {
-        // PRO testler paywall'a gidecek (PR#7); şimdilik yalnızca ücretsiz
-        // test açılıyor.
-        if (!test.pro) {
-          router.push({ pathname: '/test/[id]', params: { id: test.id } });
+        if (test.pro && !isPro) {
+          router.push({ pathname: '/paywall', params: { variant: 'generic' } });
+          return;
         }
+        router.push({ pathname: '/test/[id]', params: { id: test.id } });
       }}
     >
       <View style={styles.row}>
@@ -97,7 +99,7 @@ function TestCard({ test }: { test: PlaceholderTest }) {
           </Text>
         </View>
         <Icon
-          name={test.pro ? 'lock' : 'chevronRight'}
+          name={test.pro && !isPro ? 'lock' : 'chevronRight'}
           color={theme.colors.textMuted}
           size={test.pro ? 18 : 20}
         />

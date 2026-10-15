@@ -5,6 +5,8 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Icon, type IconName } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Card, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { setDevProOverride } from '@/lib/billing';
+import { usePro } from '@/lib/billing/context';
 import { resetOnboarding } from '@/lib/onboarding';
 import { useOnboardingGate } from '@/lib/onboarding-context';
 
@@ -19,6 +21,7 @@ type Row = {
 export default function SettingsScreen() {
   const router = useRouter();
   const { setCompleted } = useOnboardingGate();
+  const { isPro, refresh } = usePro();
 
   const preferences: Row[] = [
     { id: 'sound', label: 'Ses', value: 'Açık', icon: 'sound' },
@@ -47,6 +50,17 @@ export default function SettingsScreen() {
         void resetOnboarding().then(() => {
           setCompleted(false);
         });
+      },
+    },
+    {
+      // Yalnızca geliştirme derlemelerinde çalışır; setDevProOverride
+      // yayın derlemesinde hiçbir şey yapmaz.
+      id: 'toggle-pro',
+      label: 'PRO durumunu değiştir',
+      value: isPro ? 'Açık' : 'Kapalı',
+      icon: 'star',
+      onPress: () => {
+        void setDevProOverride(!isPro).then(() => refresh());
       },
     },
   ];

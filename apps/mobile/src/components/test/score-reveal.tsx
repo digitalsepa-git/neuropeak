@@ -6,6 +6,7 @@ import {
   type ScoreResult,
 } from '@neuropeak/core';
 import { spacing } from '@neuropeak/ui';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -13,6 +14,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Icon } from '@/components/icons';
 import { BellCurve } from '@/components/test/bell-curve';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
+import { usePro } from '@/lib/billing/context';
 
 const BAND_LABELS: Record<ScoreResult['band'], string> = {
   developing: 'Gelişime açık',
@@ -66,11 +68,19 @@ type ScoreRevealProps = {
 
 export function ScoreReveal({ result, testTitle, onDone }: ScoreRevealProps) {
   const theme = useTheme();
+  const router = useRouter();
+  const { isPro } = usePro();
   const displayed = useCountUp(result.iq);
 
   const availableDimensions = REPORT_DIMENSIONS.filter(
     (dimension) => result.subscores[dimension] !== undefined,
   );
+
+  const ranked = [...availableDimensions].sort(
+    (a, b) => (result.subscores[b] ?? 0) - (result.subscores[a] ?? 0),
+  );
+  const strongest = ranked[0];
+  const weakest = ranked.length > 1 ? ranked[ranked.length - 1] : undefined;
 
   return (
     <Screen scroll>
@@ -135,18 +145,48 @@ export function ScoreReveal({ result, testTitle, onDone }: ScoreRevealProps) {
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(600).duration(300)} style={styles.section}>
-        <Card padding="lg">
-          <View style={styles.lockedHead}>
-            <Icon name="lock" color={theme.colors.brand} size={20} />
-            <Text variant="subheading">Detaylı rapor</Text>
-          </View>
-          <Text variant="bodySmall" color="textSecondary" style={styles.lockedBody}>
-            Güçlü ve zayıf alanlarının açıklaması, yaş grubuna göre karşılaştırma ve sana özel
-            gelişim planı PRO ile açılır.
-          </Text>
-          {/* Paywall PR#7'de bağlanacak. */}
-          <Button label="PRO ile aç" size="md" onPress={() => {}} />
-        </Card>
+        {isPro ? (
+          <Card padding="lg">
+            <Text variant="subheading" style={styles.lockedBody}>
+              Senin için öne çıkanlar
+            </Text>
+            {strongest !== undefined && (
+              <Text variant="bodySmall" color="textSecondary">
+                En güçlü alanın{' '}
+                <Text variant="bodySmall" color="brand">
+                  {DIMENSION_LABELS[strongest]}
+                </Text>{' '}
+                ({result.subscores[strongest]}). Bu alandaki oyunlarda zorluk seviyeni
+                yükseltebilirsin.
+              </Text>
+            )}
+            {weakest !== undefined && (
+              <Text variant="bodySmall" color="textSecondary" style={styles.proLine}>
+                En çok gelişime açık alanın{' '}
+                <Text variant="bodySmall" color="brand">
+                  {DIMENSION_LABELS[weakest]}
+                </Text>{' '}
+                ({result.subscores[weakest]}). Günlük planına bu kategoriden bir oyun eklendi.
+              </Text>
+            )}
+          </Card>
+        ) : (
+          <Card padding="lg">
+            <View style={styles.lockedHead}>
+              <Icon name="lock" color={theme.colors.brand} size={20} />
+              <Text variant="subheading">Detaylı rapor</Text>
+            </View>
+            <Text variant="bodySmall" color="textSecondary" style={styles.lockedBody}>
+              Güçlü ve zayıf alanlarının açıklaması, yaş grubuna göre karşılaştırma ve sana özel
+              gelişim planı PRO ile açılır.
+            </Text>
+            <Button
+              label="PRO ile aç"
+              size="md"
+              onPress={() => router.push({ pathname: '/paywall', params: { variant: 'result' } })}
+            />
+          </Card>
+        )}
       </Animated.View>
 
       <Text variant="caption" color="textMuted" align="center" style={styles.disclaimer}>
@@ -191,6 +231,9 @@ const styles = StyleSheet.create({
   },
   lockedBody: {
     marginBottom: spacing.md,
+  },
+  proLine: {
+    marginTop: spacing.sm,
   },
   lockedHead: {
     alignItems: 'center',
