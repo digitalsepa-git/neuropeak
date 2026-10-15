@@ -37,14 +37,7 @@ export default function ShowcaseScreen() {
   const [filter, setFilter] = useState<string>(FILTERS[0]);
 
   return (
-    <Screen scroll>
-      <View style={styles.header}>
-        <Text variant="overline" color="brand">
-          NeuroPeak: IQ Arena
-        </Text>
-        <Text variant="title">Tasarım Sistemi</Text>
-      </View>
-
+    <Screen scroll edges={['left', 'right']}>
       <Section title="Tipografi">
         <Card>
           {TEXT_VARIANTS.map((variant) => (
@@ -170,10 +163,6 @@ const styles = StyleSheet.create({
   },
   darkActions: {
     marginTop: spacing.md,
-  },
-  header: {
-    gap: spacing.xs2,
-    paddingTop: spacing.md,
   },
   row: {
     alignItems: 'center',
