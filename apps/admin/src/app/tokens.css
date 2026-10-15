@@ -1,0 +1,118 @@
+/*
+ * ÜRETİLEN DOSYA — elle düzenlemeyin.
+ * Kaynak: packages/ui · Yeniden üretmek için: npm run tokens:css --workspace @neuropeak/ui
+ */
+
+:root {
+  --np-background: #f6f5fb;
+  --np-surface: #ffffff;
+  --np-surface-elevated: #ffffff;
+  --np-surface-sunken: #eceaf4;
+  --np-text-primary: #15111f;
+  --np-text-secondary: #6f6a80;
+  --np-text-muted: #9d98ad;
+  --np-border: #eceaf4;
+  --np-brand: #6c3bf4;
+  --np-brand-strong: #5429d6;
+  --np-on-brand: #ffffff;
+  --np-success: #059669;
+  --np-danger: #dc2626;
+  --np-warning: #f59e0b;
+  --np-info: #3b82f6;
+  --np-overlay: rgba(21, 17, 31, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --np-background: #120e20;
+    --np-surface: #1c1733;
+    --np-surface-elevated: #272047;
+    --np-surface-sunken: #352c5c;
+    --np-text-primary: #f4f2ff;
+    --np-text-secondary: #a8a2c4;
+    --np-text-muted: #9d98ad;
+    --np-border: #352c5c;
+    --np-brand: #8d6af8;
+    --np-brand-strong: #a88df9;
+    --np-on-brand: #120e20;
+    --np-success: #10b981;
+    --np-danger: #ef4444;
+    --np-warning: #f59e0b;
+    --np-info: #3b82f6;
+    --np-overlay: rgba(5, 3, 12, 0.6);
+  }
+}
+
+@theme inline {
+  --color-background: var(--np-background);
+  --color-surface: var(--np-surface);
+  --color-surface-elevated: var(--np-surface-elevated);
+  --color-surface-sunken: var(--np-surface-sunken);
+  --color-fg: var(--np-text-primary);
+  --color-fg-muted: var(--np-text-secondary);
+  --color-fg-subtle: var(--np-text-muted);
+  --color-border: var(--np-border);
+  --color-brand: var(--np-brand);
+  --color-brand-strong: var(--np-brand-strong);
+  --color-on-brand: var(--np-on-brand);
+  --color-success: var(--np-success);
+  --color-danger: var(--np-danger);
+  --color-warning: var(--np-warning);
+  --color-info: var(--np-info);
+  --color-overlay: var(--np-overlay);
+
+  --color-accent-memory: #3b82f6;
+  --color-accent-attention: #f59e0b;
+  --color-accent-logic: #8b5cf6;
+  --color-accent-math: #10b981;
+  --color-accent-spatial: #ec4899;
+  --color-accent-speed: #ef4444;
+  --color-accent-verbal: #14b8a6;
+
+  --spacing-xs2: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xl2: 48px;
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 4px 16px rgba(21, 17, 31, 0.08);
+  --shadow-raised: 0 8px 24px rgba(21, 17, 31, 0.14);
+
+  --text-display: 40px;
+  --text-display--line-height: 46px;
+  --text-display--letter-spacing: -1px;
+  --text-title: 28px;
+  --text-title--line-height: 34px;
+  --text-title--letter-spacing: -0.5px;
+  --text-heading: 22px;
+  --text-heading--line-height: 28px;
+  --text-heading--letter-spacing: -0.3px;
+  --text-subheading: 17px;
+  --text-subheading--line-height: 24px;
+  --text-subheading--letter-spacing: -0.1px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--letter-spacing: 0px;
+  --text-body-strong: 16px;
+  --text-body-strong--line-height: 24px;
+  --text-body-strong--letter-spacing: 0px;
+  --text-body-small: 14px;
+  --text-body-small--line-height: 20px;
+  --text-body-small--letter-spacing: 0px;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
+  --text-caption--letter-spacing: 0px;
+  --text-overline: 11px;
+  --text-overline--line-height: 14px;
+  --text-overline--letter-spacing: 0.8px;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
