@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
+    "@neuropeak/content": "*",
     "@neuropeak/core": "*",
     "@neuropeak/ui": "*",
     "@react-native-async-storage/async-storage": "2.2.0",

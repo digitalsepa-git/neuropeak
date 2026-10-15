@@ -7,7 +7,7 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from './theme-provider';
 
 type ScreenProps = {
-  children: ReactNode;
+  children?: ReactNode;
   /** İçerik ekrandan taşabiliyorsa. */
   scroll?: boolean;
   /** Kenar boşluğu. Kenardan kenara listelerde kapatılır. */

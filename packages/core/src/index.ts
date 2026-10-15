@@ -31,3 +31,23 @@ export {
   type NewOutboxItem,
   type OutboxItem,
 } from './sync/outbox';
+
+export { createRng, sample, seedFromString, shuffle, type Rng } from './random';
+
+export {
+  DEFAULT_NORM,
+  DEFAULT_SCORING_CONFIG,
+  IQ_MAX,
+  IQ_MIN,
+  REPORT_DIMENSIONS,
+  bandForIq,
+  dimensionOf,
+  scoreTest,
+  type AnsweredQuestion,
+  type QuestionKind,
+  type ReportDimension,
+  type ScoreBand,
+  type ScoreResult,
+  type ScoringConfig,
+  type ScoringNorm,
+} from './scoring/score';
