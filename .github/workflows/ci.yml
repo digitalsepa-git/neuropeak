@@ -82,6 +82,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+
+      # Tip üreticisi çıktıyı deponun prettier'ıyla biçimlendirir.
+      - name: Bağımlılıkları kur
+        run: npm ci
 
       - name: Şema ve RLS testleri
         run: ./scripts/verify-schema.sh
