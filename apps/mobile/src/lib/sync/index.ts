@@ -6,6 +6,7 @@ import {
   markSucceeded,
   type NewOutboxItem,
   type OutboxItem,
+  type StreakState,
 } from '@neuropeak/core';
 
 import type { OnboardingAnswers } from '../onboarding';
@@ -30,6 +31,11 @@ export type Mutation =
       kind: 'test_result';
       payload: StoredTestResult;
       dedupeKey?: undefined;
+    }
+  | {
+      kind: 'progress_upsert';
+      payload: { xp: number; level: number; streak: StreakState };
+      dedupeKey: 'self';
     };
 
 let queue: OutboxItem[] = [];
@@ -113,6 +119,32 @@ async function send(item: OutboxItem, userId: string): Promise<void> {
       });
       if (error !== null) {
         throw new Error(error.message);
+      }
+      return;
+    }
+    case 'progress_upsert': {
+      const progress = item.payload as { xp: number; level: number; streak: StreakState };
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ xp: progress.xp, level: progress.level })
+        .eq('id', userId);
+      if (profileError !== null) {
+        throw new Error(profileError.message);
+      }
+
+      const { error: streakError } = await supabase.from('streaks').upsert(
+        {
+          user_id: userId,
+          current_days: progress.streak.currentDays,
+          longest_days: progress.streak.longestDays,
+          last_active_date: progress.streak.lastActiveDate,
+          freezes_left: progress.streak.freezesLeft,
+        },
+        { onConflict: 'user_id' },
+      );
+      if (streakError !== null) {
+        throw new Error(streakError.message);
       }
       return;
     }

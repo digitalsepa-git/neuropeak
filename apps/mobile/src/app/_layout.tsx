@@ -12,8 +12,10 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { CelebrationOverlay } from '@/components/celebration-overlay';
 import { ThemeProvider, useTheme } from '@/components/ui';
 import { ProProvider } from '@/lib/billing/context';
+import { ProgressProvider } from '@/lib/progress/context';
 import { loadOnboardingState } from '@/lib/onboarding';
 import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
 import { useSyncBootstrap } from '@/lib/sync/use-sync';
@@ -54,9 +56,12 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <ProProvider>
-            <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-              <RootStack />
-            </OnboardingGateProvider>
+            <ProgressProvider>
+              <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+                <RootStack />
+                <CelebrationOverlay />
+              </OnboardingGateProvider>
+            </ProgressProvider>
           </ProProvider>
         </ThemeProvider>
       </SafeAreaProvider>

@@ -51,3 +51,42 @@ export {
   type ScoringConfig,
   type ScoringNorm,
 } from './scoring/score';
+
+export {
+  MAX_LEVEL,
+  levelForXp,
+  levelProgress,
+  totalXpForLevel,
+  type LevelProgress,
+} from './gamification/levels';
+
+export {
+  EMPTY_STREAK,
+  STREAK_MILESTONES,
+  isStreakAlive,
+  recordActivity,
+  toDateKey,
+  type StreakOutcome,
+  type StreakState,
+} from './gamification/streak';
+
+export {
+  BASE_GAME_XP,
+  DAILY_REWARDED_AD_LIMIT,
+  STAR_COSTS,
+  STAR_REWARDS,
+  TEST_COMPLETION_XP,
+  xpForGameRound,
+  xpForTestCompletion,
+} from './gamification/rewards';
+
+export {
+  DAILY_TASK_COUNT,
+  applyTaskEvent,
+  completedTaskCount,
+  pickDailyTasks,
+  type DailyTask,
+  type DailyTaskTemplate,
+  type TaskEvent,
+  type TaskMetric,
+} from './gamification/daily-tasks';

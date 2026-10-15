@@ -1,17 +1,26 @@
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
+import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
-import { CATEGORY_LABELS, DAILY_TASKS, GAMES, USER } from '@/data/placeholder';
+import { CATEGORY_LABELS, GAMES } from '@/data/placeholder';
+import { usePro } from '@/lib/billing/context';
+import { useProgress } from '@/lib/progress/context';
+import { TASK_LABELS } from '@/lib/progress/templates';
 
 const SUGGESTED = GAMES[3];
-const completedTasks = DAILY_TASKS.filter((task) => task.done >= task.target).length;
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const router = useRouter();
+  const { isPro } = usePro();
+  const { state, level } = useProgress();
+
+  const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;
+  const streakDays = state.streak.currentDays;
 
   return (
     <Screen scroll>
@@ -23,43 +32,49 @@ export default function HomeScreen() {
             <Icon name="flame" color={theme.colors.warning} size={26} filled />
           </View>
           <View style={styles.streakText}>
-            <Text variant="heading">{USER.streakDays} günlük seri</Text>
+            <Text variant="heading">
+              {streakDays > 0 ? `${streakDays} günlük seri` : 'Seriyi başlat'}
+            </Text>
             <Text variant="bodySmall" color="textSecondary">
-              Bugün bir oyun oyna, seriyi sürdür.
+              {streakDays > 0
+                ? 'Bugün bir oyun oyna, seriyi sürdür.'
+                : 'Bugün bir test veya oyun bitir, seri başlasın.'}
             </Text>
           </View>
         </View>
 
         <View style={styles.levelRow}>
           <Text variant="caption" color="textSecondary">
-            Seviye {USER.level}
+            Seviye {level.level}
           </Text>
           <Text variant="caption" color="textMuted">
-            Seviye {USER.level + 1}&apos;e %{Math.round(USER.levelProgress * 100)}
+            {level.isMaxLevel
+              ? 'En yüksek seviye'
+              : `Seviye ${level.level + 1}'e ${level.xpForNextLevel - level.xpIntoLevel} XP`}
           </Text>
         </View>
-        <ProgressBar value={USER.levelProgress} accessibilityLabel="Seviye ilerlemesi" />
+        <ProgressBar value={level.ratio} accessibilityLabel="Seviye ilerlemesi" />
       </Card>
 
-      <Section title="Günün görevleri" meta={`${completedTasks}/${DAILY_TASKS.length} tamamlandı`}>
+      <Section title="Günün görevleri" meta={`${completedTasks}/${state.tasks.length} tamamlandı`}>
         <View style={styles.stack}>
-          {DAILY_TASKS.map((task) => {
-            const done = task.done >= task.target;
+          {state.tasks.map((task) => {
+            const done = task.progress >= task.target;
             return (
               <Card key={task.id}>
                 <View style={styles.taskHead}>
                   <View style={styles.taskTitle}>
                     {done && <Icon name="check" color={theme.colors.success} size={18} />}
                     <Text variant="subheading" color={done ? 'textMuted' : 'textPrimary'}>
-                      {task.title}
+                      {TASK_LABELS[task.id] ?? task.id}
                     </Text>
                   </View>
-                  <Badge label={`+${task.reward}`} tone={done ? 'success' : 'neutral'} />
+                  <Badge label={`+${task.starReward}`} tone={done ? 'success' : 'neutral'} />
                 </View>
                 <ProgressBar
-                  value={task.done / task.target}
+                  value={task.progress / task.target}
                   color={done ? theme.colors.success : undefined}
-                  accessibilityLabel={`${task.title} ilerlemesi`}
+                  accessibilityLabel={`${TASK_LABELS[task.id] ?? task.id} ilerlemesi`}
                 />
               </Card>
             );
@@ -71,7 +86,8 @@ export default function HomeScreen() {
         <Card padding="lg">
           <View style={styles.scoreRow}>
             <Text variant="display" color="brand">
-              {USER.neuropeakScore}
+              {/* Beyin haritası PR#16'da gerçek veriyle dolacak. */}
+              {state.xp > 0 ? Math.min(99, 40 + Math.round(state.xp / 40)) : 0}
             </Text>
             <View style={styles.scoreMeta}>
               <Text variant="bodySmall" color="textSecondary">
@@ -80,11 +96,15 @@ export default function HomeScreen() {
             </View>
           </View>
           <Button
-            label="Beyin haritanı gör"
+            label={isPro ? 'Beyin haritanı gör' : 'Beyin haritanı aç'}
             variant="secondary"
             size="md"
-            onPress={() => {}}
-            icon={<Icon name="lock" color={theme.colors.textMuted} size={16} />}
+            onPress={() => {
+              if (!isPro) {
+                router.push({ pathname: '/paywall', params: { variant: 'generic' } });
+              }
+            }}
+            icon={isPro ? undefined : <Icon name="lock" color={theme.colors.textMuted} size={16} />}
           />
         </Card>
       </Section>
