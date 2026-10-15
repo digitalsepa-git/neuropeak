@@ -19,7 +19,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:verify": "./scripts/verify-schema.sh",
+    "db:types": "./scripts/generate-db-types.sh",
+    "db:types:check": "./scripts/generate-db-types.sh --check"
   },
   "devDependencies": {
     "prettier": "^3.9.10",

@@ -19,6 +19,24 @@ neuropeak/
 
 `packages/content` (soru bankası) PR#19'da eklenecek.
 
+## Veritabanı
+
+Şema `supabase/migrations` altında, elle yazılmış SQL migration'ları olarak durur.
+
+| Komut                    | Açıklama                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
+| `npm run db:verify`      | Geçici bir Postgres kurup migration'ları uygular, şema kısıtlarını ve RLS politikalarını test eder |
+| `npm run db:types`       | Şemadan TypeScript tiplerini üretir (`apps/mobile/src/lib/database.types.ts`)                      |
+| `npm run db:types:check` | Üretilen tipler güncel mi diye bakar (CI)                                                          |
+
+Yerelde `brew install postgresql@17` yeterlidir; Docker gerekmez. CI aynı betikleri hizmet olarak çalışan bir Postgres üzerinde koşturur.
+
+`database.types.ts` üretilen bir dosyadır, elle düzenlenmez — şema değişince `npm run db:types` çalıştırılıp sonuç commit edilir.
+
+### Bağlantı
+
+`apps/mobile/.env.example` dosyasını `.env` olarak kopyalayıp Supabase projesinin URL ve anon anahtarını doldurun. Boş bırakılırsa uygulama tamamen çevrimdışı çalışır: veriler cihazda durur, senkronizasyon ilk fırsatta yapılır.
+
 ## Tasarım sistemi
 
 Renk, boşluk, yarıçap, tipografi, gölge ve hareket token'larının tek kaynağı `packages/ui`'dir.

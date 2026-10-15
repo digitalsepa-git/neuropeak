@@ -55,3 +55,36 @@ jobs:
 
       - name: Derle
         run: npm run build:admin
+
+  verify-db:
+    name: Veritabanı şeması
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Şema ve RLS testleri
+        run: ./scripts/verify-schema.sh
+
+      - name: Üretilen tipler güncel mi
+        run: ./scripts/generate-db-types.sh --check
