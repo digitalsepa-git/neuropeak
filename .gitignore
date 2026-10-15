@@ -1,0 +1,59 @@
+# Bağımlılıklar
+node_modules/
+.pnp
+.pnp.js
+
+# Derleme çıktıları
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+ios/
+android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Ortam değişkenleri
+.env
+.env.*
+!.env.example
+
+# Test / kapsam
+coverage/
+.nyc_output/
+
+# Önbellek
+.cache/
+.turbo/
+.eslintcache
+.npm/
+
+# Editör
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Loglar
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
