@@ -5,6 +5,8 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Icon, type IconName } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Card, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { resetOnboarding } from '@/lib/onboarding';
+import { useOnboardingGate } from '@/lib/onboarding-context';
 
 type Row = {
   id: string;
@@ -16,6 +18,7 @@ type Row = {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { setCompleted } = useOnboardingGate();
 
   const preferences: Row[] = [
     { id: 'sound', label: 'Ses', value: 'Açık', icon: 'sound' },
@@ -35,6 +38,16 @@ export default function SettingsScreen() {
       label: 'Tasarım sistemi',
       icon: 'progress',
       onPress: () => router.push('/showcase'),
+    },
+    {
+      id: 'reset-onboarding',
+      label: "Onboarding'i sıfırla",
+      icon: 'flame',
+      onPress: () => {
+        void resetOnboarding().then(() => {
+          setCompleted(false);
+        });
+      },
     },
   ];
 
