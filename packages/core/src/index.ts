@@ -18,3 +18,16 @@ export {
 } from './domain/categories';
 
 export { clamp, lerp, standardNormalCdf } from './utils/math';
+
+export {
+  MAX_ATTEMPTS,
+  MAX_QUEUE_SIZE,
+  backoffMs,
+  dueItems,
+  enqueue,
+  markFailed,
+  markSucceeded,
+  pendingCount,
+  type NewOutboxItem,
+  type OutboxItem,
+} from './sync/outbox';

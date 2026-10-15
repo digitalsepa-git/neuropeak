@@ -13,6 +13,7 @@ import { StepProgress } from '@/components/onboarding/step-progress';
 import { Button, ProgressBar, Text, tapFeedback, useTheme } from '@/components/ui';
 import { CATEGORY_LABELS } from '@/data/placeholder';
 import { useOnboardingGate } from '@/lib/onboarding-context';
+import { enqueueMutation } from '@/lib/sync';
 import {
   AGE_RANGES,
   DAILY_GOALS,
@@ -81,7 +82,13 @@ export default function OnboardingScreen() {
   const finish = useCallback(
     async (granted: boolean) => {
       setSaving(true);
-      await saveOnboardingResult({ ...answers, notificationsGranted: granted });
+      const finalAnswers = { ...answers, notificationsGranted: granted };
+      await saveOnboardingResult(finalAnswers);
+      await enqueueMutation({
+        kind: 'onboarding_upsert',
+        payload: finalAnswers,
+        dedupeKey: 'self',
+      });
       // Kapı açılınca Stack.Protected sekmelere geçirir.
       // Paywall PR#7'de bu akışın sonuna eklenecek.
       setCompleted(true);

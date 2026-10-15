@@ -13,8 +13,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ThemeProvider, useTheme } from '@/components/ui';
-import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
 import { loadOnboardingState } from '@/lib/onboarding';
+import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
+import { useSyncBootstrap } from '@/lib/sync/use-sync';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -63,6 +64,8 @@ export default function RootLayout() {
 function RootStack() {
   const theme = useTheme();
   const { completed } = useOnboardingGate();
+
+  useSyncBootstrap();
 
   return (
     <Stack
