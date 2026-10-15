@@ -9,6 +9,7 @@ import {
 } from '@neuropeak/core';
 
 import type { OnboardingAnswers } from '../onboarding';
+import type { StoredTestResult } from '../test-results';
 import { getUserId } from '../session';
 import { isSupabaseConfigured, supabase } from '../supabase';
 
@@ -18,11 +19,18 @@ const QUEUE_KEY = 'neuropeak.outbox.v1';
  * Senkronize edilecek değişiklik türleri. Yeni bir tür eklemek için buraya
  * bir varyant ve aşağıdaki `send` içine bir dal eklemek yeterli.
  */
-export type Mutation = {
-  kind: 'onboarding_upsert';
-  payload: OnboardingAnswers;
-  dedupeKey: 'self';
-};
+export type Mutation =
+  | {
+      kind: 'onboarding_upsert';
+      payload: OnboardingAnswers;
+      dedupeKey: 'self';
+    }
+  | {
+      // Her test sonucu ayrı satır; tekilleştirilmez.
+      kind: 'test_result';
+      payload: StoredTestResult;
+      dedupeKey?: undefined;
+    };
 
 let queue: OutboxItem[] = [];
 let loaded = false;
@@ -56,7 +64,7 @@ export async function enqueueMutation(mutation: Mutation): Promise<void> {
     id: `${mutation.kind}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     kind: mutation.kind,
     payload: mutation.payload,
-    dedupeKey: mutation.dedupeKey,
+    ...(mutation.dedupeKey !== undefined && { dedupeKey: mutation.dedupeKey }),
   };
 
   queue = enqueueItem(queue, item, Date.now());
@@ -84,6 +92,25 @@ async function send(item: OutboxItem, userId: string): Promise<void> {
         },
         { onConflict: 'user_id' },
       );
+      if (error !== null) {
+        throw new Error(error.message);
+      }
+      return;
+    }
+    case 'test_result': {
+      const result = item.payload as StoredTestResult;
+      const { error } = await supabase.from('test_results').insert({
+        user_id: userId,
+        test_id: result.testId,
+        raw_score: result.score.rawScore,
+        iq_score: result.score.iq,
+        percentile: result.score.percentile,
+        correct_count: result.score.correctCount,
+        answered_count: result.score.answeredCount,
+        subscores: result.score.subscores,
+        duration_ms: result.score.durationMs,
+        created_at: result.completedAt,
+      });
       if (error !== null) {
         throw new Error(error.message);
       }

@@ -89,6 +89,7 @@ function RootStack() {
           options={{ headerShown: true, title: 'Ayarlar', presentation: 'modal' }}
         />
         <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
+        <Stack.Screen name="test/[id]" options={{ gestureEnabled: false }} />
       </Stack.Protected>
     </Stack>
   );

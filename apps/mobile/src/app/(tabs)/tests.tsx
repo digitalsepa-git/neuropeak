@@ -1,4 +1,5 @@
 import { spacing } from '@neuropeak/ui';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -70,9 +71,19 @@ export default function TestsScreen() {
 
 function TestCard({ test }: { test: PlaceholderTest }) {
   const theme = useTheme();
+  const router = useRouter();
 
   return (
-    <Card onPress={() => {}} accessibilityLabel={test.title}>
+    <Card
+      accessibilityLabel={test.title}
+      onPress={() => {
+        // PRO testler paywall'a gidecek (PR#7); şimdilik yalnızca ücretsiz
+        // test açılıyor.
+        if (!test.pro) {
+          router.push({ pathname: '/test/[id]', params: { id: test.id } });
+        }
+      }}
+    >
       <View style={styles.row}>
         <View style={styles.info}>
           <View style={styles.titleRow}>
