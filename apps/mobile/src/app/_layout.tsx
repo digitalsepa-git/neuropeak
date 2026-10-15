@@ -8,11 +8,13 @@ import {
 import { fontFamily } from '@neuropeak/ui';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ThemeProvider, useTheme } from '@/components/ui';
+import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
+import { loadOnboardingState } from '@/lib/onboarding';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -23,16 +25,25 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (fontsLoaded) {
+    void loadOnboardingState().then((state) => {
+      setOnboardingCompleted(state.completed);
+    });
+  }, []);
+
+  const ready = fontsLoaded && onboardingCompleted !== null;
+
+  useEffect(() => {
+    if (ready) {
       void SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [ready]);
 
-  // Fontlar yüklenene kadar açılış ekranı görünür kalır; yarı yüklü
-  // tipografiyle ekran çizilmez.
-  if (!fontsLoaded) {
+  // Fontlar ve onboarding durumu hazır olana kadar açılış ekranı görünür
+  // kalır; yanlış ekranın bir an görünmesini engeller.
+  if (!ready) {
     return null;
   }
 
@@ -40,7 +51,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <RootStack />
+          <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+            <RootStack />
+          </OnboardingGateProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -49,6 +62,7 @@ export default function RootLayout() {
 
 function RootStack() {
   const theme = useTheme();
+  const { completed } = useOnboardingGate();
 
   return (
     <Stack
@@ -61,12 +75,18 @@ function RootStack() {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen
-        name="settings"
-        options={{ headerShown: true, title: 'Ayarlar', presentation: 'modal' }}
-      />
-      <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
+      <Stack.Protected guard={!completed}>
+        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
+      </Stack.Protected>
+
+      <Stack.Protected guard={completed}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="settings"
+          options={{ headerShown: true, title: 'Ayarlar', presentation: 'modal' }}
+        />
+        <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
+      </Stack.Protected>
     </Stack>
   );
 }
