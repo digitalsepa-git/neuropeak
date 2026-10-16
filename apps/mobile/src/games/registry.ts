@@ -5,8 +5,11 @@ import { LightSequenceGame } from './light-sequence';
 import { LiquidSortGame } from './liquid-sort';
 import { LogicChainGame } from './logic-chain';
 import { MatrixPuzzleGame } from './matrix-puzzle';
+import { MentalRotationGame } from './mental-rotation';
 import { NumberSeriesGame } from './number-series';
+import { PaperFoldGame } from './paper-fold';
 import { QuickMathGame } from './quick-math';
+import { ShadowMatchGame } from './shadow-match';
 import { TargetNumberGame } from './target-number';
 import { OddOneOutGame } from './odd-one-out';
 import { StroopGame } from './stroop';
@@ -170,6 +173,41 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Esnek düşünme', 'Planlama', 'Aritmetik'],
     baseXp: 20,
     Component: TargetNumberGame,
+  },
+  {
+    id: 'rotation',
+    category: 'spatial',
+    mode: 'timed',
+    title: 'Şekil Döndürme',
+    instruction: 'Aynı şekil mi, ayna görüntüsü mü?',
+    description:
+      'Soldaki şekil döndürülerek sağdakine oturuyor mu, yoksa aynası mı? Zihinde döndürme hızını ölçer.',
+    skills: ['Zihinsel döndürme', 'Uzamsal görselleştirme', 'Karar hızı'],
+    baseXp: 16,
+    Component: MentalRotationGame,
+  },
+  {
+    id: 'paper-fold',
+    category: 'spatial',
+    mode: 'levels',
+    title: 'Katla-Aç',
+    instruction: 'Kağıt açılınca delikler nerede olur?',
+    description:
+      'Katlanmış kağıttaki delikler açıldığında nereye düşer? Her seviyede katlama ve delik sayısı artar.',
+    skills: ['Uzamsal muhakeme', 'Simetri', 'Zihinde canlandırma'],
+    baseXp: 20,
+    Component: PaperFoldGame,
+  },
+  {
+    id: 'shadow-match',
+    category: 'spatial',
+    mode: 'timed',
+    title: 'Gölge Eşleştir',
+    instruction: 'Şeklin gölgesini bul',
+    description: 'Üstteki şeklin silüetini dört gölgeden bul. Gölgeler döndürülmüş olabilir.',
+    skills: ['Şekil tanıma', 'Görsel eşleştirme', 'Dikkat'],
+    baseXp: 15,
+    Component: ShadowMatchGame,
   },
 ];
 
