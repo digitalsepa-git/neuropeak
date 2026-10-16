@@ -1,3 +1,4 @@
+import { AnagramGame } from './anagram';
 import { CardMatchGame } from './card-match';
 import { DigitSpanGame } from './digit-span';
 import { GoNoGoGame } from './go-no-go';
@@ -11,6 +12,8 @@ import { PaperFoldGame } from './paper-fold';
 import { QuickMathGame } from './quick-math';
 import { ShadowMatchGame } from './shadow-match';
 import { TargetNumberGame } from './target-number';
+import { WordAnalogyGame } from './word-analogy';
+import { WordLinkGame } from './word-link';
 import { OddOneOutGame } from './odd-one-out';
 import { StroopGame } from './stroop';
 import { SymbolHuntGame } from './symbol-hunt';
@@ -208,6 +211,42 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Şekil tanıma', 'Görsel eşleştirme', 'Dikkat'],
     baseXp: 15,
     Component: ShadowMatchGame,
+  },
+  {
+    id: 'anagram',
+    category: 'verbal',
+    mode: 'levels',
+    title: 'Kelime Avı',
+    instruction: 'İpucunu oku, harflerden kelimeyi kur',
+    description:
+      'Karışık harflerden ipucuna uyan kelimeyi kurarsın. Her üç seviyede bir kelimeler uzar.',
+    skills: ['Kelime dağarcığı', 'Harf çözümleme', 'Esnek düşünme'],
+    baseXp: 18,
+    Component: AnagramGame,
+  },
+  {
+    id: 'word-analogy',
+    category: 'verbal',
+    mode: 'levels',
+    title: 'Sözel Analoji',
+    instruction: 'İlişkiyi kur, eksik kelimeyi bul',
+    description:
+      'İlk iki kelime arasındaki ilişkinin aynısını kuran kelimeyi seçersin. Seviye yükseldikçe ilişkiler soyutlaşır.',
+    skills: ['Sözel muhakeme', 'İlişki kurma', 'Soyutlama'],
+    baseXp: 20,
+    Component: WordAnalogyGame,
+  },
+  {
+    id: 'word-link',
+    category: 'verbal',
+    mode: 'timed',
+    title: 'Kelime Bağı',
+    instruction: 'Eş mi, zıt mı? Doğru kelimeyi seç',
+    description:
+      'Verilen kelimenin eş ya da zıt anlamlısını 60 saniyede olabildiğince çok bul. Soruyu okumadan cevaplayamazsın.',
+    skills: ['Kelime dağarcığı', 'Anlam ayırt etme', 'Okuma hızı'],
+    baseXp: 15,
+    Component: WordLinkGame,
   },
 ];
 

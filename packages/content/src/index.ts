@@ -14,3 +14,5 @@ export function findTest(id: string): ContentTest | undefined {
 }
 
 export { basicIqTest };
+
+export { TR_ANAGRAMS, TR_ANALOGIES, TR_WORD_PAIRS } from './words/tr';
