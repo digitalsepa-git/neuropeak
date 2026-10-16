@@ -45,6 +45,8 @@ export const GAMES: PlaceholderGame[] = [
   { id: 'paper-fold', title: 'Katla-Aç', category: 'spatial', level: 11, totalLevels: 200 },
   { id: 'reaction', title: 'Reaksiyon', category: 'speed', level: 28, totalLevels: 0 },
   { id: 'anagram', title: 'Kelime Avı', category: 'verbal', level: 14, totalLevels: 260 },
+  { id: 'word-analogy', title: 'Sözel Analoji', category: 'verbal', level: 5, totalLevels: 240 },
+  { id: 'word-link', title: 'Kelime Bağı', category: 'verbal', level: 8, totalLevels: 0 },
 ];
 
 export type PlaceholderTest = {

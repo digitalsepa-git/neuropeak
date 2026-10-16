@@ -158,3 +158,18 @@ export {
   type HolePattern,
   type PaperFoldPuzzle,
 } from './puzzles/paper-fold';
+
+export {
+  anagramLengthForLevel,
+  generateAnagram,
+  generateWordAnalogy,
+  generateWordPair,
+  toTurkishUpper,
+  type AnagramEntry,
+  type AnagramPuzzle,
+  type AnalogyEntry,
+  type AnalogyPuzzle,
+  type WordPairEntry,
+  type WordPairMode,
+  type WordPairPuzzle,
+} from './puzzles/words';

@@ -111,7 +111,7 @@ Logo ve uygulama ikonu vektörel (SVG) olarak üretilecek. Test/oyun kart görse
 | Sekme         | İçerik                                                                                                                   |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **Ana Sayfa** | Günlük görevler (3), seri sayacı, günün önerilen oyunu/testi, NeuroPeak skoru özeti, lig durumu kartı, devam eden seviye |
-| **Oyunlar**   | 7 kategori × 28 oyun, filtre çipleri, her oyunda seviye ilerlemesi ve en yüksek skor                                     |
+| **Oyunlar**   | 7 kategori × 29 oyun, filtre çipleri, her oyunda seviye ilerlemesi ve en yüksek skor                                     |
 | **Testler**   | 11 test, kategori filtreleri (Popüler / IQ Testleri / Eğlence / Profil)                                                  |
 | **İlerleme**  | Beyin haritası radar grafiği, NeuroPeak skoru geçmişi, kategori bazlı istatistikler, rozet vitrini, test geçmişi         |
 | **Lig**       | Haftalık lig tablosu (30 kişilik grup), terfi/düşme bölgeleri, global ve ülke sıralaması                                 |
@@ -178,7 +178,7 @@ Her gün 3 görev, gece yarısı yenilenir. Örnek: "2 hafıza oyunu oyna", "500
 
 ---
 
-## 6. Mini Oyunlar — 28 Oyun / 7 Kategori
+## 6. Mini Oyunlar — 29 Oyun / 7 Kategori
 
 > Yapı: **Seviyeli** oyunlar prosedürel üretilmiş (seed'li, herkeste aynı) uzun seviye listesine sahip. **Süreli** oyunlar 45–60 saniyelik skor modunda, lider tablosuna bağlı.
 
@@ -238,12 +238,13 @@ Her gün 3 görev, gece yarısı yenilenir. Örnek: "2 hafıza oyunu oyna", "500
 | 25  | Reaksiyon   | Süreli | Saf tepki süresi ölçümü, milisaniye hassasiyeti |
 | 26  | Hızlı Karar | Süreli | Sembol karşılaştırma — büyük/küçük, aynı/farklı |
 
-### Sözel (2)
+### Sözel (3)
 
 | #   | Oyun          | Yapı     | Açıklama                                            |
 | --- | ------------- | -------- | --------------------------------------------------- |
 | 27  | Kelime Avı    | Seviyeli | Anagram / harflerden kelime üretme (TR + EN sözlük) |
 | 28  | Sözel Analoji | Seviyeli | "A : B :: C : ?" ilişki kurma                       |
+| 29  | Kelime Bağı   | Süreli   | Eş / zıt anlam ayırt etme                           |
 
 Her oyun ekranının ortak iskeleti: üst bar (duraklat · seviye · skor · reklamsız · ses) → talimat balonu → oyun alanı → alt araç çubuğu (ipucu · geri al, yıldız bakiyesi ile).
 
@@ -328,7 +329,7 @@ Fiyatlar ülke bazlı ayarlanır (TR/AR/BR ucuz, US/EU/UK yüksek).
 
 ### Ücretsiz katman
 
-- Tüm 28 oyun oynanabilir (reklamlı)
+- Tüm 29 oyun oynanabilir (reklamlı)
 - Temel IQ Testi tam erişim: **skor + yüzdelik dilim görünür**, detaylı rapor kilitli
 - Günde 3 ödüllü reklam ile yıldız kazanımı
 - Lig ve lider tablosuna katılım açık
