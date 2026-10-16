@@ -154,32 +154,6 @@ export const DAILY_TASKS: DailyTask[] = [
   { id: 'finish-test', title: 'Bir testi tamamla', done: 0, target: 1, reward: 30 },
 ];
 
-export type LeagueRow = {
-  rank: number;
-  name: string;
-  xp: number;
-  isCurrentUser?: boolean;
-};
-
-export const LEAGUE_ROWS: LeagueRow[] = [
-  { rank: 1, name: 'Deniz K.', xp: 4820 },
-  { rank: 2, name: 'Mert A.', xp: 4410 },
-  { rank: 3, name: 'Elif S.', xp: 4105 },
-  { rank: 4, name: 'Sen', xp: 3870, isCurrentUser: true },
-  { rank: 5, name: 'Burak T.', xp: 3640 },
-  { rank: 6, name: 'Ayşe Y.', xp: 3380 },
-  { rank: 7, name: 'Can Ö.', xp: 3120 },
-];
-
-/** Beyin haritasının eksen puanları — gerçek radar grafiği PR#16'da. */
-export const BRAIN_MAP_SCORES = {
-  memory: 72,
-  focus: 64,
-  logic: 81,
-  speed: 55,
-  problemSolving: 69,
-} as const;
-
 export const AXIS_LABELS = {
   memory: 'Hafıza',
   focus: 'Odaklanma',

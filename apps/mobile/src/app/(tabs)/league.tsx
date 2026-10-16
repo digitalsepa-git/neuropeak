@@ -1,17 +1,64 @@
+import {
+  GROUP_SIZE,
+  PROMOTION_COUNT,
+  RELEGATION_COUNT,
+  formatRemaining,
+  msUntilWeekEnd,
+  standings,
+  xpToPromotion,
+  type LeagueOutcome,
+  type LeagueStanding,
+  type LeagueTier,
+} from '@neuropeak/core';
 import { radius, spacing } from '@neuropeak/ui';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Screen, Text, useTheme } from '@/components/ui';
-import { LEAGUE_ROWS, type LeagueRow } from '@/data/placeholder';
+import { currentCohort } from '@/lib/progress/league';
+import { useProgress } from '@/lib/progress/context';
 
-/** İlk 10 terfi eder, son 5 düşer — grupta 30 kişi olacak (PR#17). */
-const PROMOTION_CUTOFF = 3;
+const TIER_LABELS: Record<LeagueTier, string> = {
+  bronze: 'Bronz Lig',
+  silver: 'Gümüş Lig',
+  gold: 'Altın Lig',
+  platinum: 'Platin Lig',
+  diamond: 'Elmas Lig',
+  legend: 'Efsane Lig',
+};
+
+const OUTCOME_LABELS: Record<LeagueOutcome, string> = {
+  promote: 'yükseldin',
+  hold: 'ligde kaldın',
+  relegate: 'düştün',
+};
+
+/** Geri sayım dakikada bir yenilenir; saniye göstermiyoruz. */
+const TICK_MS = 60_000;
 
 export default function LeagueScreen() {
   const theme = useTheme();
+  const { state, userId } = useProgress();
+
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), TICK_MS);
+    return () => clearInterval(timer);
+  }, []);
+
+  const table = useMemo(
+    () => standings(currentCohort(state.league, userId, now)),
+    [now, state.league, userId],
+  );
+
+  const me = table.find((row) => row.isCurrentUser === true);
+  const needed = xpToPromotion(table, userId);
+  const remaining = formatRemaining(msUntilWeekEnd(now));
+  const result = state.league.lastResult;
 
   return (
     <Screen scroll>
@@ -23,54 +70,71 @@ export default function LeagueScreen() {
             <Icon name="league" color={theme.colors.warning} size={28} />
           </View>
           <View style={styles.leagueText}>
-            <Text variant="heading">Altın Lig</Text>
+            <Text variant="heading">{TIER_LABELS[state.league.tier]}</Text>
             <Text variant="bodySmall" color="textSecondary">
-              Hafta bitimine 3 gün 14 saat
+              Hafta bitimine {remaining}
             </Text>
           </View>
         </View>
+
         <Text variant="bodySmall" color="textSecondary" style={styles.leagueNote}>
-          İlk 3 Platin Lig&apos;e yükselir. Sen 4. sıradasın — terfi bölgesine 235 XP kaldı.
+          {me === undefined
+            ? `İlk ${PROMOTION_COUNT} bir üst lige yükselir.`
+            : needed === 0
+              ? `${me.rank}. sıradasın — terfi bölgesindesin. Son ${RELEGATION_COUNT} bir alt lige düşer.`
+              : `${me.rank}. sıradasın — terfi bölgesine ${needed} XP kaldı.`}
         </Text>
       </Card>
 
-      <Section title="Haftalık sıralama">
+      {result !== null && (
+        <Card padding="lg">
+          <Text variant="bodyStrong">Geçen hafta {result.rank}. oldun</Text>
+          <Text variant="bodySmall" color="textSecondary">
+            {TIER_LABELS[result.tier]} sonunda {OUTCOME_LABELS[result.outcome]}.
+          </Text>
+        </Card>
+      )}
+
+      <Section title="Haftalık sıralama" meta={`${GROUP_SIZE} kişi`}>
         <Card padding="xs">
-          {LEAGUE_ROWS.map((row, index) => (
-            <View key={row.rank}>
+          {table.map((row, index) => (
+            <View key={row.id}>
               <LeagueRowItem row={row} />
-              {index === PROMOTION_CUTOFF - 1 && (
-                <View style={styles.cutoff}>
-                  <View style={[styles.cutoffLine, { backgroundColor: theme.colors.success }]} />
-                  <Text variant="overline" color="success">
-                    Terfi bölgesi
-                  </Text>
-                  <View style={[styles.cutoffLine, { backgroundColor: theme.colors.success }]} />
-                </View>
+              {index === PROMOTION_COUNT - 1 && (
+                <ZoneDivider label="Terfi bölgesi" color={theme.colors.success} />
+              )}
+              {index === table.length - RELEGATION_COUNT - 1 && (
+                <ZoneDivider label="Düşme bölgesi" color={theme.colors.danger} />
               )}
             </View>
           ))}
         </Card>
       </Section>
 
-      <Section title="Küresel sıralama">
-        <Card onPress={() => {}}>
-          <View style={styles.globalRow}>
-            <View style={styles.leagueText}>
-              <Text variant="subheading">Türkiye&apos;de 1.284.</Text>
-              <Text variant="caption" color="textMuted">
-                Dünyada 48.902. · NeuroPeak skoruna göre
-              </Text>
-            </View>
-            <Icon name="chevronRight" color={theme.colors.textMuted} size={20} />
-          </View>
-        </Card>
-      </Section>
+      <Card padding="lg">
+        <Text variant="bodyStrong">Deneme ligi</Text>
+        <Text variant="bodySmall" color="textSecondary">
+          Rakipler şimdilik cihazında üretiliyor; gerçek oyuncular sunucu bağlandığında gelecek.
+          Sıralama, terfi ve düşme kuralları aynı çalışıyor.
+        </Text>
+      </Card>
     </Screen>
   );
 }
 
-function LeagueRowItem({ row }: { row: LeagueRow }) {
+function ZoneDivider({ label, color }: { label: string; color: string }) {
+  return (
+    <View style={styles.cutoff}>
+      <View style={[styles.cutoffLine, { backgroundColor: color }]} />
+      <Text variant="overline" style={{ color }}>
+        {label}
+      </Text>
+      <View style={[styles.cutoffLine, { backgroundColor: color }]} />
+    </View>
+  );
+}
+
+function LeagueRowItem({ row }: { row: LeagueStanding }) {
   const theme = useTheme();
   const highlight = row.isCurrentUser === true;
 
@@ -87,12 +151,18 @@ function LeagueRowItem({ row }: { row: LeagueRow }) {
       <Text variant="bodyStrong" color={highlight ? 'brand' : 'textMuted'} style={styles.rank}>
         {row.rank}
       </Text>
-      <Text variant="body" color={highlight ? 'brand' : 'textPrimary'} style={styles.name}>
+      <Text
+        variant="body"
+        color={highlight ? 'brand' : 'textPrimary'}
+        style={styles.name}
+        numberOfLines={1}
+      >
         {row.name}
       </Text>
-      {row.rank <= PROMOTION_CUTOFF && <Badge label="Terfi" tone="success" />}
+      {row.outcome === 'promote' && <Badge label="Terfi" tone="success" />}
+      {row.outcome === 'relegate' && <Badge label="Düşme" tone="danger" />}
       <Text variant="caption" color="textSecondary">
-        {row.xp.toLocaleString('tr-TR')} XP
+        {row.weeklyXp.toLocaleString('tr-TR')} XP
       </Text>
     </View>
   );
@@ -110,11 +180,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 1,
     opacity: 0.4,
-  },
-  globalRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm,
   },
   leagueHead: {
     alignItems: 'center',

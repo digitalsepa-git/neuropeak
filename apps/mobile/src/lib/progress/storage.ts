@@ -6,6 +6,8 @@ import {
   type CategoryCounts,
   type DailyTask,
   type DayActivity,
+  type LeagueOutcome,
+  type LeagueTier,
   type StreakState,
 } from '@neuropeak/core';
 
@@ -27,6 +29,24 @@ export type ProgressState = {
   history: DayActivity[];
   /** Kategori başına oynanan tur sayısı. */
   categoryRounds: CategoryCounts;
+  league: LeagueState;
+};
+
+export type LeagueState = {
+  tier: LeagueTier;
+  /** İçinde bulunulan haftanın pazartesisi. */
+  weekStart: string | null;
+  /** Bu hafta kazanılan XP; lig sıralaması buna bakar. */
+  weeklyXp: number;
+  /** Geçen haftanın sonucu; hafta başında bir kez gösterilir. */
+  lastResult: { tier: LeagueTier; rank: number; outcome: LeagueOutcome } | null;
+};
+
+export const EMPTY_LEAGUE: LeagueState = {
+  tier: 'bronze',
+  weekStart: null,
+  weeklyXp: 0,
+  lastResult: null,
 };
 
 export const EMPTY_PROGRESS: ProgressState = {
@@ -39,6 +59,7 @@ export const EMPTY_PROGRESS: ProgressState = {
   brainMap: EMPTY_BRAIN_MAP,
   history: [],
   categoryRounds: {},
+  league: EMPTY_LEAGUE,
 };
 
 export async function loadProgress(): Promise<ProgressState> {
@@ -55,6 +76,7 @@ export async function loadProgress(): Promise<ProgressState> {
       brainMap: { ...EMPTY_BRAIN_MAP, ...parsed.brainMap },
       history: parsed.history ?? [],
       categoryRounds: parsed.categoryRounds ?? {},
+      league: { ...EMPTY_LEAGUE, ...parsed.league },
     };
   } catch {
     return EMPTY_PROGRESS;
