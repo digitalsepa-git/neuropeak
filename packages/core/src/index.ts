@@ -210,3 +210,41 @@ export {
 } from './puzzles/quick-decision';
 
 export { toTurkishUpper, turkishDativeSuffix } from './utils/turkish';
+
+export {
+  generateGridRecall,
+  generateNBack,
+  gridRecallCountForLevel,
+  gridRecallSizeForLevel,
+  nBackLevel,
+  type GridRecallPuzzle,
+  type NBackSequence,
+} from './puzzles/memory-tasks';
+
+export {
+  BALL_RADIUS,
+  FIELD,
+  generateTracking,
+  stepTracking,
+  trackingBallsForLevel,
+  trackingTargetsForLevel,
+  type Ball,
+  type TrackingRound,
+} from './puzzles/tracking';
+
+export {
+  generateBalance,
+  type BalanceHint,
+  type BalancePuzzle,
+  type BalanceShape,
+} from './puzzles/balance';
+
+export {
+  canPlaceTile,
+  generateTiling,
+  tileCells,
+  tilingShapeForLevel,
+  type TilingPiece,
+  type TilingPlacement,
+  type TilingPuzzle,
+} from './puzzles/tiling';
