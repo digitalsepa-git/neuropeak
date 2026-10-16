@@ -90,3 +90,31 @@ export {
   type TaskEvent,
   type TaskMetric,
 } from './gamification/daily-tasks';
+
+export {
+  TUBE_CAPACITY,
+  canPour,
+  colorCountForLevel,
+  generateLiquidSort,
+  isSolvable,
+  isSolved,
+  pour,
+  type LiquidSortPuzzle,
+  type Tube,
+} from './puzzles/liquid-sort';
+
+export {
+  MATRIX_SHAPES,
+  generateMatrixPuzzle,
+  visualKey,
+  visuallyEqual,
+  type MatrixCell,
+  type MatrixPuzzle,
+  type MatrixShape,
+} from './puzzles/matrix';
+
+export {
+  chainLengthForLevel,
+  generateLogicChain,
+  type LogicChainPuzzle,
+} from './puzzles/logic-chain';

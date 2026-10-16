@@ -2,6 +2,9 @@ import { CardMatchGame } from './card-match';
 import { DigitSpanGame } from './digit-span';
 import { GoNoGoGame } from './go-no-go';
 import { LightSequenceGame } from './light-sequence';
+import { LiquidSortGame } from './liquid-sort';
+import { LogicChainGame } from './logic-chain';
+import { MatrixPuzzleGame } from './matrix-puzzle';
 import { OddOneOutGame } from './odd-one-out';
 import { StroopGame } from './stroop';
 import { SymbolHuntGame } from './symbol-hunt';
@@ -93,6 +96,42 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Dürtü kontrolü', 'Tepki hızı', 'Hata izleme'],
     baseXp: 15,
     Component: GoNoGoGame,
+  },
+  {
+    id: 'matrix',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Matris Bulmaca',
+    instruction: 'Kuralı bul, eksik hücreyi tamamla',
+    description:
+      '3×3 ızgaradaki örüntüyü çöz ve boş hücreye hangi şeklin geleceğini bul. Her doğruda kural zorlaşır.',
+    skills: ['Soyut akıl yürütme', 'Örüntü tanıma', 'Tümevarım'],
+    baseXp: 18,
+    Component: MatrixPuzzleGame,
+  },
+  {
+    id: 'liquid-sort',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Sıvı Sıralama',
+    instruction: 'Her şişede tek renk kalana kadar dök',
+    description:
+      'Renkleri şişeler arasında taşıyarak ayır. Her seviyede renk sayısı artar; tahtalar üretilirken çözülebilirlikleri doğrulanır.',
+    skills: ['İleri planlama', 'Problem çözme', 'Sabır'],
+    baseXp: 18,
+    Component: LiquidSortGame,
+  },
+  {
+    id: 'logic-chain',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Mantık Zinciri',
+    instruction: 'Verilenlerden sıralamayı çıkar',
+    description:
+      'Karşılaştırmalardan tam sıralamayı kurup soruyu cevapla. Zincir her seviyede uzar.',
+    skills: ['Tümdengelim', 'Çalışma belleği', 'Sıralama'],
+    baseXp: 18,
+    Component: LogicChainGame,
   },
 ];
 
