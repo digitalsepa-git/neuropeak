@@ -7,6 +7,8 @@ import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
+import { findTest } from '@neuropeak/content';
+
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
 
@@ -75,11 +77,18 @@ function TestCard({ test }: { test: PlaceholderTest }) {
   const router = useRouter();
   const { isPro } = usePro();
 
+  // Soru bankası yazılmamış testler listede kalır ama açılmaz;
+  // yol haritası görünsün, boş ekran açılmasın.
+  const content = findTest(test.id);
+  const ready = content !== undefined;
+  const locked = test.pro && !isPro;
+
   return (
     <Card
       accessibilityLabel={test.title}
       onPress={() => {
-        if (test.pro && !isPro) {
+        if (!ready) return;
+        if (locked) {
           router.push({ pathname: '/paywall', params: { variant: 'generic' } });
           return;
         }
@@ -87,22 +96,32 @@ function TestCard({ test }: { test: PlaceholderTest }) {
       }}
     >
       <View style={styles.row}>
-        <View style={styles.info}>
+        <View style={[styles.info, !ready && styles.dimmed]}>
           <View style={styles.titleRow}>
             <Text variant="subheading" numberOfLines={1}>
               {test.title}
             </Text>
-            {test.pro ? <Badge label="PRO" tone="brand" /> : <Badge label="Ücretsiz" />}
+            {!ready ? (
+              <Badge label="Yakında" />
+            ) : test.pro ? (
+              <Badge label="PRO" tone="brand" />
+            ) : (
+              <Badge label="Ücretsiz" />
+            )}
           </View>
           <Text variant="caption" color="textMuted">
-            {test.questions} soru · {test.minutes} dk
+            {ready
+              ? `${content.questionCount} soru · ${content.estMinutes[0]}-${content.estMinutes[1]} dk`
+              : `${test.questions} soru · ${test.minutes} dk`}
           </Text>
         </View>
-        <Icon
-          name={test.pro && !isPro ? 'lock' : 'chevronRight'}
-          color={theme.colors.textMuted}
-          size={test.pro ? 18 : 20}
-        />
+        {ready && (
+          <Icon
+            name={locked ? 'lock' : 'chevronRight'}
+            color={theme.colors.textMuted}
+            size={locked ? 18 : 20}
+          />
+        )}
       </View>
     </Card>
   );
@@ -113,6 +132,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingBottom: spacing.xs,
     paddingHorizontal: spacing.lg,
+  },
+  dimmed: {
+    opacity: 0.55,
   },
   info: {
     flex: 1,
