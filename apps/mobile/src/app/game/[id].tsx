@@ -14,6 +14,7 @@ import { track } from '@/lib/analytics';
 
 import { GameShell } from '@/components/game/game-shell';
 import { Icon } from '@/components/icons';
+import { RewardedAdCard } from '@/components/rewarded-ad-card';
 import {
   Badge,
   Button,
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui';
 import { findGame } from '@/games/registry';
 import type { RoundOutcome } from '@/games/types';
+import { useAds } from '@/lib/ads/context';
 import { useProgress } from '@/lib/progress/context';
 
 type Phase = 'briefing' | 'playing' | 'result';
@@ -59,6 +61,7 @@ export default function GameScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { recordGameRound } = useProgress();
+  const { afterRound } = useAds();
 
   const game = findGame(id ?? '');
 
@@ -67,6 +70,24 @@ export default function GameScreen() {
   const [status, setStatus] = useState<RoundOutcome>({ score: 0, level: 1, completed: false });
   const [outcome, setOutcome] = useState<RoundOutcome | null>(null);
   const [xpEarned, setXpEarned] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+
+  /**
+   * Ödül ekranından çıkışta reklam.
+   *
+   * Tur biter biter göstermek kazanılan XP'nin üstünü kapatıyordu;
+   * kullanıcı ödülünü gördükten sonra, ekrandan ayrılırken gösteriliyor.
+   */
+  const leaveResult = useCallback(
+    (next: () => void) => {
+      setLeaving(true);
+      void afterRound().finally(() => {
+        setLeaving(false);
+        next();
+      });
+    },
+    [afterRound],
+  );
 
   const onFinish = useCallback(
     (result: RoundOutcome) => {
@@ -261,16 +282,29 @@ export default function GameScreen() {
         </View>
       </Card>
 
+      <View style={styles.rewardedAd}>
+        <RewardedAdCard />
+      </View>
+
       <View style={styles.resultActions}>
         <Button
           label="Tekrar oyna"
-          onPress={() => {
-            setOutcome(null);
-            setStatus({ score: 0, level: 1, completed: false });
-            setPhase('briefing');
-          }}
+          loading={leaving}
+          onPress={() =>
+            leaveResult(() => {
+              setOutcome(null);
+              setStatus({ score: 0, level: 1, completed: false });
+              setPhase('briefing');
+            })
+          }
         />
-        <Button label="Bitti" variant="ghost" size="md" onPress={() => router.back()} />
+        <Button
+          label="Bitti"
+          variant="ghost"
+          size="md"
+          disabled={leaving}
+          onPress={() => leaveResult(() => router.back())}
+        />
       </View>
     </Screen>
   );
@@ -341,6 +375,9 @@ const styles = StyleSheet.create({
   rewardRow: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  rewardedAd: {
+    marginTop: spacing.sm,
   },
   sectionLabel: {
     marginBottom: spacing.sm,
