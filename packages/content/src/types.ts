@@ -1,4 +1,4 @@
-import type { QuestionKind, ScoringNorm } from '@neuropeak/core';
+import type { QuestionKind, ReportDimension, ScoringNorm } from '@neuropeak/core';
 
 export type Localized = {
   readonly tr: string;
@@ -28,6 +28,13 @@ export type ContentTest = {
   readonly questionCount: number;
   readonly estMinutes: readonly [number, number];
   readonly isPro: boolean;
+  /**
+   * Tek bir alanı ölçen testler için o alan. Genel testlerde boş
+   * bırakılır; soru türü dağılımı denetlenirken ikisi farklı
+   * değerlendirilir — Sözel IQ'nun sözel sorulardan oluşması kusur
+   * değil, tanımı.
+   */
+  readonly focus?: ReportDimension;
   readonly norm: ScoringNorm;
   readonly questions: readonly ContentQuestion[];
 };

@@ -4,6 +4,7 @@ import {
   scoreTest,
   seedFromString,
   type AnsweredQuestion,
+  type QuestionKind,
   type ScoreResult,
 } from '@neuropeak/core';
 import { findTest, type ContentQuestion } from '@neuropeak/content';
@@ -22,11 +23,35 @@ import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
 
 type Phase = 'intro' | 'running' | 'result';
 
-const SKILL_BULLETS = [
-  { tr: 'Örüntü tanıma', hint: 'Sayı ve ilişki dizilerini çözme' },
-  { tr: 'Sözel akıl yürütme', hint: 'Kavramlar arası bağ kurma' },
-  { tr: 'Mantıksal çıkarım', hint: 'Öncüllerden sonuca ulaşma' },
-];
+/**
+ * Soru türünden "ölçülecek yetenek" kartına. Liste önceden sabitti ve
+ * Sözel IQ testinin girişinde "sayı dizilerini çözme" yazıyordu;
+ * artık testin kendi havuzundan türetiliyor.
+ */
+const SKILL_FOR_KIND: Record<QuestionKind, { title: string; hint: string }> = {
+  number_series: { title: 'Örüntü tanıma', hint: 'Sayı dizilerindeki kuralı bulma' },
+  arithmetic: { title: 'Aritmetik akıl yürütme', hint: 'İşlem sırasını doğru kurma' },
+  verbal_analogy: { title: 'Sözel akıl yürütme', hint: 'Kavramlar arası bağ kurma' },
+  odd_one_out: { title: 'Sınıflandırma', hint: 'Ortak özelliği ve istisnayı görme' },
+  logic: { title: 'Mantıksal çıkarım', hint: 'Öncüllerden sonuca ulaşma' },
+  coding: { title: 'Kural uygulama', hint: 'Verilen kuralı yeni duruma taşıma' },
+  matrix: { title: 'Görsel örüntü', hint: 'Şekil ilişkilerini tamamlama' },
+  shape_analogy: { title: 'Şekil analojisi', hint: 'Şekiller arası ilişki kurma' },
+  spatial: { title: 'Uzamsal muhakeme', hint: 'Zihinde döndürme ve katlama' },
+};
+
+/** Havuzda en çok geçen üç soru türünün kartı. */
+function skillBulletsFor(questions: readonly ContentQuestion[]) {
+  const counts = new Map<QuestionKind, number>();
+  for (const question of questions) {
+    counts.set(question.kind, (counts.get(question.kind) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([kind]) => SKILL_FOR_KIND[kind]);
+}
 
 export default function TestRunnerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -152,9 +177,9 @@ export default function TestRunnerScreen() {
           Ölçülecek yetenekler
         </Text>
         <View style={styles.bullets}>
-          {SKILL_BULLETS.map((bullet) => (
-            <Card key={bullet.tr}>
-              <Text variant="subheading">{bullet.tr}</Text>
+          {skillBulletsFor(test.questions).map((bullet) => (
+            <Card key={bullet.title}>
+              <Text variant="subheading">{bullet.title}</Text>
               <Text variant="bodySmall" color="textSecondary">
                 {bullet.hint}
               </Text>
