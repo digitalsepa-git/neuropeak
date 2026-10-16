@@ -14,6 +14,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CelebrationOverlay } from '@/components/celebration-overlay';
 import { ThemeProvider, useTheme } from '@/components/ui';
+import { AdsProvider } from '@/lib/ads/context';
 import { startAnalytics, track } from '@/lib/analytics';
 import { ProProvider } from '@/lib/billing/context';
 import { ProgressProvider } from '@/lib/progress/context';
@@ -67,10 +68,12 @@ export default function RootLayout() {
           <RemoteConfigProvider>
             <ProProvider>
               <ProgressProvider>
-                <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-                  <RootStack />
-                  <CelebrationOverlay />
-                </OnboardingGateProvider>
+                <AdsProvider>
+                  <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+                    <RootStack />
+                    <CelebrationOverlay />
+                  </OnboardingGateProvider>
+                </AdsProvider>
               </ProgressProvider>
             </ProProvider>
           </RemoteConfigProvider>

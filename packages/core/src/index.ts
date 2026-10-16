@@ -356,3 +356,12 @@ export {
   type FunnelResult,
   type FunnelStep,
 } from './analytics/events';
+
+export {
+  GRACE_ROUNDS,
+  INTERSTITIAL_COOLDOWN_MS,
+  canWatchRewardedAd,
+  rewardedAdsRemaining,
+  shouldShowInterstitial,
+  type InterstitialInput,
+} from './ads/pacing';

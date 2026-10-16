@@ -17,6 +17,7 @@ import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { Icon } from '@/components/icons';
 import { ScoreReveal } from '@/components/test/score-reveal';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { useAds } from '@/lib/ads/context';
 import { track } from '@/lib/analytics';
 import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
@@ -59,6 +60,7 @@ export default function TestRunnerScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { recordTestFinished } = useProgress();
+  const { afterRound } = useAds();
 
   const test = findTest(id ?? '');
 
@@ -216,7 +218,16 @@ export default function TestRunnerScreen() {
   }
 
   if (phase === 'result' && result !== null) {
-    return <ScoreReveal result={result} testTitle={test.title.tr} onDone={() => router.back()} />;
+    // Reklam, sonuç ekranından çıkışta: skorun üstünü kapatmıyor.
+    return (
+      <ScoreReveal
+        result={result}
+        testTitle={test.title.tr}
+        onDone={() => {
+          void afterRound().finally(() => router.back());
+        }}
+      />
+    );
   }
 
   const question = questions[questionIndex];

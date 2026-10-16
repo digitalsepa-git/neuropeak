@@ -78,6 +78,8 @@ type ProgressContextValue = {
   /** Rozet vitrini için tanımlar; içerik paketinden geliyor. */
   readonly badges: readonly ContentBadge[];
   spendStars: (amount: number) => Promise<boolean>;
+  /** Ödüllü reklam sonuna kadar izlendiğinde çağrılır. */
+  grantRewardedAdStars: () => Promise<void>;
 };
 
 const noop = async () => undefined;
@@ -99,6 +101,7 @@ const ProgressContext = createContext<ProgressContextValue>({
   recordGameRound: noop,
   recordTestFinished: noop,
   spendStars: () => Promise.resolve(false),
+  grantRewardedAdStars: noop,
 });
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
@@ -335,6 +338,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
+  const grantRewardedAdStars = useCallback<
+    ProgressContextValue['grantRewardedAdStars']
+  >(async () => {
+    const current = stateRef.current;
+
+    // Günlük sınır çekirdekte kontrol ediliyor; burada yalnızca
+    // sayaç ve yıldız işleniyor.
+    await commit({
+      ...current,
+      stars: current.stars + STAR_REWARDS.rewardedAd,
+      rewardedAdsToday: current.rewardedAdsToday + 1,
+    });
+  }, [commit]);
+
   const value = useMemo<ProgressContextValue>(
     () => ({
       state,
@@ -348,8 +365,18 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       recordGameRound,
       recordTestFinished,
       spendStars,
+      grantRewardedAdStars,
     }),
-    [celebration, ready, recordGameRound, recordTestFinished, spendStars, state, userId],
+    [
+      celebration,
+      grantRewardedAdStars,
+      ready,
+      recordGameRound,
+      recordTestFinished,
+      spendStars,
+      state,
+      userId,
+    ],
   );
 
   return <ProgressContext value={value}>{children}</ProgressContext>;

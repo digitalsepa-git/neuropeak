@@ -4,11 +4,13 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
+import { RewardedAdCard } from '@/components/rewarded-ad-card';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
 import { GAME_CATALOGUE } from '@neuropeak/content';
 
 import { CATEGORY_LABELS } from '@/data/placeholder';
+import { useAds } from '@/lib/ads/context';
 import { useRemoteConfig } from '@/lib/remote/context';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
@@ -23,6 +25,7 @@ export default function HomeScreen() {
   const announcement = getString('announcement.text');
   const { isPro } = usePro();
   const { state, level, neuropeak } = useProgress();
+  const { canWatchRewarded } = useAds();
 
   const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;
   const streakDays = state.streak.currentDays;
@@ -92,6 +95,12 @@ export default function HomeScreen() {
           })}
         </View>
       </Section>
+
+      {canWatchRewarded && (
+        <Section title="Yıldız kazan">
+          <RewardedAdCard />
+        </Section>
+      )}
 
       <Section title="NeuroPeak skorun">
         <Card padding="lg">
