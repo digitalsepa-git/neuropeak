@@ -5,7 +5,6 @@ import {
   generateAnagram,
   generateWordAnalogy,
   generateWordPair,
-  toTurkishUpper,
   type AnagramEntry,
   type AnalogyEntry,
   type WordPairEntry,
@@ -67,22 +66,6 @@ const PAIRS: readonly WordPairEntry[] = [
     distractors: ['yiğit', 'atak', 'güçlü'],
   },
 ];
-
-describe('toTurkishUpper', () => {
-  it('noktalı i harfini korur', () => {
-    expect(toTurkishUpper('iplik')).toBe('İPLİK');
-    expect(toTurkishUpper('ışık')).toBe('IŞIK');
-  });
-
-  it('Türkçeye özgü harfleri büyütür', () => {
-    expect(toTurkishUpper('çiğdem')).toBe('ÇİĞDEM');
-    expect(toTurkishUpper('gözlükçü')).toBe('GÖZLÜKÇÜ');
-  });
-
-  it('zaten büyük harfleri değiştirmez', () => {
-    expect(toTurkishUpper('ABC')).toBe('ABC');
-  });
-});
 
 describe('anagramLengthForLevel', () => {
   it('dört harften başlar', () => {

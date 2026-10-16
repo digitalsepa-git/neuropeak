@@ -164,7 +164,6 @@ export {
   generateAnagram,
   generateWordAnalogy,
   generateWordPair,
-  toTurkishUpper,
   type AnagramEntry,
   type AnagramPuzzle,
   type AnalogyEntry,
@@ -173,3 +172,41 @@ export {
   type WordPairMode,
   type WordPairPuzzle,
 } from './puzzles/words';
+
+export {
+  edgeKey,
+  generateOneLine,
+  hasEulerPath,
+  type Edge,
+  type OneLinePuzzle,
+} from './puzzles/one-line';
+
+export {
+  WALL_EAST,
+  WALL_NORTH,
+  WALL_SOUTH,
+  WALL_WEST,
+  generateMaze,
+  isBlocked,
+  mazeSizeForLevel,
+  solveMaze,
+  type MazePuzzle,
+} from './puzzles/maze';
+
+export {
+  connectPairsForLevel,
+  connectSizeForLevel,
+  generateConnect,
+  isConnectSolved,
+  neighbourCells,
+  type ConnectPair,
+  type ConnectPuzzle,
+} from './puzzles/connect';
+
+export {
+  generateQuickDecision,
+  type QuickDecisionDifficulty,
+  type QuickDecisionTrial,
+} from './puzzles/quick-decision';
+
+export { toTurkishUpper, turkishDativeSuffix } from './utils/turkish';

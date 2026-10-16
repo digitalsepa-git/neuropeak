@@ -1,15 +1,20 @@
 import { AnagramGame } from './anagram';
 import { CardMatchGame } from './card-match';
+import { ConnectGame } from './connect';
 import { DigitSpanGame } from './digit-span';
 import { GoNoGoGame } from './go-no-go';
 import { LightSequenceGame } from './light-sequence';
 import { LiquidSortGame } from './liquid-sort';
 import { LogicChainGame } from './logic-chain';
 import { MatrixPuzzleGame } from './matrix-puzzle';
+import { MazeGame } from './maze';
 import { MentalRotationGame } from './mental-rotation';
 import { NumberSeriesGame } from './number-series';
+import { OneLineGame } from './one-line';
 import { PaperFoldGame } from './paper-fold';
+import { QuickDecisionGame } from './quick-decision';
 import { QuickMathGame } from './quick-math';
+import { ReactionGame } from './reaction';
 import { ShadowMatchGame } from './shadow-match';
 import { TargetNumberGame } from './target-number';
 import { WordAnalogyGame } from './word-analogy';
@@ -247,6 +252,65 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Kelime dağarcığı', 'Anlam ayırt etme', 'Okuma hızı'],
     baseXp: 15,
     Component: WordLinkGame,
+  },
+  {
+    id: 'one-line',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Tek Çizgi',
+    instruction: 'Kalemi kaldırmadan her kenarı bir kez çiz',
+    description:
+      'Noktalara sırayla dokunarak bütün kenarları tek seferde çizersin. Her tahta çözülebilir üretilir.',
+    skills: ['Planlama', 'Uzamsal muhakeme', 'Deneme-yanılma'],
+    baseXp: 22,
+    Component: OneLineGame,
+  },
+  {
+    id: 'connect',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Bağlantı',
+    instruction: 'Aynı renkleri kesişmeden bağla',
+    description:
+      'Aynı renk iki noktayı, yollar birbirini kesmeden bağlarsın. Seviye yükseldikçe ızgara ve çift sayısı büyür.',
+    skills: ['Planlama', 'Uzamsal muhakeme', 'Sabır'],
+    baseXp: 24,
+    Component: ConnectGame,
+  },
+  {
+    id: 'maze',
+    category: 'logic',
+    mode: 'levels',
+    title: 'Doğru Yolu Seç',
+    instruction: 'Labirentten çıkışı bul',
+    description: 'Yön tuşlarıyla labirentten çıkarsın. Kısa yoldan çıkmak daha çok puan getirir.',
+    skills: ['Yön bulma', 'Planlama', 'Çalışma belleği'],
+    baseXp: 20,
+    Component: MazeGame,
+  },
+  {
+    id: 'reaction',
+    category: 'speed',
+    mode: 'timed',
+    title: 'Reaksiyon',
+    instruction: 'Yeşili görünce hemen bas',
+    description:
+      'Ekran yeşile dönünce basarsın. Beş ölçümün ortalaması tepki süreni milisaniye hassasiyetiyle verir.',
+    skills: ['Tepki süresi', 'Dikkat', 'Dürtü kontrolü'],
+    baseXp: 12,
+    Component: ReactionGame,
+  },
+  {
+    id: 'quick-decision',
+    category: 'speed',
+    mode: 'timed',
+    title: 'Hızlı Karar',
+    instruction: 'İki paneli karşılaştır',
+    description:
+      'Hangi tarafta daha çok nokta var, ya da sayılar aynı mı? Soru dönüşümlü sorulur, kalıba bağlanamazsın.',
+    skills: ['Karar hızı', 'Sayı sezgisi', 'Dikkat'],
+    baseXp: 14,
+    Component: QuickDecisionGame,
   },
 ];
 
