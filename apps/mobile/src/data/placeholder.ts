@@ -17,44 +17,41 @@ export const CATEGORY_LABELS: Record<GameCategory, string> = {
   verbal: 'Sözel',
 };
 
-export type PlaceholderGame = {
-  id: string;
-  title: string;
-  category: GameCategory;
-  level: number;
-  totalLevels: number;
+/**
+ * GEÇİCİ — oyun başına ilerleme henüz kaydedilmiyor. Oyunlar sekmesi
+ * kartları dolu göstersin diye bu değerleri kullanıyor; gerçek
+ * ilerleme kaydı eklendiğinde bu tablo silinecek.
+ */
+export const GAME_PROGRESS: Record<string, number> = {
+  'card-match': 12,
+  'n-back': 4,
+  'light-sequence': 9,
+  'grid-recall': 11,
+  stroop: 21,
+  'odd-one-out': 7,
+  'symbol-hunt': 3,
+  'go-no-go': 5,
+  tracking: 6,
+  matrix: 18,
+  'logic-chain': 8,
+  'liquid-sort': 46,
+  'one-line': 31,
+  connect: 17,
+  maze: 24,
+  'quick-math': 15,
+  'number-series': 22,
+  'target-number': 9,
+  balance: 19,
+  rotation: 6,
+  'shadow-match': 4,
+  'paper-fold': 11,
+  tiling: 7,
+  reaction: 28,
+  'quick-decision': 13,
+  anagram: 14,
+  'word-analogy': 5,
+  'word-link': 8,
 };
-
-export const GAMES: PlaceholderGame[] = [
-  { id: 'card-match', title: 'Kart Eşleme', category: 'memory', level: 12, totalLevels: 240 },
-  { id: 'n-back', title: 'N-Geri', category: 'memory', level: 4, totalLevels: 0 },
-  { id: 'light-sequence', title: 'Işık Dizisi', category: 'memory', level: 9, totalLevels: 0 },
-  { id: 'grid-recall', title: 'Nerede Kaldı?', category: 'memory', level: 11, totalLevels: 260 },
-  { id: 'stroop', title: 'Renk Tuzağı', category: 'attention', level: 21, totalLevels: 0 },
-  { id: 'odd-one-out', title: 'Farklı Olanı Bul', category: 'attention', level: 7, totalLevels: 0 },
-  { id: 'symbol-hunt', title: 'Simge Avı', category: 'attention', level: 3, totalLevels: 0 },
-  { id: 'go-no-go', title: 'Dur / Geç', category: 'attention', level: 5, totalLevels: 0 },
-  { id: 'tracking', title: 'Çoklu Takip', category: 'attention', level: 6, totalLevels: 220 },
-  { id: 'matrix', title: 'Matris Bulmaca', category: 'logic', level: 18, totalLevels: 320 },
-  { id: 'logic-chain', title: 'Mantık Zinciri', category: 'logic', level: 8, totalLevels: 240 },
-  { id: 'liquid-sort', title: 'Sıvı Sıralama', category: 'logic', level: 46, totalLevels: 400 },
-  { id: 'one-line', title: 'Tek Çizgi', category: 'logic', level: 31, totalLevels: 315 },
-  { id: 'connect', title: 'Bağlantı', category: 'logic', level: 17, totalLevels: 280 },
-  { id: 'maze', title: 'Doğru Yolu Seç', category: 'logic', level: 24, totalLevels: 300 },
-  { id: 'quick-math', title: 'Hızlı İşlem', category: 'math', level: 15, totalLevels: 0 },
-  { id: 'number-series', title: 'Sayı Dizisi', category: 'math', level: 22, totalLevels: 280 },
-  { id: 'target-number', title: 'Hedef Sayı', category: 'math', level: 9, totalLevels: 300 },
-  { id: 'balance', title: 'Terazi', category: 'math', level: 19, totalLevels: 260 },
-  { id: 'rotation', title: 'Şekil Döndürme', category: 'spatial', level: 6, totalLevels: 0 },
-  { id: 'shadow-match', title: 'Gölge Eşleştir', category: 'spatial', level: 4, totalLevels: 0 },
-  { id: 'paper-fold', title: 'Katla-Aç', category: 'spatial', level: 11, totalLevels: 200 },
-  { id: 'tiling', title: 'Parça Birleştir', category: 'spatial', level: 7, totalLevels: 240 },
-  { id: 'reaction', title: 'Reaksiyon', category: 'speed', level: 28, totalLevels: 0 },
-  { id: 'quick-decision', title: 'Hızlı Karar', category: 'speed', level: 13, totalLevels: 0 },
-  { id: 'anagram', title: 'Kelime Avı', category: 'verbal', level: 14, totalLevels: 260 },
-  { id: 'word-analogy', title: 'Sözel Analoji', category: 'verbal', level: 5, totalLevels: 240 },
-  { id: 'word-link', title: 'Kelime Bağı', category: 'verbal', level: 8, totalLevels: 0 },
-];
 
 export type PlaceholderTest = {
   id: string;

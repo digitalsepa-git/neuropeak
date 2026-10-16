@@ -1,5 +1,4 @@
-import type { Difficulty, GameCategory, GameMode } from '@neuropeak/core';
-import type { ComponentType } from 'react';
+import type { Difficulty } from '@neuropeak/core';
 
 export type RoundOutcome = {
   /** Oyunun kendi puanı; oyunlar arası karşılaştırılmaz. */
@@ -22,19 +21,4 @@ export type GameProps = {
   /** Oyun ilerledikçe çağrılır; kabuk üst bardaki skoru buradan okur. */
   onProgress: (outcome: RoundOutcome) => void;
   onFinish: (outcome: RoundOutcome) => void;
-};
-
-export type GameDefinition = {
-  readonly id: string;
-  readonly category: GameCategory;
-  readonly mode: GameMode;
-  readonly title: string;
-  /** Oyun ekranının üstündeki tek cümlelik yönerge. */
-  readonly instruction: string;
-  /** Brifing ekranındaki kısa açıklama. */
-  readonly description: string;
-  /** Bu oyunun geliştirdiği yetenekler; brifingde listelenir. */
-  readonly skills: readonly string[];
-  readonly baseXp: number;
-  readonly Component: ComponentType<GameProps>;
 };

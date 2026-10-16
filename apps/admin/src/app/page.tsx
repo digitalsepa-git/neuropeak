@@ -1,5 +1,4 @@
-import { CONTENT_TESTS } from '@neuropeak/content';
-import { BADGES } from '@neuropeak/content';
+import { BADGES, CONTENT_TESTS, GAME_CATALOGUE } from '@neuropeak/content';
 import Link from 'next/link';
 
 import { Shell } from '@/components/shell';
@@ -14,6 +13,7 @@ export default function DashboardPage() {
     { label: 'Test', value: `${tests.length}` },
     { label: 'Soru (tekil)', value: `${questions}` },
     { label: 'PRO test', value: `${proTests}` },
+    { label: 'Oyun', value: `${GAME_CATALOGUE.length}` },
     { label: 'Rozet', value: `${BADGES.length}` },
   ];
 

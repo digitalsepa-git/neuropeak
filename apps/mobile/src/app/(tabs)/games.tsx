@@ -7,8 +7,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { AppHeader } from '@/components/app-header';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text } from '@/components/ui';
+import { GAME_CATALOGUE, type ContentGame } from '@neuropeak/content';
+
 import { isGamePlayable } from '@/games/registry';
-import { CATEGORY_LABELS, GAMES, type PlaceholderGame } from '@/data/placeholder';
+import { CATEGORY_LABELS, GAME_PROGRESS } from '@/data/placeholder';
 
 type Filter = GameCategory | 'all';
 
@@ -17,7 +19,7 @@ export default function GamesScreen() {
 
   const visibleCategories = GAME_CATEGORIES.filter(
     (category) => filter === 'all' || filter === category,
-  ).filter((category) => GAMES.some((game) => game.category === category));
+  ).filter((category) => GAME_CATALOGUE.some((game) => game.category === category));
 
   return (
     <Screen scroll padded={false}>
@@ -45,7 +47,7 @@ export default function GamesScreen() {
         {visibleCategories.map((category) => (
           <Section key={category} title={CATEGORY_LABELS[category]}>
             <View style={styles.grid}>
-              {GAMES.filter((game) => game.category === category).map((game) => (
+              {GAME_CATALOGUE.filter((game) => game.category === category).map((game) => (
                 <GameCard key={game.id} game={game} />
               ))}
             </View>
@@ -56,11 +58,14 @@ export default function GamesScreen() {
   );
 }
 
-function GameCard({ game }: { game: PlaceholderGame }) {
+function GameCard({ game }: { game: ContentGame }) {
   const router = useRouter();
   const accent = categoryAccent[game.category];
   const isEndless = game.totalLevels === 0;
   const playable = isGamePlayable(game.id);
+  // Oyun başına ilerleme henüz kaydedilmiyor; kart dolu görünsün diye
+  // yer tutucu değer kullanılıyor.
+  const level = GAME_PROGRESS[game.id] ?? 1;
 
   return (
     <Card
@@ -81,7 +86,7 @@ function GameCard({ game }: { game: PlaceholderGame }) {
       </Text>
       {playable ? (
         <Text variant="caption" color="textMuted">
-          {isEndless ? `En iyi seviye ${game.level}` : `Seviye ${game.level}/${game.totalLevels}`}
+          {isEndless ? `En iyi seviye ${level}` : `Seviye ${level}/${game.totalLevels}`}
         </Text>
       ) : (
         <Badge label="Yakında" />
