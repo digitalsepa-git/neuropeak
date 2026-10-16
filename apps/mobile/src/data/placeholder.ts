@@ -39,6 +39,7 @@ export const GAMES: PlaceholderGame[] = [
   { id: 'one-line', title: 'Tek Çizgi', category: 'logic', level: 31, totalLevels: 315 },
   { id: 'quick-math', title: 'Hızlı İşlem', category: 'math', level: 15, totalLevels: 0 },
   { id: 'number-series', title: 'Sayı Dizisi', category: 'math', level: 22, totalLevels: 280 },
+  { id: 'target-number', title: 'Hedef Sayı', category: 'math', level: 9, totalLevels: 300 },
   { id: 'rotation', title: 'Şekil Döndürme', category: 'spatial', level: 6, totalLevels: 0 },
   { id: 'paper-fold', title: 'Katla-Aç', category: 'spatial', level: 11, totalLevels: 200 },
   { id: 'reaction', title: 'Reaksiyon', category: 'speed', level: 28, totalLevels: 0 },
