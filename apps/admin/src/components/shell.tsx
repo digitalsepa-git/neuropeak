@@ -17,7 +17,7 @@ type NavItem = {
 const NAV: readonly NavItem[] = [
   { href: '/', label: 'Genel bakış', ready: true },
   { href: '/content/tests', label: 'Testler', ready: true },
-  { href: '/content/games', label: 'Oyunlar', ready: false },
+  { href: '/content/games', label: 'Oyunlar', ready: true },
   { href: '/users', label: 'Kullanıcılar', ready: false },
   { href: '/analytics', label: 'Analitik', ready: false },
   { href: '/remote', label: 'Uzaktan kontrol', ready: false },

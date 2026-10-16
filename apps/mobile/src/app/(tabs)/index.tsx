@@ -6,12 +6,14 @@ import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
-import { CATEGORY_LABELS, GAMES } from '@/data/placeholder';
+import { GAME_CATALOGUE } from '@neuropeak/content';
+
+import { CATEGORY_LABELS } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
 import { TASK_LABELS } from '@/lib/progress/templates';
 
-const SUGGESTED = GAMES[3];
+const SUGGESTED = GAME_CATALOGUE[3];
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -111,13 +113,16 @@ export default function HomeScreen() {
 
       {SUGGESTED !== undefined && (
         <Section title="Bugünün önerisi">
-          <Card accentColor={categoryAccent[SUGGESTED.category]} onPress={() => {}}>
+          <Card
+            accentColor={categoryAccent[SUGGESTED.category]}
+            onPress={() => router.push({ pathname: '/game/[id]', params: { id: SUGGESTED.id } })}
+          >
             <View style={styles.taskHead}>
               <Text variant="subheading">{SUGGESTED.title}</Text>
               <Badge label={CATEGORY_LABELS[SUGGESTED.category]} />
             </View>
             <Text variant="bodySmall" color="textSecondary">
-              Seviye {SUGGESTED.level} · dikkat ve tepki hızını çalıştırır
+              {SUGGESTED.instruction}
             </Text>
           </Card>
         </Section>
