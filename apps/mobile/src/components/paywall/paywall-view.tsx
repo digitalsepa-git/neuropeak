@@ -8,7 +8,9 @@ import { ExitOffer } from '@/components/paywall/exit-offer';
 import { PlanCard } from '@/components/paywall/plan-card';
 import { Button, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { EXIT_OFFER_PLAN, billing, type Plan, type PlanId } from '@/lib/billing';
+import { track } from '@/lib/analytics';
 import { usePro } from '@/lib/billing/context';
+import { useRemoteConfig } from '@/lib/remote/context';
 
 export type PaywallVariant = 'onboarding' | 'result' | 'generic';
 
@@ -57,6 +59,7 @@ export function PaywallView({
 }: PaywallViewProps) {
   const theme = useTheme();
   const { purchase, restore } = usePro();
+  const { getString } = useRemoteConfig();
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selected, setSelected] = useState<PlanId>('weekly');
@@ -66,6 +69,10 @@ export function PaywallView({
   useEffect(() => {
     void billing.getPlans().then(setPlans);
   }, []);
+
+  useEffect(() => {
+    track('paywall_view', { variant });
+  }, [variant]);
 
   const finishPurchase = useCallback(() => {
     if (onPurchased !== undefined) {
@@ -136,6 +143,10 @@ export function PaywallView({
       : 'Devam et';
 
   const headline = HEADLINES[variant];
+  // Panelden yazılan başlık varsa onu kullan; boşsa varyantın kendi
+  // başlığı kalır.
+  const remoteTitle = getString('paywall.title');
+  const title = remoteTitle.length > 0 ? remoteTitle : headline.title;
 
   return (
     <Screen scroll>
@@ -161,7 +172,7 @@ export function PaywallView({
         <Text variant="overline" color="brand">
           NeuroPeak PRO
         </Text>
-        <Text variant="title">{headline.title}</Text>
+        <Text variant="title">{title}</Text>
         <Text variant="bodySmall" color="textSecondary">
           {headline.subtitle}
         </Text>

@@ -10,6 +10,8 @@ import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { track } from '@/lib/analytics';
+
 import { GameShell } from '@/components/game/game-shell';
 import { Icon } from '@/components/icons';
 import {
@@ -69,6 +71,14 @@ export default function GameScreen() {
   const onFinish = useCallback(
     (result: RoundOutcome) => {
       if (game === undefined) return;
+
+      track('game_complete', {
+        game: game.id,
+        category: game.category,
+        difficulty,
+        level: result.level,
+        completed: result.completed,
+      });
 
       setOutcome(result);
       setXpEarned(xpForGameRound({ baseXp: game.baseXp, difficulty, completed: result.completed }));

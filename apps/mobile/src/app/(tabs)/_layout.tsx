@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 
 import { Icon, type IconName } from '@/components/icons';
 import { tapFeedback, useTheme } from '@/components/ui';
+import { useRemoteConfig } from '@/lib/remote/context';
 
 const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: 'index', title: 'Ana Sayfa', icon: 'home' },
@@ -14,6 +15,11 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const { getBoolean } = useRemoteConfig();
+
+  // Lig sekmesi uzaktan kapatılabiliyor: sunucu tarafı sorun çıkarırsa
+  // uygulama güncellemesi beklemeden gizlenir.
+  const tabs = TABS.filter((tab) => tab.name !== 'league' || getBoolean('leagues.enabled'));
 
   return (
     <Tabs
@@ -41,7 +47,7 @@ export default function TabsLayout() {
         },
       }}
     >
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <Tabs.Screen
           key={tab.name}
           name={tab.name}

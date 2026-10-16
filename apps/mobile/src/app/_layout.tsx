@@ -14,10 +14,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CelebrationOverlay } from '@/components/celebration-overlay';
 import { ThemeProvider, useTheme } from '@/components/ui';
+import { startAnalytics, track } from '@/lib/analytics';
 import { ProProvider } from '@/lib/billing/context';
 import { ProgressProvider } from '@/lib/progress/context';
 import { loadOnboardingState } from '@/lib/onboarding';
 import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
+import { RemoteConfigProvider } from '@/lib/remote/context';
 import { useSyncBootstrap } from '@/lib/sync/use-sync';
 
 void SplashScreen.preventAutoHideAsync();
@@ -45,6 +47,13 @@ export default function RootLayout() {
     }
   }, [ready]);
 
+  // Açılış olayı ve düzenli gönderim; Supabase bağlı değilse ikisi de
+  // sessizce hiçbir şey yapmıyor.
+  useEffect(() => {
+    track('app_open');
+    return startAnalytics();
+  }, []);
+
   // Fontlar ve onboarding durumu hazır olana kadar açılış ekranı görünür
   // kalır; yanlış ekranın bir an görünmesini engeller.
   if (!ready) {
@@ -55,14 +64,16 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <ProProvider>
-            <ProgressProvider>
-              <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-                <RootStack />
-                <CelebrationOverlay />
-              </OnboardingGateProvider>
-            </ProgressProvider>
-          </ProProvider>
+          <RemoteConfigProvider>
+            <ProProvider>
+              <ProgressProvider>
+                <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+                  <RootStack />
+                  <CelebrationOverlay />
+                </OnboardingGateProvider>
+              </ProgressProvider>
+            </ProProvider>
+          </RemoteConfigProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
