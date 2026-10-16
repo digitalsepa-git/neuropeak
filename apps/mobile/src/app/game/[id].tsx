@@ -186,7 +186,9 @@ export default function GameScreen() {
 
   if (phase === 'playing') {
     const Game = game.Component;
-    const progressLabel = game.mode === 'levels' ? `Seviye ${status.level}` : `Tur ${status.level}`;
+    // Süreli oyunlar kendi etiketini (geri sayım) bildirir.
+    const progressLabel =
+      status.label ?? (game.mode === 'levels' ? `Seviye ${status.level}` : `Tur ${status.level}`);
 
     return (
       <ThemeProvider name="dark">
