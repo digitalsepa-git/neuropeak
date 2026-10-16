@@ -1,5 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { EMPTY_STREAK, type DailyTask, type StreakState } from '@neuropeak/core';
+import {
+  EMPTY_BRAIN_MAP,
+  EMPTY_STREAK,
+  type BrainMap,
+  type CategoryCounts,
+  type DailyTask,
+  type DayActivity,
+  type StreakState,
+} from '@neuropeak/core';
 
 const STATE_KEY = 'neuropeak.progress.v1';
 const DEVICE_ID_KEY = 'neuropeak.deviceId';
@@ -13,6 +21,12 @@ export type ProgressState = {
   tasks: DailyTask[];
   /** Bugün ödüllü reklamla kazanılan yıldız sayısı. */
   rewardedAdsToday: number;
+  /** Beş eksendeki güncel performans; İlerleme sekmesini besler. */
+  brainMap: BrainMap;
+  /** Son iki haftanın günlük XP ve tur sayısı. */
+  history: DayActivity[];
+  /** Kategori başına oynanan tur sayısı. */
+  categoryRounds: CategoryCounts;
 };
 
 export const EMPTY_PROGRESS: ProgressState = {
@@ -22,6 +36,9 @@ export const EMPTY_PROGRESS: ProgressState = {
   tasksDate: null,
   tasks: [],
   rewardedAdsToday: 0,
+  brainMap: EMPTY_BRAIN_MAP,
+  history: [],
+  categoryRounds: {},
 };
 
 export async function loadProgress(): Promise<ProgressState> {
@@ -35,6 +52,9 @@ export async function loadProgress(): Promise<ProgressState> {
       ...parsed,
       streak: { ...EMPTY_STREAK, ...parsed.streak },
       tasks: parsed.tasks ?? [],
+      brainMap: { ...EMPTY_BRAIN_MAP, ...parsed.brainMap },
+      history: parsed.history ?? [],
+      categoryRounds: parsed.categoryRounds ?? {},
     };
   } catch {
     return EMPTY_PROGRESS;

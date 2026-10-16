@@ -1,14 +1,21 @@
 import {
   STAR_REWARDS,
+  applyRoundToBrainMap,
   applyTaskEvent,
   levelProgress,
+  neuropeakScore,
   pickDailyTasks,
   recordActivity,
+  recordCategoryRound,
+  recordDayActivity,
+  roundPerformance,
   toDateKey,
   xpForGameRound,
   xpForTestCompletion,
+  type BrainMap,
   type Difficulty,
   type GameCategory,
+  type GameMode,
   type LevelProgress,
   type TaskEvent,
 } from '@neuropeak/core';
@@ -46,11 +53,15 @@ type ProgressContextValue = {
   readonly ready: boolean;
   readonly celebration: Celebration | null;
   clearCelebration: () => void;
+  readonly neuropeak: number;
   recordGameRound: (options: {
     category: GameCategory;
     difficulty: Difficulty;
     completed: boolean;
     baseXp?: number;
+    /** Beyin haritası için: oyunun yapısı ve ulaşılan seviye. */
+    mode: GameMode;
+    level: number;
   }) => Promise<void>;
   recordTestFinished: (iq: number) => Promise<void>;
   spendStars: (amount: number) => Promise<boolean>;
@@ -61,6 +72,7 @@ const noop = async () => undefined;
 const ProgressContext = createContext<ProgressContextValue>({
   state: EMPTY_PROGRESS,
   level: levelProgress(0),
+  neuropeak: neuropeakScore(EMPTY_PROGRESS.brainMap),
   ready: false,
   celebration: null,
   clearCelebration: () => undefined,
@@ -124,7 +136,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
    * yıldızlar. Tek kapıdan geçmesi, bir ödülün unutulmasını engelliyor.
    */
   const applyActivity = useCallback(
-    async (options: { xpGain: number; starGain: number; taskEvents: TaskEvent[] }) => {
+    async (options: {
+      xpGain: number;
+      starGain: number;
+      taskEvents: TaskEvent[];
+      /** Oyun turuysa beyin haritasına işlenecek bilgi. */
+      round?: { category: GameCategory; performance: number };
+    }) => {
       const current = stateRef.current;
       const today = toDateKey(new Date());
 
@@ -167,6 +185,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         setCelebration({ type: 'tasks_done', stars: taskStars });
       }
 
+      const brainMap: BrainMap =
+        options.round === undefined
+          ? current.brainMap
+          : applyRoundToBrainMap(
+              current.brainMap,
+              options.round.category,
+              options.round.performance,
+            );
+
+      const categoryRounds =
+        options.round === undefined
+          ? current.categoryRounds
+          : recordCategoryRound(current.categoryRounds, options.round.category);
+
       await commit({
         ...current,
         xp,
@@ -174,6 +206,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         streak: streakOutcome.state,
         tasksDate: today,
         tasks,
+        brainMap,
+        categoryRounds,
+        history: recordDayActivity(current.history, today, {
+          xp: options.xpGain,
+          rounds: options.round === undefined ? 0 : 1,
+        }),
       });
     },
     [commit],
@@ -185,6 +223,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         xpGain: xpForGameRound(options),
         starGain: options.completed ? STAR_REWARDS.gameComplete : 0,
         taskEvents: [{ type: 'game_played', category: options.category }],
+        round: {
+          category: options.category,
+          performance: roundPerformance({
+            mode: options.mode,
+            level: options.level,
+            completed: options.completed,
+            difficulty: options.difficulty,
+          }),
+        },
       });
     },
     [applyActivity],
@@ -215,6 +262,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       level: levelProgress(state.xp),
+      neuropeak: neuropeakScore(state.brainMap),
       ready,
       celebration,
       clearCelebration: () => setCelebration(null),
