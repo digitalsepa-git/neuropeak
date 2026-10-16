@@ -20,8 +20,8 @@ const NAV: readonly NavItem[] = [
   { href: '/content/games', label: 'Oyunlar', ready: true },
   { href: '/users', label: 'Kullanıcılar', ready: true },
   { href: '/users/push', label: 'Push', ready: true },
-  { href: '/analytics', label: 'Analitik', ready: false },
-  { href: '/remote', label: 'Uzaktan kontrol', ready: false },
+  { href: '/analytics', label: 'Analitik', ready: true },
+  { href: '/remote', label: 'Uzaktan kontrol', ready: true },
 ];
 
 export function Shell({

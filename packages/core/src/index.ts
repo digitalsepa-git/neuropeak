@@ -328,3 +328,31 @@ export {
   type PushIssue,
   type PushMessage,
 } from './crm/push';
+
+export {
+  DEFAULT_REMOTE_CONFIG,
+  REMOTE_KEYS,
+  experimentVariant,
+  findRemoteKey,
+  isValidRemoteValue,
+  isVersionBelow,
+  mergeRemoteConfig,
+  remoteBoolean,
+  remoteNumber,
+  remoteString,
+  type RemoteConfig,
+  type RemoteKeyDefinition,
+  type RemoteValue,
+} from './remote/config';
+
+export {
+  ACTIVATION_FUNNEL,
+  ANALYTICS_EVENTS,
+  countByEvent,
+  funnel,
+  retention,
+  type AnalyticsEvent,
+  type AnalyticsRecord,
+  type FunnelResult,
+  type FunnelStep,
+} from './analytics/events';
