@@ -79,6 +79,8 @@ export default function GameScreen() {
         difficulty,
         completed: result.completed,
         baseXp: game.baseXp,
+        mode: game.mode,
+        level: result.level,
       });
     },
     [difficulty, game, recordGameRound],

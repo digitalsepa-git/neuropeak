@@ -248,3 +248,28 @@ export {
   type TilingPlacement,
   type TilingPuzzle,
 } from './puzzles/tiling';
+
+export {
+  EMPTY_BRAIN_MAP,
+  FALL_RATE,
+  INITIAL_AXIS_SCORE,
+  RISE_RATE,
+  applyRoundToBrainMap,
+  axisForCategory,
+  categoriesForAxis,
+  neuropeakScore,
+  roundPerformance,
+  strongestAxis,
+  weakestAxis,
+  type RoundPerformanceInput,
+} from './gamification/brain-map';
+
+export {
+  HISTORY_DAYS,
+  lastDays,
+  rankCategories,
+  recordCategoryRound,
+  recordDayActivity,
+  type CategoryCounts,
+  type DayActivity,
+} from './gamification/activity';
