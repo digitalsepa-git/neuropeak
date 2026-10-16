@@ -41,6 +41,7 @@ export const GAMES: PlaceholderGame[] = [
   { id: 'number-series', title: 'Sayı Dizisi', category: 'math', level: 22, totalLevels: 280 },
   { id: 'target-number', title: 'Hedef Sayı', category: 'math', level: 9, totalLevels: 300 },
   { id: 'rotation', title: 'Şekil Döndürme', category: 'spatial', level: 6, totalLevels: 0 },
+  { id: 'shadow-match', title: 'Gölge Eşleştir', category: 'spatial', level: 4, totalLevels: 0 },
   { id: 'paper-fold', title: 'Katla-Aç', category: 'spatial', level: 11, totalLevels: 200 },
   { id: 'reaction', title: 'Reaksiyon', category: 'speed', level: 28, totalLevels: 0 },
   { id: 'anagram', title: 'Kelime Avı', category: 'verbal', level: 14, totalLevels: 260 },

@@ -132,3 +132,29 @@ export {
   type QuickMathDifficulty,
   type QuickMathProblem,
 } from './puzzles/quick-math';
+
+export {
+  boundsOf,
+  generateChiralShape,
+  growShape,
+  isChiral,
+  mirror,
+  normalize,
+  rotate,
+  rotateTimes,
+  rotations,
+  sameUpToRotation,
+  shapeKey,
+  type Cell,
+  type Shape,
+} from './puzzles/shapes';
+
+export {
+  PAPER_SIZE,
+  generatePaperFold,
+  patternKey,
+  unfold,
+  type FoldAxis,
+  type HolePattern,
+  type PaperFoldPuzzle,
+} from './puzzles/paper-fold';
