@@ -18,7 +18,8 @@ const NAV: readonly NavItem[] = [
   { href: '/', label: 'Genel bakış', ready: true },
   { href: '/content/tests', label: 'Testler', ready: true },
   { href: '/content/games', label: 'Oyunlar', ready: true },
-  { href: '/users', label: 'Kullanıcılar', ready: false },
+  { href: '/users', label: 'Kullanıcılar', ready: true },
+  { href: '/users/push', label: 'Push', ready: true },
   { href: '/analytics', label: 'Analitik', ready: false },
   { href: '/remote', label: 'Uzaktan kontrol', ready: false },
 ];
@@ -82,12 +83,13 @@ export function Shell({
 function EmbeddedNotice() {
   return (
     <div className="mb-lg rounded-lg border border-border bg-surface-sunken p-md">
-      <p className="text-bodysmall font-semibold">Salt okunur — gömülü içerik</p>
+      <p className="text-bodysmall font-semibold">Salt okunur — bağlantı yok</p>
       <p className="mt-1 text-bodysmall text-fg-muted">
-        Supabase bağlantısı yapılandırılmamış. Panel şu an uygulamanın içine gömülü soru bankasını
-        gösteriyor; düzenleme kapalı. <code className="text-caption">NEXT_PUBLIC_SUPABASE_URL</code>{' '}
-        ve <code className="text-caption">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> tanımlandığında
-        içerik veritabanından okunur ve düzenleme açılır.
+        Supabase bağlantısı yapılandırılmamış. İçerik uygulamaya gömülü bankadan gösteriliyor;
+        kullanıcı verisi, kitle sayıları ve gönderim kapalı.{' '}
+        <code className="text-caption">NEXT_PUBLIC_SUPABASE_URL</code> ve{' '}
+        <code className="text-caption">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> tanımlandığında hepsi
+        açılır.
       </p>
     </div>
   );

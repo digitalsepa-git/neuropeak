@@ -306,3 +306,25 @@ export {
   type BadgeRequirement,
   type BadgeTier,
 } from './gamification/badges';
+
+export {
+  audienceFor,
+  describeRule,
+  describeSegment,
+  matchesRule,
+  matchesSegment,
+  type Segment,
+  type SegmentRule,
+  type UserSnapshot,
+} from './crm/segments';
+
+export {
+  PUSH_BODY_MAX,
+  PUSH_TITLE_MAX,
+  isCampaignReady,
+  previewText,
+  validateCampaign,
+  type PushCampaign,
+  type PushIssue,
+  type PushMessage,
+} from './crm/push';

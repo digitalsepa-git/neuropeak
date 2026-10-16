@@ -41,3 +41,5 @@ export { TR_DISPLAY_NAMES } from './names/tr';
 export { BADGES, type ContentBadge } from './badges/catalogue';
 
 export { GAME_CATALOGUE, findGameContent, type ContentGame } from './games/catalogue';
+
+export { DEFAULT_SEGMENTS } from './crm/segments';
