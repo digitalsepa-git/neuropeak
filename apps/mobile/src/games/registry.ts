@@ -1,14 +1,17 @@
 import { AnagramGame } from './anagram';
+import { BalanceGame } from './balance';
 import { CardMatchGame } from './card-match';
 import { ConnectGame } from './connect';
 import { DigitSpanGame } from './digit-span';
 import { GoNoGoGame } from './go-no-go';
+import { GridRecallGame } from './grid-recall';
 import { LightSequenceGame } from './light-sequence';
 import { LiquidSortGame } from './liquid-sort';
 import { LogicChainGame } from './logic-chain';
 import { MatrixPuzzleGame } from './matrix-puzzle';
 import { MazeGame } from './maze';
 import { MentalRotationGame } from './mental-rotation';
+import { NBackGame } from './n-back';
 import { NumberSeriesGame } from './number-series';
 import { OneLineGame } from './one-line';
 import { PaperFoldGame } from './paper-fold';
@@ -17,6 +20,8 @@ import { QuickMathGame } from './quick-math';
 import { ReactionGame } from './reaction';
 import { ShadowMatchGame } from './shadow-match';
 import { TargetNumberGame } from './target-number';
+import { TilingGame } from './tiling';
+import { TrackingGame } from './tracking';
 import { WordAnalogyGame } from './word-analogy';
 import { WordLinkGame } from './word-link';
 import { OddOneOutGame } from './odd-one-out';
@@ -311,6 +316,65 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Karar hızı', 'Sayı sezgisi', 'Dikkat'],
     baseXp: 14,
     Component: QuickDecisionGame,
+  },
+  {
+    id: 'n-back',
+    category: 'memory',
+    mode: 'timed',
+    title: 'N-Geri',
+    instruction: 'Simge n adım öncekiyle aynı mı?',
+    description:
+      'Akan simgelerde n adım öncekiyle eşleşeni yakalarsın. Üst üste doğru bildikçe n büyür.',
+    skills: ['Çalışma belleği', 'Dikkat', 'Güncelleme'],
+    baseXp: 24,
+    Component: NBackGame,
+  },
+  {
+    id: 'grid-recall',
+    category: 'memory',
+    mode: 'levels',
+    title: 'Nerede Kaldı?',
+    instruction: 'Yanan hücreleri hatırla',
+    description:
+      'Izgarada yanıp sönen hücreleri aklında tutup aynılarını işaretlersin. Her seviyede hücre sayısı artar.',
+    skills: ['Görsel bellek', 'Uzamsal bellek', 'Dikkat'],
+    baseXp: 20,
+    Component: GridRecallGame,
+  },
+  {
+    id: 'tracking',
+    category: 'attention',
+    mode: 'levels',
+    title: 'Çoklu Takip',
+    instruction: 'Hedefleri gözünle takip et',
+    description:
+      'İşaretli toplar diğerlerine karışır; durduklarında hangilerinin hedef olduğunu bulursun.',
+    skills: ['Bölünmüş dikkat', 'Görsel takip', 'Odak sürdürme'],
+    baseXp: 26,
+    Component: TrackingGame,
+  },
+  {
+    id: 'balance',
+    category: 'math',
+    mode: 'levels',
+    title: 'Terazi',
+    instruction: 'Kaç daire dengeler?',
+    description: 'İpucu terazilerinden şekillerin ağırlığını çıkarıp soru terazisini dengelersin.',
+    skills: ['Denklem kurma', 'Çıkarım', 'Aritmetik'],
+    baseXp: 22,
+    Component: BalanceGame,
+  },
+  {
+    id: 'tiling',
+    category: 'spatial',
+    mode: 'levels',
+    title: 'Parça Birleştir',
+    instruction: 'Parçaları çerçeveye tam oturt',
+    description:
+      'Parçaları döndürüp çerçeveyi boşluksuz doldurursun. Her tahta parçalara bölünerek üretildiği için çözülebilir.',
+    skills: ['Uzamsal planlama', 'Zihinde döndürme', 'Deneme-yanılma'],
+    baseXp: 26,
+    Component: TilingGame,
   },
 ];
 
