@@ -30,6 +30,17 @@ function contentFor(celebration: Celebration): {
         title: 'Görev tamam',
         body: `+${celebration.stars} yıldız kazandın.`,
       };
+    case 'badge':
+      return {
+        icon: 'shield',
+        // Bir turda birden çok rozet açılabiliyor; tek rozetin adını
+        // yazıp hepsinin yıldızını göstermek yanıltıcı oluyordu.
+        title: celebration.count > 1 ? `${celebration.count} yeni rozet` : celebration.title,
+        body:
+          celebration.count > 1
+            ? `${celebration.title} ve ${celebration.count - 1} rozet daha. +${celebration.stars} yıldız hesabına eklendi.`
+            : `Yeni rozet kazandın. +${celebration.stars} yıldız hesabına eklendi.`,
+      };
   }
 }
 

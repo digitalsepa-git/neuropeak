@@ -293,3 +293,16 @@ export {
   type LeagueStanding,
   type LeagueTier,
 } from './gamification/league';
+
+export {
+  badgeProgress,
+  isBadgeEarned,
+  newlyEarnedBadges,
+  showcaseOrder,
+  starsForBadges,
+  type BadgeContext,
+  type BadgeDefinition,
+  type BadgeProgress,
+  type BadgeRequirement,
+  type BadgeTier,
+} from './gamification/badges';

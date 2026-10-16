@@ -4,8 +4,10 @@ import {
   categoriesForAxis,
   lastDays,
   rankCategories,
+  showcaseOrder,
   toDateKey,
   weakestAxis,
+  type BadgeContext,
   type BrainAxis,
 } from '@neuropeak/core';
 import { categoryAccent, palette, radius, spacing } from '@neuropeak/ui';
@@ -15,10 +17,11 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
+import { BadgeShowcase } from '@/components/progress/badge-showcase';
 import { BrainRadar } from '@/components/progress/brain-radar';
 import { WeeklyChart } from '@/components/progress/weekly-chart';
 import { Section } from '@/components/section';
-import { Badge, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
+import { Badge, Card, ProgressBar, Screen, Text } from '@/components/ui';
 import { AXIS_LABELS, CATEGORY_LABELS } from '@/data/placeholder';
 import { GAME_DEFINITIONS } from '@/games/registry';
 import { useProgress } from '@/lib/progress/context';
@@ -32,17 +35,9 @@ const AXIS_COLORS: Record<BrainAxis, string> = {
   problemSolving: palette.accentMath,
 };
 
-const BADGES = [
-  { id: 'first-test', label: 'İlk test', earned: true },
-  { id: 'streak-7', label: '7 gün', earned: true },
-  { id: 'logic-master', label: 'Mantık ustası', earned: false },
-  { id: 'all-categories', label: 'Kâşif', earned: false },
-];
-
 export default function ProgressScreen() {
-  const theme = useTheme();
   const router = useRouter();
-  const { state, neuropeak, level } = useProgress();
+  const { state, neuropeak, level, badges } = useProgress();
 
   const today = toDateKey(new Date());
   const week = useMemo(() => lastDays(state.history, today, 7), [state.history, today]);
@@ -61,6 +56,33 @@ export default function ProgressScreen() {
   }, [focusAxis]);
 
   const mostPlayed = categories[0]?.count ?? 1;
+
+  const badgeContext: BadgeContext = useMemo(
+    () => ({
+      level: level.level,
+      xp: state.xp,
+      longestStreak: state.streak.longestDays,
+      totalRounds: Object.values(state.categoryRounds).reduce((total, count) => total + count, 0),
+      testsFinished: state.testsFinished,
+      categoryRounds: state.categoryRounds,
+      brainMap: state.brainMap,
+      neuropeak,
+      bestLeagueTier: state.league.bestTier,
+      bestWeeklyXp: state.league.bestWeeklyXp,
+      bestIq: state.bestIq,
+    }),
+    [level.level, neuropeak, state],
+  );
+
+  // `showcaseOrder` tanımları süzüp sıralıyor; içerik paketinin
+  // başlıklı tipi korunsun diye sonuç geri eşleniyor.
+  const visibleBadges = useMemo(() => {
+    const byId = new Map(badges.map((badge) => [badge.id, badge]));
+    return showcaseOrder(badges, badgeContext, state.badges).flatMap((badge) => {
+      const found = byId.get(badge.id);
+      return found === undefined ? [] : [found];
+    });
+  }, [badgeContext, badges, state.badges]);
 
   return (
     <Screen scroll>
@@ -171,39 +193,8 @@ export default function ProgressScreen() {
         </Section>
       )}
 
-      <Section title="Rozetler" meta="2/40">
-        <View style={styles.badgeGrid}>
-          {BADGES.map((badge) => (
-            <View key={badge.id} style={styles.badgeItem}>
-              <View
-                style={[
-                  styles.badgeCircle,
-                  {
-                    backgroundColor: badge.earned
-                      ? `${theme.colors.brand}1F`
-                      : theme.colors.surface,
-                    borderColor: badge.earned ? theme.colors.brand : theme.colors.border,
-                  },
-                ]}
-              >
-                <Icon
-                  name={badge.earned ? 'star' : 'lock'}
-                  color={badge.earned ? theme.colors.brand : theme.colors.textMuted}
-                  size={22}
-                  filled={badge.earned}
-                />
-              </View>
-              <Text
-                variant="caption"
-                color={badge.earned ? 'textSecondary' : 'textMuted'}
-                align="center"
-                numberOfLines={1}
-              >
-                {badge.label}
-              </Text>
-            </View>
-          ))}
-        </View>
+      <Section title="Rozetler" meta={`${state.badges.length}/${badges.length}`}>
+        <BadgeShowcase badges={visibleBadges} earned={state.badges} context={badgeContext} />
       </Section>
     </Screen>
   );
@@ -219,24 +210,6 @@ const styles = StyleSheet.create({
   axisHead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  badgeCircle: {
-    alignItems: 'center',
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    height: 60,
-    justifyContent: 'center',
-    width: 60,
-  },
-  badgeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  badgeItem: {
-    alignItems: 'center',
-    gap: spacing.xs2,
-    width: 72,
   },
   note: {
     marginTop: spacing.md,

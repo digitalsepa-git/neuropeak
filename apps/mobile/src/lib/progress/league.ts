@@ -1,16 +1,23 @@
 import { TR_DISPLAY_NAMES } from '@neuropeak/content';
 import {
+  LEAGUE_TIERS,
   generatePracticeCohort,
   standings,
   tierAfter,
   weekProgress,
   weekStartKey,
   type LeagueMember,
+  type LeagueTier,
 } from '@neuropeak/core';
 
 import { type LeagueState } from './storage';
 
 const USER_NAME = 'Sen';
+
+/** İki kademeden yüksek olanı. */
+function bestOf(a: LeagueTier, b: LeagueTier): LeagueTier {
+  return LEAGUE_TIERS.indexOf(a) >= LEAGUE_TIERS.indexOf(b) ? a : b;
+}
 
 /**
  * Lig grubu. Supabase projesi bağlanana kadar rakipler yerel
@@ -61,10 +68,14 @@ export function rolloverLeague(league: LeagueState, now: Date, userId: string): 
     return { ...league, weekStart: thisWeek, weeklyXp: 0 };
   }
 
+  const tier = tierAfter(league.tier, user.outcome);
+
   return {
-    tier: tierAfter(league.tier, user.outcome),
+    ...league,
+    tier,
     weekStart: thisWeek,
     weeklyXp: 0,
     lastResult: { tier: league.tier, rank: user.rank, outcome: user.outcome },
+    bestTier: bestOf(league.bestTier, tier),
   };
 }

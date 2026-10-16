@@ -18,3 +18,5 @@ export { basicIqTest };
 export { TR_ANAGRAMS, TR_ANALOGIES, TR_WORD_PAIRS } from './words/tr';
 
 export { TR_DISPLAY_NAMES } from './names/tr';
+
+export { BADGES, type ContentBadge } from './badges/catalogue';
