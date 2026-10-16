@@ -1,11 +1,13 @@
 import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { Section } from '@/components/section';
-import { Card, Chip, Screen, Text } from '@/components/ui';
+import { Badge, Card, Chip, Screen, Text } from '@/components/ui';
+import { isGamePlayable } from '@/games/registry';
 import { CATEGORY_LABELS, GAMES, type PlaceholderGame } from '@/data/placeholder';
 
 type Filter = GameCategory | 'all';
@@ -55,20 +57,35 @@ export default function GamesScreen() {
 }
 
 function GameCard({ game }: { game: PlaceholderGame }) {
+  const router = useRouter();
   const accent = categoryAccent[game.category];
   const isEndless = game.totalLevels === 0;
+  const playable = isGamePlayable(game.id);
 
   return (
-    <Card style={styles.gameCard} padding="sm" onPress={() => {}} accessibilityLabel={game.title}>
-      <View style={[styles.thumb, { backgroundColor: `${accent}1F` }]}>
+    <Card
+      style={styles.gameCard}
+      padding="sm"
+      accessibilityLabel={game.title}
+      onPress={() => {
+        if (playable) {
+          router.push({ pathname: '/game/[id]', params: { id: game.id } });
+        }
+      }}
+    >
+      <View style={[styles.thumb, { backgroundColor: `${accent}1F`, opacity: playable ? 1 : 0.5 }]}>
         <View style={[styles.thumbDot, { backgroundColor: accent }]} />
       </View>
       <Text variant="subheading" numberOfLines={1}>
         {game.title}
       </Text>
-      <Text variant="caption" color="textMuted">
-        {isEndless ? `En iyi seviye ${game.level}` : `Seviye ${game.level}/${game.totalLevels}`}
-      </Text>
+      {playable ? (
+        <Text variant="caption" color="textMuted">
+          {isEndless ? `En iyi seviye ${game.level}` : `Seviye ${game.level}/${game.totalLevels}`}
+        </Text>
+      ) : (
+        <Badge label="Yakında" />
+      )}
     </Card>
   );
 }
