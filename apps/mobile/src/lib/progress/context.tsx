@@ -32,6 +32,7 @@ import {
 
 import { enqueueMutation } from '@/lib/sync';
 
+import { rolloverLeague } from './league';
 import {
   EMPTY_PROGRESS,
   getDeviceId,
@@ -54,6 +55,8 @@ type ProgressContextValue = {
   readonly celebration: Celebration | null;
   clearCelebration: () => void;
   readonly neuropeak: number;
+  /** Lig grubunu tohumlayan kalıcı kimlik. */
+  readonly userId: string;
   recordGameRound: (options: {
     category: GameCategory;
     difficulty: Difficulty;
@@ -73,6 +76,7 @@ const ProgressContext = createContext<ProgressContextValue>({
   state: EMPTY_PROGRESS,
   level: levelProgress(0),
   neuropeak: neuropeakScore(EMPTY_PROGRESS.brainMap),
+  userId: 'anonymous',
   ready: false,
   celebration: null,
   clearCelebration: () => undefined,
@@ -85,6 +89,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ProgressState>(EMPTY_PROGRESS);
   const [ready, setReady] = useState(false);
   const [celebration, setCelebration] = useState<Celebration | null>(null);
+  // Kimlik render sırasında okunduğu için ref değil state; ref'i render
+  // içinde okumak React Compiler'ın haklı olarak yasakladığı bir şey.
+  const [userId, setUserId] = useState('anonymous');
 
   // Hesaplamalar güncel durumu okumalı ama setState güncelleyicisi saf
   // kalmalı; bu yüzden durum ayrıca bir ref'te tutuluyor.
@@ -105,15 +112,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function bootstrap() {
       deviceId.current = await getDeviceId();
+      setUserId(deviceId.current);
       const stored = await loadProgress();
-      const today = toDateKey(new Date());
+      const now = new Date();
+      const today = toDateKey(now);
+      const league = rolloverLeague(stored.league, now, deviceId.current);
 
       // Gün değiştiyse görevler yenilenir ve reklam sayacı sıfırlanır.
+      const withLeague: ProgressState = league === stored.league ? stored : { ...stored, league };
+
       const refreshed: ProgressState =
-        stored.tasksDate === today
-          ? stored
+        withLeague.tasksDate === today
+          ? withLeague
           : {
-              ...stored,
+              ...withLeague,
               tasksDate: today,
               tasks: pickDailyTasks(DAILY_TASK_TEMPLATES, deviceId.current, today),
               rewardedAdsToday: 0,
@@ -208,6 +220,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         tasks,
         brainMap,
         categoryRounds,
+        league: { ...current.league, weeklyXp: current.league.weeklyXp + options.xpGain },
         history: recordDayActivity(current.history, today, {
           xp: options.xpGain,
           rounds: options.round === undefined ? 0 : 1,
@@ -263,6 +276,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       state,
       level: levelProgress(state.xp),
       neuropeak: neuropeakScore(state.brainMap),
+      userId,
       ready,
       celebration,
       clearCelebration: () => setCelebration(null),
@@ -270,7 +284,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       recordTestFinished,
       spendStars,
     }),
-    [celebration, ready, recordGameRound, recordTestFinished, spendStars, state],
+    [celebration, ready, recordGameRound, recordTestFinished, spendStars, state, userId],
   );
 
   return <ProgressContext value={value}>{children}</ProgressContext>;

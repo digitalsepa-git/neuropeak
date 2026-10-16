@@ -273,3 +273,23 @@ export {
   type CategoryCounts,
   type DayActivity,
 } from './gamification/activity';
+
+export {
+  GROUP_SIZE,
+  LEAGUE_TIERS,
+  PROMOTION_COUNT,
+  RELEGATION_COUNT,
+  formatRemaining,
+  generatePracticeCohort,
+  msUntilWeekEnd,
+  outcomeForRank,
+  standings,
+  tierAfter,
+  weekProgress,
+  weekStartKey,
+  xpToPromotion,
+  type LeagueMember,
+  type LeagueOutcome,
+  type LeagueStanding,
+  type LeagueTier,
+} from './gamification/league';
