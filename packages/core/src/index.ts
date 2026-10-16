@@ -118,3 +118,17 @@ export {
   generateLogicChain,
   type LogicChainPuzzle,
 } from './puzzles/logic-chain';
+
+export { generateNumberSeries, type NumberSeriesPuzzle } from './puzzles/number-series';
+
+export {
+  generateTargetNumber,
+  solveTargetNumber,
+  type TargetNumberPuzzle,
+} from './puzzles/target-number';
+
+export {
+  generateQuickMath,
+  type QuickMathDifficulty,
+  type QuickMathProblem,
+} from './puzzles/quick-math';

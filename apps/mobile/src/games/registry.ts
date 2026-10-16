@@ -5,6 +5,9 @@ import { LightSequenceGame } from './light-sequence';
 import { LiquidSortGame } from './liquid-sort';
 import { LogicChainGame } from './logic-chain';
 import { MatrixPuzzleGame } from './matrix-puzzle';
+import { NumberSeriesGame } from './number-series';
+import { QuickMathGame } from './quick-math';
+import { TargetNumberGame } from './target-number';
 import { OddOneOutGame } from './odd-one-out';
 import { StroopGame } from './stroop';
 import { SymbolHuntGame } from './symbol-hunt';
@@ -132,6 +135,41 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Tümdengelim', 'Çalışma belleği', 'Sıralama'],
     baseXp: 18,
     Component: LogicChainGame,
+  },
+  {
+    id: 'quick-math',
+    category: 'math',
+    mode: 'timed',
+    title: 'Hızlı İşlem',
+    instruction: 'Doğru sonucu seç',
+    description:
+      'Sürede kaç işlem çözebildiğini ölçer. Doğru seri uzadıkça her işlem daha çok puan getirir.',
+    skills: ['Zihinden işlem', 'İşlem hızı', 'Sayı duyusu'],
+    baseXp: 15,
+    Component: QuickMathGame,
+  },
+  {
+    id: 'number-series',
+    category: 'math',
+    mode: 'levels',
+    title: 'Sayı Dizisi',
+    instruction: 'Diziyi sürdüren sayıyı bul',
+    description: 'Diziyi üreten kuralı çöz ve devamını seç. Doğru cevaptan sonra kural gösterilir.',
+    skills: ['Örüntü tanıma', 'Tümevarım', 'Sayısal akıl yürütme'],
+    baseXp: 18,
+    Component: NumberSeriesGame,
+  },
+  {
+    id: 'target-number',
+    category: 'math',
+    mode: 'levels',
+    title: 'Hedef Sayı',
+    instruction: 'Dört sayı ve dört işlemle hedefe ulaş',
+    description:
+      'İki sayı seçip bir işlemle birleştir. Elde tek sayı kalıp hedefe eşit olunca seviye biter; her bulmacanın çözümü garanti.',
+    skills: ['Esnek düşünme', 'Planlama', 'Aritmetik'],
+    baseXp: 20,
+    Component: TargetNumberGame,
   },
 ];
 
