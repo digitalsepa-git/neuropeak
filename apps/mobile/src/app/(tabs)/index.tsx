@@ -9,6 +9,7 @@ import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/comp
 import { GAME_CATALOGUE } from '@neuropeak/content';
 
 import { CATEGORY_LABELS } from '@/data/placeholder';
+import { useRemoteConfig } from '@/lib/remote/context';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
 import { TASK_LABELS } from '@/lib/progress/templates';
@@ -18,8 +19,10 @@ const SUGGESTED = GAME_CATALOGUE[3];
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const { getString } = useRemoteConfig();
+  const announcement = getString('announcement.text');
   const { isPro } = usePro();
-  const { state, level } = useProgress();
+  const { state, level, neuropeak } = useProgress();
 
   const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;
   const streakDays = state.streak.currentDays;
@@ -27,6 +30,12 @@ export default function HomeScreen() {
   return (
     <Screen scroll>
       <AppHeader title="Ana Sayfa" />
+
+      {announcement.length > 0 && (
+        <Card padding="md">
+          <Text variant="bodySmall">{announcement}</Text>
+        </Card>
+      )}
 
       <Card padding="lg">
         <View style={styles.streakRow}>
@@ -88,8 +97,7 @@ export default function HomeScreen() {
         <Card padding="lg">
           <View style={styles.scoreRow}>
             <Text variant="display" color="brand">
-              {/* Beyin haritası PR#16'da gerçek veriyle dolacak. */}
-              {state.xp > 0 ? Math.min(99, 40 + Math.round(state.xp / 40)) : 0}
+              {neuropeak}
             </Text>
             <View style={styles.scoreMeta}>
               <Text variant="bodySmall" color="textSecondary">

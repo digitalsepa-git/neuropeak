@@ -17,6 +17,7 @@ import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { Icon } from '@/components/icons';
 import { ScoreReveal } from '@/components/test/score-reveal';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { track } from '@/lib/analytics';
 import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
 import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
@@ -95,6 +96,13 @@ export default function TestRunnerScreen() {
         completedAt: new Date().toISOString(),
         score,
       };
+
+      track('test_complete', {
+        test: test.id,
+        iq: score.iq,
+        correct: answers.filter((answer) => answer.isCorrect).length,
+        total: answers.length,
+      });
 
       await saveTestResult(stored);
       await enqueueMutation({ kind: 'test_result', payload: stored });
@@ -196,6 +204,7 @@ export default function TestRunnerScreen() {
           <Button
             label="Teste başla"
             onPress={() => {
+              track('test_start', { test: test.id, questions: test.questionCount });
               setSessionSeed(`${test.id}-${Date.now()}`);
               questionStartedAt.current = Date.now();
               setPhase('running');
