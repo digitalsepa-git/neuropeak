@@ -30,6 +30,11 @@ export type ProgressState = {
   /** Kategori başına oynanan tur sayısı. */
   categoryRounds: CategoryCounts;
   league: LeagueState;
+  /** Kazanılmış rozet kimlikleri. */
+  badges: string[];
+  testsFinished: number;
+  /** Testlerde alınmış en yüksek skor; rozet koşulu buna bakar. */
+  bestIq: number;
 };
 
 export type LeagueState = {
@@ -40,6 +45,10 @@ export type LeagueState = {
   weeklyXp: number;
   /** Geçen haftanın sonucu; hafta başında bir kez gösterilir. */
   lastResult: { tier: LeagueTier; rank: number; outcome: LeagueOutcome } | null;
+  /** Ulaşılmış en yüksek kademe; düşünce rozet geri alınmasın diye. */
+  bestTier: LeagueTier;
+  /** Bir haftada toplanmış en yüksek XP. */
+  bestWeeklyXp: number;
 };
 
 export const EMPTY_LEAGUE: LeagueState = {
@@ -47,6 +56,8 @@ export const EMPTY_LEAGUE: LeagueState = {
   weekStart: null,
   weeklyXp: 0,
   lastResult: null,
+  bestTier: 'bronze',
+  bestWeeklyXp: 0,
 };
 
 export const EMPTY_PROGRESS: ProgressState = {
@@ -60,6 +71,9 @@ export const EMPTY_PROGRESS: ProgressState = {
   history: [],
   categoryRounds: {},
   league: EMPTY_LEAGUE,
+  badges: [],
+  testsFinished: 0,
+  bestIq: 0,
 };
 
 export async function loadProgress(): Promise<ProgressState> {
@@ -77,6 +91,7 @@ export async function loadProgress(): Promise<ProgressState> {
       history: parsed.history ?? [],
       categoryRounds: parsed.categoryRounds ?? {},
       league: { ...EMPTY_LEAGUE, ...parsed.league },
+      badges: parsed.badges ?? [],
     };
   } catch {
     return EMPTY_PROGRESS;

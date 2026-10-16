@@ -7,8 +7,11 @@ import {
   pickDailyTasks,
   recordActivity,
   recordCategoryRound,
+  LEAGUE_TIERS,
+  newlyEarnedBadges,
   recordDayActivity,
   roundPerformance,
+  starsForBadges,
   toDateKey,
   xpForGameRound,
   xpForTestCompletion,
@@ -16,6 +19,8 @@ import {
   type Difficulty,
   type GameCategory,
   type GameMode,
+  type BadgeContext,
+  type LeagueTier,
   type LevelProgress,
   type TaskEvent,
 } from '@neuropeak/core';
@@ -32,6 +37,8 @@ import {
 
 import { enqueueMutation } from '@/lib/sync';
 
+import { BADGES, type ContentBadge } from '@neuropeak/content';
+
 import { rolloverLeague } from './league';
 import {
   EMPTY_PROGRESS,
@@ -46,7 +53,8 @@ import { DAILY_TASK_TEMPLATES } from './templates';
 export type Celebration =
   | { type: 'level_up'; level: number }
   | { type: 'streak'; days: number }
-  | { type: 'tasks_done'; stars: number };
+  | { type: 'tasks_done'; stars: number }
+  | { type: 'badge'; title: string; count: number; stars: number };
 
 type ProgressContextValue = {
   readonly state: ProgressState;
@@ -67,16 +75,24 @@ type ProgressContextValue = {
     level: number;
   }) => Promise<void>;
   recordTestFinished: (iq: number) => Promise<void>;
+  /** Rozet vitrini için tanımlar; içerik paketinden geliyor. */
+  readonly badges: readonly ContentBadge[];
   spendStars: (amount: number) => Promise<boolean>;
 };
 
 const noop = async () => undefined;
+
+/** İki kademeden yüksek olanı; düşünce rozet geri alınmasın diye. */
+function betterTier(a: LeagueTier, b: LeagueTier): LeagueTier {
+  return LEAGUE_TIERS.indexOf(a) >= LEAGUE_TIERS.indexOf(b) ? a : b;
+}
 
 const ProgressContext = createContext<ProgressContextValue>({
   state: EMPTY_PROGRESS,
   level: levelProgress(0),
   neuropeak: neuropeakScore(EMPTY_PROGRESS.brainMap),
   userId: 'anonymous',
+  badges: BADGES,
   ready: false,
   celebration: null,
   clearCelebration: () => undefined,
@@ -154,6 +170,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       taskEvents: TaskEvent[];
       /** Oyun turuysa beyin haritasına işlenecek bilgi. */
       round?: { category: GameCategory; performance: number };
+      /** Test tamamlandıysa alınan skor. */
+      testIq?: number;
     }) => {
       const current = stateRef.current;
       const today = toDateKey(new Date());
@@ -185,18 +203,6 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const stars =
-        current.stars + options.starGain + taskStars + (leveledUp ? STAR_REWARDS.levelUp : 0);
-
-      // Kutlama önceliği: seviye atlama > seri eşiği > görev bitirme.
-      if (leveledUp) {
-        setCelebration({ type: 'level_up', level: nextLevel });
-      } else if (streakOutcome.milestone !== null) {
-        setCelebration({ type: 'streak', days: streakOutcome.milestone });
-      } else if (completedAny) {
-        setCelebration({ type: 'tasks_done', stars: taskStars });
-      }
-
       const brainMap: BrainMap =
         options.round === undefined
           ? current.brainMap
@@ -211,6 +217,60 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           ? current.categoryRounds
           : recordCategoryRound(current.categoryRounds, options.round.category);
 
+      const weeklyXp = current.league.weeklyXp + options.xpGain;
+      const league = {
+        ...current.league,
+        weeklyXp,
+        bestWeeklyXp: Math.max(current.league.bestWeeklyXp, weeklyXp),
+        bestTier: betterTier(current.league.bestTier, current.league.tier),
+      };
+
+      const testsFinished = current.testsFinished + (options.testIq === undefined ? 0 : 1);
+      const bestIq = Math.max(current.bestIq, options.testIq ?? 0);
+
+      // Rozetler en son bakılıyor: koşulları bu etkinlikten sonraki
+      // duruma göre değerlendirilmeli, önceki duruma göre değil.
+      const badgeContext: BadgeContext = {
+        level: nextLevel,
+        xp,
+        longestStreak: streakOutcome.state.longestDays,
+        totalRounds: Object.values(categoryRounds).reduce((total, count) => total + count, 0),
+        testsFinished,
+        categoryRounds,
+        brainMap,
+        neuropeak: neuropeakScore(brainMap),
+        bestLeagueTier: league.bestTier,
+        bestWeeklyXp: league.bestWeeklyXp,
+        bestIq,
+      };
+
+      const earned = newlyEarnedBadges(BADGES, badgeContext, current.badges) as ContentBadge[];
+      const badgeStars = starsForBadges(earned);
+
+      const stars =
+        current.stars +
+        options.starGain +
+        taskStars +
+        badgeStars +
+        (leveledUp ? STAR_REWARDS.levelUp : 0);
+
+      // Kutlama önceliği: rozet > seviye atlama > seri eşiği > görev.
+      const firstBadge = earned[0];
+      if (firstBadge !== undefined) {
+        setCelebration({
+          type: 'badge',
+          title: firstBadge.title.tr,
+          count: earned.length,
+          stars: badgeStars,
+        });
+      } else if (leveledUp) {
+        setCelebration({ type: 'level_up', level: nextLevel });
+      } else if (streakOutcome.milestone !== null) {
+        setCelebration({ type: 'streak', days: streakOutcome.milestone });
+      } else if (completedAny) {
+        setCelebration({ type: 'tasks_done', stars: taskStars });
+      }
+
       await commit({
         ...current,
         xp,
@@ -220,7 +280,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         tasks,
         brainMap,
         categoryRounds,
-        league: { ...current.league, weeklyXp: current.league.weeklyXp + options.xpGain },
+        league,
+        testsFinished,
+        bestIq,
+        badges: [...current.badges, ...earned.map((badge) => badge.id)],
         history: recordDayActivity(current.history, today, {
           xp: options.xpGain,
           rounds: options.round === undefined ? 0 : 1,
@@ -256,6 +319,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         xpGain: xpForTestCompletion(iq),
         starGain: STAR_REWARDS.testComplete,
         taskEvents: [{ type: 'test_finished' }],
+        testIq: iq,
       });
     },
     [applyActivity],
@@ -277,6 +341,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       level: levelProgress(state.xp),
       neuropeak: neuropeakScore(state.brainMap),
       userId,
+      badges: BADGES,
       ready,
       celebration,
       clearCelebration: () => setCelebration(null),
