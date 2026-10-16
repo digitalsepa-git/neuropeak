@@ -8,6 +8,11 @@ export type RoundOutcome = {
   readonly level: number;
   /** Oyun hedefine ulaşılarak mı bitti, yoksa yarıda mı kaldı. */
   readonly completed: boolean;
+  /**
+   * Üst barda seviye/tur yerine gösterilecek metin — süreli oyunlarda
+   * geri sayım. Yalnızca oyun sürerken kullanılır.
+   */
+  readonly label?: string;
 };
 
 export type GameProps = {

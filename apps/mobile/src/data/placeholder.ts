@@ -32,6 +32,7 @@ export const GAMES: PlaceholderGame[] = [
   { id: 'stroop', title: 'Renk Tuzağı', category: 'attention', level: 21, totalLevels: 0 },
   { id: 'odd-one-out', title: 'Farklı Olanı Bul', category: 'attention', level: 7, totalLevels: 0 },
   { id: 'symbol-hunt', title: 'Simge Avı', category: 'attention', level: 3, totalLevels: 0 },
+  { id: 'go-no-go', title: 'Dur / Geç', category: 'attention', level: 5, totalLevels: 0 },
   { id: 'matrix', title: 'Matris Bulmaca', category: 'logic', level: 18, totalLevels: 320 },
   { id: 'liquid-sort', title: 'Sıvı Sıralama', category: 'logic', level: 46, totalLevels: 400 },
   { id: 'one-line', title: 'Tek Çizgi', category: 'logic', level: 31, totalLevels: 315 },

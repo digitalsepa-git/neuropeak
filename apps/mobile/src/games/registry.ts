@@ -1,6 +1,10 @@
 import { CardMatchGame } from './card-match';
 import { DigitSpanGame } from './digit-span';
+import { GoNoGoGame } from './go-no-go';
 import { LightSequenceGame } from './light-sequence';
+import { OddOneOutGame } from './odd-one-out';
+import { StroopGame } from './stroop';
+import { SymbolHuntGame } from './symbol-hunt';
 import type { GameDefinition } from './types';
 
 /**
@@ -42,6 +46,53 @@ export const GAME_DEFINITIONS: readonly GameDefinition[] = [
     skills: ['Çalışma belleği', 'Sayısal hafıza', 'Konsantrasyon'],
     baseXp: 16,
     Component: DigitSpanGame,
+  },
+  {
+    id: 'stroop',
+    category: 'attention',
+    mode: 'timed',
+    title: 'Renk Tuzağı',
+    instruction: 'Yazının rengini seç, kelimeyi değil',
+    description:
+      'Kelime bir renk adı, ama hangi renkte yazıldığı başka. Beynin okumayı bastırıp rengi görmesi gerekiyor.',
+    skills: ['Dürtü kontrolü', 'Seçici dikkat', 'Zihinsel esneklik'],
+    baseXp: 15,
+    Component: StroopGame,
+  },
+  {
+    id: 'odd-one-out',
+    category: 'attention',
+    mode: 'timed',
+    title: 'Farklı Olanı Bul',
+    instruction: 'Izgaradaki tek farklı tonu bul',
+    description:
+      'Her doğruda ızgara büyür ve renk farkı incelir. Gözün ne kadar ayrıntı yakaladığını ölçer.',
+    skills: ['Görsel ayırt etme', 'Tarama hızı', 'Sürdürülebilir dikkat'],
+    baseXp: 15,
+    Component: OddOneOutGame,
+  },
+  {
+    id: 'symbol-hunt',
+    category: 'attention',
+    mode: 'timed',
+    title: 'Simge Avı',
+    instruction: "Sayıları 1'den başlayarak sırayla bul",
+    description:
+      'Dağınık bir tabloda sayıları sırayla bul. Tablo bitince yenisi gelir; amaç sürede kaç tablo bitirdiğin.',
+    skills: ['Görsel tarama', 'Dikkat dağılmasına direnç', 'İşlem hızı'],
+    baseXp: 15,
+    Component: SymbolHuntGame,
+  },
+  {
+    id: 'go-no-go',
+    category: 'attention',
+    mode: 'timed',
+    title: 'Dur / Geç',
+    instruction: 'Yeşil daireye dokun, kırmızı kareye dokunma',
+    description: 'Hızlı tepki vermek yarısı; asıl zor olan yanlış uyaranda elini tutabilmek.',
+    skills: ['Dürtü kontrolü', 'Tepki hızı', 'Hata izleme'],
+    baseXp: 15,
+    Component: GoNoGoGame,
   },
 ];
 
