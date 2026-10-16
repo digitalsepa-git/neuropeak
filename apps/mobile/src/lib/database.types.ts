@@ -463,6 +463,111 @@ export type Database = {
         };
         Relationships: [];
       };
+      push_campaigns: {
+        Row: {
+          id: string;
+          segment_id: string | null;
+          title_tr: string;
+          body_tr: string;
+          title_en: string;
+          body_en: string;
+          local_hour: number | null;
+          status: Database['public']['Enums']['push_status'];
+          scheduled_for: string | null;
+          sent_at: string | null;
+          recipient_count: number;
+          delivered_count: number;
+          opened_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          segment_id?: string | null;
+          title_tr: string;
+          body_tr: string;
+          title_en: string;
+          body_en: string;
+          local_hour?: number | null;
+          status?: Database['public']['Enums']['push_status'];
+          scheduled_for?: string | null;
+          sent_at?: string | null;
+          recipient_count?: number;
+          delivered_count?: number;
+          opened_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          segment_id?: string | null;
+          title_tr?: string;
+          body_tr?: string;
+          title_en?: string;
+          body_en?: string;
+          local_hour?: number | null;
+          status?: Database['public']['Enums']['push_status'];
+          scheduled_for?: string | null;
+          sent_at?: string | null;
+          recipient_count?: number;
+          delivered_count?: number;
+          opened_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      push_deliveries: {
+        Row: {
+          campaign_id: string;
+          user_id: string;
+          sent_at: string;
+          opened_at: string | null;
+        };
+        Insert: {
+          campaign_id: string;
+          user_id: string;
+          sent_at?: string;
+          opened_at?: string | null;
+        };
+        Update: {
+          campaign_id?: string;
+          user_id?: string;
+          sent_at?: string;
+          opened_at?: string | null;
+        };
+        Relationships: [];
+      };
+      push_tokens: {
+        Row: {
+          user_id: string;
+          token: string;
+          platform: string;
+          locale: string;
+          is_active: boolean;
+          last_seen_at: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          token: string;
+          platform: string;
+          locale?: string;
+          is_active?: boolean;
+          last_seen_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          token?: string;
+          platform?: string;
+          locale?: string;
+          is_active?: boolean;
+          last_seen_at?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       questions: {
         Row: {
           id: string;
@@ -511,6 +616,39 @@ export type Database = {
           axis?: Database['public']['Enums']['brain_axis'] | null;
           explanation_tr?: string | null;
           explanation_en?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      segments: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          match_mode: string;
+          rules: Json;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          title: string;
+          description?: string | null;
+          match_mode?: string;
+          rules?: Json;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          match_mode?: string;
+          rules?: Json;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -738,6 +876,7 @@ export type Database = {
       game_category: 'memory' | 'attention' | 'logic' | 'math' | 'spatial' | 'speed' | 'verbal';
       game_mode: 'levels' | 'timed';
       league_tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'legend';
+      push_status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
       question_kind:
         | 'matrix'
         | 'number_series'
