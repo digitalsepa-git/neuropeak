@@ -70,29 +70,6 @@ export type WordPairPuzzle = {
   readonly correctIndex: number;
 };
 
-const TURKISH_UPPER: Readonly<Record<string, string>> = {
-  i: 'İ',
-  ı: 'I',
-  ğ: 'Ğ',
-  ü: 'Ü',
-  ş: 'Ş',
-  ö: 'Ö',
-  ç: 'Ç',
-};
-
-/**
- * Türkçe büyük harf. `toUpperCase()` "i" harfini "I" yapar; oyun
- * tahtasında "İPLİK" yerine "IPLIK" görünmemesi için harf harf
- * eşleniyor. Hermes'te Intl'e güvenmek yerine tabloyu burada tutuyoruz.
- */
-export function toTurkishUpper(value: string): string {
-  let result = '';
-  for (const character of value) {
-    result += TURKISH_UPPER[character] ?? character.toUpperCase();
-  }
-  return result;
-}
-
 /** Seviyeye göre kaç harfli kelimeler sorulacağı. */
 export function anagramLengthForLevel(level: number): number {
   return Math.min(8, 4 + Math.floor((level - 1) / 3));

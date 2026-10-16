@@ -1,4 +1,9 @@
-import { DIFFICULTY_MULTIPLIERS, xpForGameRound, type Difficulty } from '@neuropeak/core';
+import {
+  DIFFICULTY_MULTIPLIERS,
+  turkishDativeSuffix,
+  xpForGameRound,
+  type Difficulty,
+} from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -42,7 +47,9 @@ function resultSummary(mode: 'levels' | 'timed', result: RoundOutcome): string {
   if (!result.completed) {
     return mode === 'levels' ? 'Seviye tamamlanmadı' : 'Tur tamamlanmadı';
   }
-  return mode === 'levels' ? `Seviye ${result.level}'e ulaştın` : `${result.level} tur tamamladın`;
+  return mode === 'levels'
+    ? `Seviye ${result.level}${turkishDativeSuffix(result.level)} ulaştın`
+    : `${result.level} tur tamamladın`;
 }
 
 export default function GameScreen() {
