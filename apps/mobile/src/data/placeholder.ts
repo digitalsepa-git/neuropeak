@@ -34,6 +34,7 @@ export const GAMES: PlaceholderGame[] = [
   { id: 'symbol-hunt', title: 'Simge Avı', category: 'attention', level: 3, totalLevels: 0 },
   { id: 'go-no-go', title: 'Dur / Geç', category: 'attention', level: 5, totalLevels: 0 },
   { id: 'matrix', title: 'Matris Bulmaca', category: 'logic', level: 18, totalLevels: 320 },
+  { id: 'logic-chain', title: 'Mantık Zinciri', category: 'logic', level: 8, totalLevels: 240 },
   { id: 'liquid-sort', title: 'Sıvı Sıralama', category: 'logic', level: 46, totalLevels: 400 },
   { id: 'one-line', title: 'Tek Çizgi', category: 'logic', level: 31, totalLevels: 315 },
   { id: 'quick-math', title: 'Hızlı İşlem', category: 'math', level: 15, totalLevels: 0 },
