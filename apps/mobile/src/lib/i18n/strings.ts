@@ -806,6 +806,7 @@ export const STRINGS = {
   'settings.privacy': { tr: 'Gizlilik Politikası', en: 'Privacy Policy' },
   'settings.terms': { tr: 'Kullanım Şartları', en: 'Terms of Use' },
   'settings.support': { tr: 'E-posta Desteği', en: 'Email support' },
+  'settings.supportSubject': { tr: 'NeuroPeak desteği', en: 'NeuroPeak support' },
   'settings.developer': { tr: 'Geliştirici', en: 'Developer' },
   'settings.designSystem': { tr: 'Tasarım sistemi', en: 'Design system' },
   'settings.resetOnboarding': { tr: "Onboarding'i sıfırla", en: 'Reset onboarding' },
