@@ -221,7 +221,7 @@ export function ConnectGame({ startLevel, onFinish, onProgress }: GameProps) {
           style={[styles.reset, { borderColor: theme.colors.border }]}
         >
           <Text variant="caption" color="textMuted">
-            Temizle
+            {t('play.clear')}
           </Text>
         </Pressable>
       </View>

@@ -167,7 +167,7 @@ export function ReactionGame({ onFinish, onProgress }: GameProps) {
           style={[styles.finish, { backgroundColor: theme.colors.brand }]}
         >
           <Text variant="bodyStrong" color="onBrand">
-            Sonucu gör
+            {t('play.seeResult')}
           </Text>
         </Pressable>
       )}

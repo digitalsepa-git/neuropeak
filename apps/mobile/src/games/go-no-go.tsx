@@ -150,13 +150,13 @@ export function GoNoGoGame({ difficulty, onFinish, onProgress }: GameProps) {
         {isNoGo && <View style={[styles.noGoShape, { backgroundColor: theme.colors.danger }]} />}
         {stimulus === null && (
           <Text variant="caption" color="textMuted">
-            Hazır ol
+            {t('play.getReady')}
           </Text>
         )}
       </Pressable>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        Yeşil daireye dokun · kırmızı kareye dokunma
+        {t('play.goNoGoHint')}
       </Text>
     </View>
   );

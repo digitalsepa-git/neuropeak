@@ -116,7 +116,7 @@ export function TargetNumberGame({ startLevel, onFinish, onProgress }: GameProps
     <View style={styles.root}>
       <View style={[styles.targetCard, { backgroundColor: theme.colors.surface }]}>
         <Text variant="caption" color="textMuted">
-          Hedef
+          {t('play.target')}
         </Text>
         <Text variant="display" color="brand">
           {puzzle.target}

@@ -169,13 +169,13 @@ export function DigitSpanGame({ difficulty, onFinish, onProgress }: GameProps) {
         )}
         {phase === 'correct' && (
           <Text variant="heading" color="success">
-            Doğru
+            {t('play.correctShort')}
           </Text>
         )}
         {phase === 'wrong' && (
           <View style={styles.wrong}>
             <Text variant="heading" color="danger">
-              Yanlış
+              {t('play.wrongShort')}
             </Text>
             <Text variant="bodySmall" color="textSecondary">
               Doğrusu {digits.join('')}

@@ -183,7 +183,7 @@ export function OneLineGame({ startLevel, onFinish, onProgress }: GameProps) {
           style={[styles.reset, { borderColor: theme.colors.border }]}
         >
           <Text variant="caption" color="textMuted">
-            Baştan
+            {t('play.restart')}
           </Text>
         </Pressable>
       </View>

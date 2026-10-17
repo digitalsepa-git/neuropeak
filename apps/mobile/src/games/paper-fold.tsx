@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const FOLD_LABEL = {
   vertical: 'dikey',
@@ -100,6 +101,7 @@ function UnfoldedPaper({ pattern, cellSize }: { pattern: HolePattern; cellSize: 
  */
 export function PaperFoldGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() => generatePaperFold(startLevel, startLevel * 7919));
@@ -150,7 +152,7 @@ export function PaperFoldGame({ startLevel, onFinish, onProgress }: GameProps) {
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.question}>
-        Açılınca hangisi olur?
+        {t('play.unfoldQuestion')}
       </Text>
 
       <View style={styles.options}>

@@ -16,6 +16,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const SHAPE_SIZE: Record<GameProps['difficulty'], number> = {
   easy: 4,
@@ -68,6 +69,7 @@ function buildTrial(size: number, seed: number): Trial {
  */
 export function ShadowMatchGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const size = SHAPE_SIZE[difficulty];
 
   const [trial, setTrial] = useState<Trial>(() => buildTrial(SHAPE_SIZE[difficulty], 1));
@@ -127,7 +129,7 @@ export function ShadowMatchGame({ difficulty, onFinish, onProgress }: GameProps)
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        Gölgesini bul
+        {t('play.findShadow')}
       </Text>
 
       <View style={styles.options}>
