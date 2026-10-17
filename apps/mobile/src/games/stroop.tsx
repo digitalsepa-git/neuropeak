@@ -7,19 +7,21 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 
 const COLORS = [
-  { id: 'red', label: 'KIRMIZI', value: palette.red500 },
-  { id: 'blue', label: 'MAVİ', value: palette.accentMemory },
-  { id: 'green', label: 'YEŞİL', value: palette.green500 },
-  { id: 'yellow', label: 'SARI', value: palette.amber500 },
-] as const;
+  { id: 'red', key: 'play.colorRed', value: palette.red500 },
+  { id: 'blue', key: 'play.colorBlue', value: palette.accentMemory },
+  { id: 'green', key: 'play.colorGreen', value: palette.green500 },
+  { id: 'yellow', key: 'play.colorYellow', value: palette.amber500 },
+] as const satisfies readonly { id: string; key: StringKey; value: string }[];
 
 type ColorId = (typeof COLORS)[number]['id'];
 
 type Prompt = {
-  /** Yazan kelime. */
-  readonly word: string;
+  /** Yazan kelimenin rengi; metin dile göre seçiliyor. */
+  readonly word: ColorId;
   /** Yazının mürekkep rengi — doğru cevap bu. */
   readonly ink: ColorId;
 };
@@ -36,12 +38,12 @@ function nextPrompt(conflictRate: number): Prompt {
   const ink = COLORS[inkIndex] as (typeof COLORS)[number];
 
   if (Math.random() > conflictRate) {
-    return { word: ink.label, ink: ink.id };
+    return { word: ink.id, ink: ink.id };
   }
 
   const others = COLORS.filter((color) => color.id !== ink.id);
   const word = others[Math.floor(Math.random() * others.length)] as (typeof COLORS)[number];
-  return { word: word.label, ink: ink.id };
+  return { word: word.id, ink: ink.id };
 }
 
 /**
@@ -50,9 +52,12 @@ function nextPrompt(conflictRate: number): Prompt {
  */
 export function StroopGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const conflictRate = CONFLICT_RATE[difficulty];
 
-  const [prompt, setPrompt] = useState<Prompt>(() => ({ word: 'MAVİ', ink: 'blue' }));
+  const colorWord = (id: ColorId) => t((COLORS.find((color) => color.id === id) ?? COLORS[0]).key);
+
+  const [prompt, setPrompt] = useState<Prompt>(() => ({ word: 'blue', ink: 'blue' }));
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
@@ -121,13 +126,13 @@ export function StroopGame({ difficulty, onFinish, onProgress }: GameProps) {
           entering={FadeIn.duration(120)}
         >
           <Text variant="display" style={[styles.word, { color: colorValue(prompt.ink) }]}>
-            {prompt.word}
+            {colorWord(prompt.word)}
           </Text>
         </Animated.View>
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.streak}>
-        {streak > 2 ? `${streak} doğru üst üste` : 'Yazının rengini seç'}
+        {streak > 2 ? t('play.streakCorrect', { count: streak }) : t('play.pickInkColor')}
       </Text>
 
       <View style={styles.options}>
@@ -135,11 +140,11 @@ export function StroopGame({ difficulty, onFinish, onProgress }: GameProps) {
           <Pressable
             key={color.id}
             accessibilityRole="button"
-            accessibilityLabel={color.label}
+            accessibilityLabel={t(color.key)}
             onPress={() => answer(color.id)}
             style={[styles.option, { backgroundColor: theme.colors.surfaceElevated }]}
           >
-            <Text variant="bodyStrong">{color.label}</Text>
+            <Text variant="bodyStrong">{t(color.key)}</Text>
           </Pressable>
         ))}
       </View>

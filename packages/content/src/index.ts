@@ -35,8 +35,12 @@ export {
 };
 
 export { TR_ANAGRAMS, TR_ANALOGIES, TR_WORD_PAIRS } from './words/tr';
+export { EN_ANAGRAMS, EN_ANALOGIES, EN_WORD_PAIRS } from './words/en';
 
 export { TR_DISPLAY_NAMES } from './names/tr';
+export { EN_DISPLAY_NAMES } from './names/en';
+
+export { displayNamesFor, wordBankFor, type WordBank } from './words/bank';
 
 export { BADGES, type ContentBadge } from './badges/catalogue';
 

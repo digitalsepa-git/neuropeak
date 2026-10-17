@@ -5,6 +5,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import type { AppLanguage } from '@neuropeak/core';
 import { fontFamily } from '@neuropeak/ui';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,6 +18,7 @@ import { ThemeProvider, useTheme } from '@/components/ui';
 import { AdsProvider } from '@/lib/ads/context';
 import { startAnalytics, track } from '@/lib/analytics';
 import { ProProvider } from '@/lib/billing/context';
+import { I18nProvider, loadLanguage, useT } from '@/lib/i18n';
 import { ProgressProvider } from '@/lib/progress/context';
 import { loadOnboardingState } from '@/lib/onboarding';
 import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
@@ -33,14 +35,16 @@ export default function RootLayout() {
     Inter_700Bold,
   });
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
+  const [language, setLanguage] = useState<AppLanguage | null>(null);
 
   useEffect(() => {
     void loadOnboardingState().then((state) => {
       setOnboardingCompleted(state.completed);
     });
+    void loadLanguage().then(setLanguage);
   }, []);
 
-  const ready = fontsLoaded && onboardingCompleted !== null;
+  const ready = fontsLoaded && onboardingCompleted !== null && language !== null;
 
   useEffect(() => {
     if (ready) {
@@ -65,18 +69,20 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <RemoteConfigProvider>
-            <ProProvider>
-              <ProgressProvider>
-                <AdsProvider>
-                  <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-                    <RootStack />
-                    <CelebrationOverlay />
-                  </OnboardingGateProvider>
-                </AdsProvider>
-              </ProgressProvider>
-            </ProProvider>
-          </RemoteConfigProvider>
+          <I18nProvider initialLanguage={language}>
+            <RemoteConfigProvider>
+              <ProProvider>
+                <ProgressProvider>
+                  <AdsProvider>
+                    <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+                      <RootStack />
+                      <CelebrationOverlay />
+                    </OnboardingGateProvider>
+                  </AdsProvider>
+                </ProgressProvider>
+              </ProProvider>
+            </RemoteConfigProvider>
+          </I18nProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -85,6 +91,7 @@ export default function RootLayout() {
 
 function RootStack() {
   const theme = useTheme();
+  const t = useT();
   const { completed } = useOnboardingGate();
 
   useSyncBootstrap();
@@ -108,9 +115,12 @@ function RootStack() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="settings"
-          options={{ headerShown: true, title: 'Ayarlar', presentation: 'modal' }}
+          options={{ headerShown: true, title: t('settings.title'), presentation: 'modal' }}
         />
-        <Stack.Screen name="showcase" options={{ headerShown: true, title: 'Tasarım Sistemi' }} />
+        <Stack.Screen
+          name="showcase"
+          options={{ headerShown: true, title: t('settings.designSystem') }}
+        />
         <Stack.Screen name="test/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="game/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />

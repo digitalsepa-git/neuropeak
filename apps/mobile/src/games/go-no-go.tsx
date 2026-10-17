@@ -6,6 +6,8 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 
 /** Uyaranın ekranda kalma süresi; zorluk arttıkça kısalır. */
 const STIMULUS_MS: Record<GameProps['difficulty'], number> = {
@@ -21,11 +23,11 @@ type Stimulus = { kind: 'go' | 'nogo'; id: number } | null;
 
 type Feedback = 'hit' | 'miss' | 'falseAlarm' | 'inhibit' | null;
 
-const FEEDBACK_TEXT: Record<Exclude<Feedback, null>, string> = {
-  hit: 'Doğru',
-  inhibit: 'İyi durdun',
-  miss: 'Kaçırdın',
-  falseAlarm: 'Durmalıydın',
+const FEEDBACK_KEYS: Record<Exclude<Feedback, null>, StringKey> = {
+  hit: 'play.correct',
+  inhibit: 'play.goodStop',
+  miss: 'play.missed',
+  falseAlarm: 'play.shouldHaveStopped',
 };
 
 /**
@@ -34,6 +36,7 @@ const FEEDBACK_TEXT: Record<Exclude<Feedback, null>, string> = {
  */
 export function GoNoGoGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const stimulusMs = STIMULUS_MS[difficulty];
 
   const [stimulus, setStimulus] = useState<Stimulus>(null);
@@ -132,14 +135,14 @@ export function GoNoGoGame({ difficulty, onFinish, onProgress }: GameProps) {
             variant="subheading"
             color={feedback === 'hit' || feedback === 'inhibit' ? 'success' : 'danger'}
           >
-            {FEEDBACK_TEXT[feedback]}
+            {FEEDBACK_KEYS[feedback]}
           </Text>
         )}
       </View>
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Tepki alanı"
+        accessibilityLabel={t('play.reactionArea')}
         onPress={onTap}
         style={[styles.stage, { backgroundColor: theme.colors.surface }]}
       >

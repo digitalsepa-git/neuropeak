@@ -15,6 +15,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /** Zorluk, şeklin hücre sayısını belirler: daha çok hücre, daha zor. */
 const SHAPE_SIZE: Record<GameProps['difficulty'], number> = {
@@ -52,6 +53,7 @@ function buildTrial(size: number, seed: number): Trial {
  */
 export function MentalRotationGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const size = SHAPE_SIZE[difficulty];
 
   const [trial, setTrial] = useState<Trial>(() =>
@@ -123,19 +125,19 @@ export function MentalRotationGame({ difficulty, onFinish, onProgress }: GamePro
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Aynı şekil"
+          accessibilityLabel={t('play.sameShape')}
           onPress={() => answer(true)}
           style={[styles.action, { backgroundColor: theme.colors.surfaceElevated }]}
         >
-          <Text variant="bodyStrong">Aynı</Text>
+          <Text variant="bodyStrong">{t('play.same')}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Ayna görüntüsü"
+          accessibilityLabel={t('play.mirrorImage')}
           onPress={() => answer(false)}
           style={[styles.action, { backgroundColor: theme.colors.surfaceElevated }]}
         >
-          <Text variant="bodyStrong">Ayna</Text>
+          <Text variant="bodyStrong">{t('play.mirror')}</Text>
         </Pressable>
       </View>
     </View>

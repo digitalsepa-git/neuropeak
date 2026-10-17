@@ -7,6 +7,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const SYMBOLS = ['▲', '■', '●', '◆', '★', '✚'] as const;
 const SEQUENCE_LENGTH = 200;
@@ -28,6 +29,7 @@ const SYMBOL_COLORS = [
  */
 export function NBackGame({ onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [n, setN] = useState(1);
   const [sequence, setSequence] = useState(() => generateNBack(SEQUENCE_LENGTH, 1, 1));
@@ -116,11 +118,11 @@ export function NBackGame({ onFinish, onProgress }: GameProps) {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Eşleşme"
+        accessibilityLabel={t('play.match')}
         onPress={answer}
         style={[styles.action, { backgroundColor: theme.colors.surfaceElevated }]}
       >
-        <Text variant="bodyStrong">Eşleşme</Text>
+        <Text variant="bodyStrong">{t('play.match')}</Text>
       </Pressable>
 
       <Text variant="caption" color="textMuted" style={styles.streak}>

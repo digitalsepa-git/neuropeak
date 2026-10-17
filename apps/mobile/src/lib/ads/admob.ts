@@ -103,10 +103,10 @@ async function present(kind: 'interstitial' | 'rewarded'): Promise<AdOutcome> {
         switch (event.type) {
           case module.AdEventType.LOADED:
           case module.RewardedAdEventType.LOADED:
-            ad.show().catch(() => finish({ status: 'error', message: 'Reklam gösterilemedi' }));
+            ad.show().catch(() => finish({ status: 'error' }));
             break;
           case module.AdEventType.ERROR:
-            finish({ status: 'error', message: 'Reklam yüklenemedi' });
+            finish({ status: 'error' });
             break;
           case module.RewardedAdEventType.EARNED_REWARD:
             earned = true;

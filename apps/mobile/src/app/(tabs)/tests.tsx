@@ -11,17 +11,20 @@ import { findTest } from '@neuropeak/content';
 
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
+import { useI18n, useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 
 const FILTERS = [
-  { id: 'all', label: 'Tümü' },
-  { id: 'iq', label: 'IQ Testleri' },
-  { id: 'fun', label: 'Keşfet' },
-] as const;
+  { id: 'all', label: 'common.all' },
+  { id: 'iq', label: 'tests.filterIq' },
+  { id: 'fun', label: 'tests.filterFun' },
+] as const satisfies readonly { id: string; label: StringKey }[];
 
 type FilterId = (typeof FILTERS)[number]['id'];
 
 export default function TestsScreen() {
   const [filter, setFilter] = useState<FilterId>('all');
+  const t = useT();
 
   const iqTests = TESTS.filter((test) => test.group === 'iq');
   const funTests = TESTS.filter((test) => test.group === 'fun');
@@ -29,7 +32,7 @@ export default function TestsScreen() {
   return (
     <Screen scroll padded={false}>
       <View style={styles.padded}>
-        <AppHeader title="Testler" />
+        <AppHeader title={t('tests.title')} />
       </View>
 
       <ScrollView
@@ -40,7 +43,7 @@ export default function TestsScreen() {
         {FILTERS.map((item) => (
           <Chip
             key={item.id}
-            label={item.label}
+            label={t(item.label)}
             selected={filter === item.id}
             onPress={() => setFilter(item.id)}
           />
@@ -49,7 +52,7 @@ export default function TestsScreen() {
 
       <View style={styles.padded}>
         {(filter === 'all' || filter === 'iq') && (
-          <Section title="IQ Testleri">
+          <Section title={t('tests.sectionIq')}>
             <View style={styles.stack}>
               {iqTests.map((test) => (
                 <TestCard key={test.id} test={test} />
@@ -59,7 +62,7 @@ export default function TestsScreen() {
         )}
 
         {(filter === 'all' || filter === 'fun') && (
-          <Section title="Keşfet">
+          <Section title={t('tests.sectionFun')}>
             <View style={styles.stack}>
               {funTests.map((test) => (
                 <TestCard key={test.id} test={test} />
@@ -75,6 +78,8 @@ export default function TestsScreen() {
 function TestCard({ test }: { test: PlaceholderTest }) {
   const theme = useTheme();
   const router = useRouter();
+  const t = useT();
+  const { localized } = useI18n();
   const { isPro } = usePro();
 
   // Soru bankası yazılmamış testler listede kalır ama açılmaz;
@@ -85,7 +90,7 @@ function TestCard({ test }: { test: PlaceholderTest }) {
 
   return (
     <Card
-      accessibilityLabel={test.title}
+      accessibilityLabel={localized(test.title)}
       onPress={() => {
         if (!ready) return;
         if (locked) {
@@ -99,20 +104,20 @@ function TestCard({ test }: { test: PlaceholderTest }) {
         <View style={[styles.info, !ready && styles.dimmed]}>
           <View style={styles.titleRow}>
             <Text variant="subheading" numberOfLines={1}>
-              {test.title}
+              {ready ? localized(content.title) : localized(test.title)}
             </Text>
             {!ready ? (
-              <Badge label="Yakında" />
+              <Badge label={t('common.soon')} />
             ) : test.pro ? (
               <Badge label="PRO" tone="brand" />
             ) : (
-              <Badge label="Ücretsiz" />
+              <Badge label={t('common.free')} />
             )}
           </View>
           <Text variant="caption" color="textMuted">
             {ready
-              ? `${content.questionCount} soru · ${content.estMinutes[0]}-${content.estMinutes[1]} dk`
-              : `${test.questions} soru · ${test.minutes} dk`}
+              ? `${t('common.questionCount', { count: content.questionCount })} · ${t('common.minutesShort', { value: `${content.estMinutes[0]}-${content.estMinutes[1]}` })}`
+              : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
           </Text>
         </View>
         {ready && (

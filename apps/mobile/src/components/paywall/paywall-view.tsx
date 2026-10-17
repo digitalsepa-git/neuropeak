@@ -10,32 +10,27 @@ import { Button, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { EXIT_OFFER_PLAN, billing, type Plan, type PlanId } from '@/lib/billing';
 import { track } from '@/lib/analytics';
 import { usePro } from '@/lib/billing/context';
+import { usePlanText, useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 
 export type PaywallVariant = 'onboarding' | 'result' | 'generic';
 
-const HEADLINES: Record<PaywallVariant, { title: string; subtitle: string }> = {
+const HEADLINES: Record<PaywallVariant, { title: StringKey; subtitle: StringKey }> = {
   onboarding: {
-    title: 'Zihnini her gün biraz daha ileri taşı',
-    subtitle: 'Planın hazır. PRO ile tüm testler, detaylı raporlar ve reklamsız deneyim açılır.',
+    title: 'paywall.onboarding.title',
+    subtitle: 'paywall.onboarding.subtitle',
   },
-  result: {
-    title: 'Detaylı raporunu aç',
-    subtitle:
-      'Güçlü ve zayıf alanların, yaş grubuna göre karşılaştırma ve sana özel gelişim planı.',
-  },
-  generic: {
-    title: 'NeuroPeak PRO',
-    subtitle: 'Zihnini geliştirmek için ihtiyacın olan her şey tek abonelikte.',
-  },
+  result: { title: 'paywall.result.title', subtitle: 'paywall.result.subtitle' },
+  generic: { title: 'paywall.generic.title', subtitle: 'paywall.generic.subtitle' },
 };
 
-const BENEFITS = [
-  'Tüm IQ ve kişilik testleri',
-  'Her testte detaylı rapor ve gelişim planı',
-  'Reklamsız deneyim',
-  'Sınırsız ipucu ve yıldız',
-  'Beyin haritası geçmişi ve haftalık trend',
+const BENEFITS: StringKey[] = [
+  'paywall.benefit1',
+  'paywall.benefit2',
+  'paywall.benefit3',
+  'paywall.benefit4',
+  'paywall.benefit5',
 ];
 
 const TERMS_URL = 'https://neuropeak.app/terms';
@@ -58,6 +53,8 @@ export function PaywallView({
   withExitOffer = true,
 }: PaywallViewProps) {
   const theme = useTheme();
+  const t = useT();
+  const planText = usePlanText();
   const { purchase, restore } = usePro();
   const { getString } = useRemoteConfig();
 
@@ -96,9 +93,9 @@ export function PaywallView({
         return;
       }
 
-      Alert.alert('Abonelik', outcome.message);
+      Alert.alert(t('paywall.alertTitle'), t(`billing.${outcome.issue}`));
     },
-    [finishPurchase, purchase],
+    [finishPurchase, purchase, t],
   );
 
   const onRestore = useCallback(async () => {
@@ -113,8 +110,8 @@ export function PaywallView({
     if (outcome.status === 'cancelled') {
       return;
     }
-    Alert.alert('Satın alımları geri yükle', outcome.message);
-  }, [finishPurchase, restore]);
+    Alert.alert(t('paywall.restoreAlertTitle'), t(`billing.${outcome.issue}`));
+  }, [finishPurchase, restore, t]);
 
   const close = useCallback(() => {
     tapFeedback();
@@ -139,21 +136,21 @@ export function PaywallView({
   const selectedPlan = plans.find((plan) => plan.id === selected);
   const ctaLabel =
     selectedPlan?.trialDays !== undefined
-      ? `${selectedPlan.trialDays} gün ücretsiz dene`
-      : 'Devam et';
+      ? t('paywall.trialCta', { days: selectedPlan.trialDays })
+      : t('common.continueAction');
 
   const headline = HEADLINES[variant];
   // Panelden yazılan başlık varsa onu kullan; boşsa varyantın kendi
   // başlığı kalır.
   const remoteTitle = getString('paywall.title');
-  const title = remoteTitle.length > 0 ? remoteTitle : headline.title;
+  const title = remoteTitle.length > 0 ? remoteTitle : t(headline.title);
 
   return (
     <Screen scroll>
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Kapat"
+          accessibilityLabel={t('common.close')}
           hitSlop={12}
           onPress={close}
         >
@@ -163,18 +160,18 @@ export function PaywallView({
         </Pressable>
         <Pressable accessibilityRole="button" hitSlop={12} onPress={() => void onRestore()}>
           <Text variant="caption" color="textMuted">
-            Geri yükle
+            {t('paywall.restore')}
           </Text>
         </Pressable>
       </View>
 
       <Animated.View entering={FadeIn.duration(260)} style={styles.header}>
         <Text variant="overline" color="brand">
-          NeuroPeak PRO
+          {t('paywall.brand')}
         </Text>
         <Text variant="title">{title}</Text>
         <Text variant="bodySmall" color="textSecondary">
-          {headline.subtitle}
+          {t(headline.subtitle)}
         </Text>
       </Animated.View>
 
@@ -183,7 +180,7 @@ export function PaywallView({
           <View key={benefit} style={styles.benefit}>
             <Icon name="check" color={theme.colors.success} size={18} strokeWidth={2.4} />
             <Text variant="body" style={styles.benefitText}>
-              {benefit}
+              {t(benefit)}
             </Text>
           </View>
         ))}
@@ -204,16 +201,25 @@ export function PaywallView({
 
       {/* App Store, fiyat ve yenileme koşullarının paywall'da görünmesini şart koşuyor. */}
       <Text variant="caption" color="textMuted" align="center" style={styles.disclosure}>
-        {selectedPlan?.trialDays !== undefined
-          ? `${selectedPlan.trialDays} günlük ücretsiz deneme sonunda ${selectedPlan.priceLabel}/${selectedPlan.periodLabel} olarak otomatik yenilenir.`
-          : `${selectedPlan?.priceLabel ?? ''}/${selectedPlan?.periodLabel ?? ''} olarak otomatik yenilenir.`}{' '}
-        İstediğin zaman App Store ayarlarından iptal edebilirsin.
+        {selectedPlan === undefined
+          ? ''
+          : selectedPlan.trialDays !== undefined
+            ? t('paywall.disclosureTrial', {
+                days: selectedPlan.trialDays,
+                price: selectedPlan.priceLabel,
+                period: planText.period(selectedPlan),
+              })
+            : t('paywall.disclosurePlain', {
+                price: selectedPlan.priceLabel,
+                period: planText.period(selectedPlan),
+              })}{' '}
+        {t('paywall.cancelNote')}
       </Text>
 
       <View style={styles.links}>
         <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(TERMS_URL)}>
           <Text variant="caption" color="textMuted">
-            Kullanım Şartları
+            {t('paywall.terms')}
           </Text>
         </Pressable>
         <Text variant="caption" color="textMuted">
@@ -221,7 +227,7 @@ export function PaywallView({
         </Text>
         <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(PRIVACY_URL)}>
           <Text variant="caption" color="textMuted">
-            Gizlilik Politikası
+            {t('paywall.privacy')}
           </Text>
         </Pressable>
       </View>

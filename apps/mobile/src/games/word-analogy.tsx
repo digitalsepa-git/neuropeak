@@ -1,4 +1,4 @@
-import { TR_ANALOGIES } from '@neuropeak/content';
+import { wordBankFor } from '@neuropeak/content';
 import { generateWordAnalogy } from '@neuropeak/core';
 import { radius, spacing } from '@neuropeak/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useI18n } from '@/lib/i18n';
 
 /**
  * Sözel Analoji — seviyeli. "A : B :: C : ?" ilişkisini kurup eksik
@@ -15,10 +16,12 @@ import { useRoundFinish } from '@/games/use-round-finish';
  */
 export function WordAnalogyGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const { language } = useI18n();
+  const bank = wordBankFor(language).analogies;
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() =>
-    generateWordAnalogy(TR_ANALOGIES, startLevel, startLevel * 7919),
+    generateWordAnalogy(bank, startLevel, startLevel * 7919),
   );
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -53,12 +56,10 @@ export function WordAnalogyGame({ startLevel, onFinish, onProgress }: GameProps)
         const nextLevel = correct ? level + 1 : level;
         setPicked(null);
         setLevel(nextLevel);
-        setPuzzle(
-          generateWordAnalogy(TR_ANALOGIES, nextLevel, nextLevel * 7919 + score, puzzle.id),
-        );
+        setPuzzle(generateWordAnalogy(bank, nextLevel, nextLevel * 7919 + score, puzzle.id));
       }, 1100);
     },
-    [level, picked, puzzle.correctIndex, puzzle.id, score, streak],
+    [bank, level, picked, puzzle.correctIndex, puzzle.id, score, streak],
   );
 
   return (

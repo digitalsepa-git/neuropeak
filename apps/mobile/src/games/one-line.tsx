@@ -7,6 +7,7 @@ import Svg, { Circle, Line } from 'react-native-svg';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 300;
 const NODE_RADIUS = 11;
@@ -18,6 +19,7 @@ const NODE_RADIUS = 11;
  */
 export function OneLineGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() => generateOneLine(startLevel, startLevel * 7919));
@@ -176,7 +178,7 @@ export function OneLineGame({ startLevel, onFinish, onProgress }: GameProps) {
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Baştan çiz"
+          accessibilityLabel={t('play.redraw')}
           onPress={reset}
           style={[styles.reset, { borderColor: theme.colors.border }]}
         >

@@ -68,14 +68,12 @@ export const revenueCatProvider: BillingProvider = {
       );
 
       if (target === undefined) {
-        return { status: 'unavailable', message: 'Bu plan şu anda mağazada bulunamadı.' };
+        return { status: 'unavailable', issue: 'plan_missing' };
       }
 
       const result = await Purchases.purchasePackage(target);
       const active = result.customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
-      return active
-        ? { status: 'purchased' }
-        : { status: 'error', message: 'Abonelik doğrulanamadı.' };
+      return active ? { status: 'purchased' } : { status: 'error', issue: 'not_verified' };
     } catch (error) {
       // Kullanıcı vazgeçtiyse bu bir hata değil.
       if (typeof error === 'object' && error !== null && 'userCancelled' in error) {
@@ -83,7 +81,7 @@ export const revenueCatProvider: BillingProvider = {
           return { status: 'cancelled' };
         }
       }
-      return { status: 'error', message: 'Satın alma tamamlanamadı. Lütfen tekrar deneyin.' };
+      return { status: 'error', issue: 'purchase_failed' };
     }
   },
 
@@ -92,11 +90,9 @@ export const revenueCatProvider: BillingProvider = {
       const { default: Purchases } = await loadPurchases();
       const info = await Purchases.restorePurchases();
       const active = info.entitlements.active[ENTITLEMENT_ID] !== undefined;
-      return active
-        ? { status: 'purchased' }
-        : { status: 'error', message: 'Bu hesapta etkin bir abonelik bulunamadı.' };
+      return active ? { status: 'purchased' } : { status: 'error', issue: 'no_subscription' };
     } catch {
-      return { status: 'error', message: 'Satın alımlar geri yüklenemedi.' };
+      return { status: 'error', issue: 'restore_failed' };
     }
   },
 

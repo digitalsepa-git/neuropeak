@@ -1,4 +1,4 @@
-import { TR_DISPLAY_NAMES } from '@neuropeak/content';
+import { displayNamesFor } from '@neuropeak/content';
 import {
   LEAGUE_TIERS,
   generatePracticeCohort,
@@ -6,13 +6,12 @@ import {
   tierAfter,
   weekProgress,
   weekStartKey,
+  type AppLanguage,
   type LeagueMember,
   type LeagueTier,
 } from '@neuropeak/core';
 
 import { type LeagueState } from './storage';
-
-const USER_NAME = 'Sen';
 
 /** İki kademeden yüksek olanı. */
 function bestOf(a: LeagueTier, b: LeagueTier): LeagueTier {
@@ -28,20 +27,28 @@ export function cohortFor(
   userId: string,
   weekStart: string,
   progress: number,
+  language: AppLanguage,
+  userName: string,
 ): LeagueMember[] {
   return generatePracticeCohort({
-    names: TR_DISPLAY_NAMES,
+    names: displayNamesFor(language),
     tier: league.tier,
     weekStart,
     userId,
-    userName: USER_NAME,
+    userName,
     userXp: league.weeklyXp,
     progress,
   });
 }
 
-export function currentCohort(league: LeagueState, userId: string, now: Date): LeagueMember[] {
-  return cohortFor(league, userId, weekStartKey(now), weekProgress(now));
+export function currentCohort(
+  league: LeagueState,
+  userId: string,
+  now: Date,
+  language: AppLanguage,
+  userName: string,
+): LeagueMember[] {
+  return cohortFor(league, userId, weekStartKey(now), weekProgress(now), language, userName);
 }
 
 /**
@@ -49,7 +56,13 @@ export function currentCohort(league: LeagueState, userId: string, now: Date): L
  * ya da düşme uygulanır, haftalık XP sıfırlanır. Aynı hafta içinde
  * çağrılırsa durumu değiştirmez.
  */
-export function rolloverLeague(league: LeagueState, now: Date, userId: string): LeagueState {
+export function rolloverLeague(
+  league: LeagueState,
+  now: Date,
+  userId: string,
+  language: AppLanguage,
+  userName: string,
+): LeagueState {
   const thisWeek = weekStartKey(now);
 
   if (league.weekStart === null) {
@@ -60,7 +73,7 @@ export function rolloverLeague(league: LeagueState, now: Date, userId: string): 
 
   // Geçen haftanın grubu tohumdan birebir yeniden üretilebiliyor;
   // sıralamayı kapatmak için sunucuya gerek yok.
-  const finished = cohortFor(league, userId, league.weekStart, 1);
+  const finished = cohortFor(league, userId, league.weekStart, 1, language, userName);
   const table = standings(finished);
   const user = table.find((row) => row.id === userId);
 

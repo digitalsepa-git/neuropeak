@@ -5,7 +5,8 @@ export type AdOutcome =
   | { readonly status: 'dismissed' }
   /** Reklam ağı kurulu değil ya da bu derlemede yok. */
   | { readonly status: 'unavailable' }
-  | { readonly status: 'error'; readonly message: string };
+  /** Yüklenemedi ya da gösterilemedi; nedeni kullanıcıya yazılmıyor. */
+  | { readonly status: 'error' };
 
 export type AdProvider = {
   /** Gerçek reklam ağı bağlantısı var mı. */

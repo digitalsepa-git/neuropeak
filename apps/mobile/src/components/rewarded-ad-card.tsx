@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { Icon } from '@/components/icons';
 import { Button, Card, Text, useTheme } from '@/components/ui';
 import { useAds } from '@/lib/ads/context';
+import { useT } from '@/lib/i18n';
 
 /**
  * Ödüllü reklam girişi.
@@ -16,6 +17,7 @@ import { useAds } from '@/lib/ads/context';
  */
 export function RewardedAdCard() {
   const theme = useTheme();
+  const t = useT();
   const { canWatchRewarded, rewardedLeft, watchRewarded } = useAds();
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -29,9 +31,11 @@ export function RewardedAdCard() {
           <Icon name="star" color={theme.colors.brand} size={20} />
         </View>
         <View style={styles.copy}>
-          <Text variant="subheading">+{STAR_REWARDS.rewardedAd} yıldız</Text>
+          <Text variant="subheading">
+            {t('ads.rewardTitle', { stars: STAR_REWARDS.rewardedAd })}
+          </Text>
           <Text variant="caption" color="textMuted">
-            Kısa bir reklam izle. Bugün {rewardedLeft}/{DAILY_REWARDED_AD_LIMIT} hakkın kaldı.
+            {t('ads.rewardBody', { left: rewardedLeft, limit: DAILY_REWARDED_AD_LIMIT })}
           </Text>
         </View>
       </View>
@@ -44,7 +48,7 @@ export function RewardedAdCard() {
 
       <View style={styles.action}>
         <Button
-          label="Reklam izle"
+          label={t('ads.watch')}
           variant="secondary"
           size="md"
           loading={busy}
@@ -54,11 +58,7 @@ export function RewardedAdCard() {
             void watchRewarded()
               .then((outcome) => {
                 if (outcome.status === 'rewarded') return;
-                setNote(
-                  outcome.status === 'dismissed'
-                    ? 'Reklam sonuna kadar izlenmedi, yıldız eklenmedi.'
-                    : 'Şu anda uygun reklam yok, sonra tekrar dene.',
-                );
+                setNote(outcome.status === 'dismissed' ? t('ads.dismissed') : t('ads.unavailable'));
               })
               .finally(() => setBusy(false));
           }}

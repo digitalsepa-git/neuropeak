@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 260;
 const TRAY_CELL = 16;
@@ -58,6 +59,7 @@ type Placed = { readonly pieceId: number; readonly cells: readonly number[] };
  */
 export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() => generateTiling(startLevel, startLevel * 7919));
@@ -201,7 +203,7 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Seçili parçayı döndür"
+          accessibilityLabel={t('play.rotatePiece')}
           onPress={rotateSelected}
           style={[styles.action, { borderColor: theme.colors.border }]}
         >
@@ -211,7 +213,7 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Son parçayı geri al"
+          accessibilityLabel={t('play.undoPiece')}
           onPress={undo}
           style={[styles.action, { borderColor: theme.colors.border }]}
         >

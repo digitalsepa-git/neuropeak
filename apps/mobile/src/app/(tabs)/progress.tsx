@@ -22,8 +22,8 @@ import { BrainRadar } from '@/components/progress/brain-radar';
 import { WeeklyChart } from '@/components/progress/weekly-chart';
 import { Section } from '@/components/section';
 import { Badge, Card, ProgressBar, Screen, Text } from '@/components/ui';
-import { AXIS_LABELS, CATEGORY_LABELS } from '@/data/placeholder';
 import { GAME_DEFINITIONS } from '@/games/registry';
+import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 
 /** Eksen renkleri — radar grafiğiyle aynı paleti kullanır. */
@@ -37,6 +37,9 @@ const AXIS_COLORS: Record<BrainAxis, string> = {
 
 export default function ProgressScreen() {
   const router = useRouter();
+  const t = useT();
+  const { localized } = useI18n();
+  const labels = useLabels();
   const { state, neuropeak, level, badges } = useProgress();
 
   const today = toDateKey(new Date());
@@ -86,26 +89,24 @@ export default function ProgressScreen() {
 
   return (
     <Screen scroll>
-      <AppHeader title="İlerleme" />
+      <AppHeader title={t('progress.title')} />
 
       <Card padding="lg">
         <Text variant="overline" color="textMuted">
-          NeuroPeak skoru
+          {t('progress.scoreLabel')}
         </Text>
         <View style={styles.scoreRow}>
           <Text variant="display" color="brand">
             {neuropeak}
           </Text>
-          <Badge label={`Seviye ${level.level}`} tone="success" />
+          <Badge label={t('common.levelLabel', { level: level.level })} tone="success" />
         </View>
         <Text variant="bodySmall" color="textSecondary">
-          {playedAny
-            ? 'Skor beş eksenin ağırlıklı ortalaması. Oyun oynadıkça eksenler güncel performansına yaklaşır.'
-            : 'Henüz oyun oynamadın. Skor 50’den başlar ve oynadıkça performansına göre değişir.'}
+          {playedAny ? t('progress.scoreBodyPlayed') : t('progress.scoreBodyEmpty')}
         </Text>
       </Card>
 
-      <Section title="Beyin haritası">
+      <Section title={t('progress.brainMap')}>
         <Card padding="lg">
           <BrainRadar map={state.brainMap} />
 
@@ -113,7 +114,7 @@ export default function ProgressScreen() {
             {BRAIN_AXES.map((axis) => (
               <View key={axis} style={styles.axis}>
                 <View style={styles.axisHead}>
-                  <Text variant="caption">{AXIS_LABELS[axis]}</Text>
+                  <Text variant="caption">{labels.axis(axis)}</Text>
                   <Text variant="caption" color="textMuted">
                     {state.brainMap[axis]}
                   </Text>
@@ -121,24 +122,23 @@ export default function ProgressScreen() {
                 <ProgressBar
                   value={state.brainMap[axis] / 100}
                   color={AXIS_COLORS[axis]}
-                  accessibilityLabel={`${AXIS_LABELS[axis]} puanı`}
+                  accessibilityLabel={t('progress.axisScoreLabel', { axis: labels.axis(axis) })}
                 />
               </View>
             ))}
           </View>
 
           <Text variant="caption" color="textMuted" style={styles.note}>
-            Harita bir ölçüm değil, oyunlardaki güncel performansının özeti. Her eksen{' '}
-            {INITIAL_AXIS_SCORE} puandan başlar.
+            {t('progress.brainMapNote', { start: INITIAL_AXIS_SCORE })}
           </Text>
         </Card>
       </Section>
 
       {suggestion !== undefined && (
-        <Section title="Bugün neye çalış?">
+        <Section title={t('progress.suggestionSection')}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${suggestion.title} oyna`}
+            accessibilityLabel={t('progress.playGameLabel', { game: localized(suggestion.title) })}
             onPress={() => router.push(`/game/${suggestion.id}`)}
           >
             <Card padding="lg">
@@ -152,9 +152,9 @@ export default function ProgressScreen() {
                   <Icon name="games" color={AXIS_COLORS[focusAxis]} size={22} />
                 </View>
                 <View style={styles.suggestionText}>
-                  <Text variant="bodyStrong">{suggestion.title}</Text>
+                  <Text variant="bodyStrong">{localized(suggestion.title)}</Text>
                   <Text variant="caption" color="textMuted">
-                    En düşük eksenin {AXIS_LABELS[focusAxis]} — bu oyun oraya çalışıyor
+                    {t('progress.suggestionBody', { axis: labels.axis(focusAxis) })}
                   </Text>
                 </View>
               </View>
@@ -163,28 +163,33 @@ export default function ProgressScreen() {
         </Section>
       )}
 
-      <Section title="Bu hafta" meta={`${weekXp} XP · ${weekRounds} tur`}>
+      <Section
+        title={t('progress.thisWeek')}
+        meta={t('progress.weekMeta', { xp: weekXp, rounds: weekRounds })}
+      >
         <Card padding="lg">
           <WeeklyChart days={week} />
         </Card>
       </Section>
 
       {categories.length > 0 && (
-        <Section title="Kategori dağılımı">
+        <Section title={t('progress.categorySection')}>
           <Card padding="lg">
             <View style={styles.axes}>
               {categories.map(({ category, count }) => (
                 <View key={category} style={styles.axis}>
                   <View style={styles.axisHead}>
-                    <Text variant="caption">{CATEGORY_LABELS[category]}</Text>
+                    <Text variant="caption">{labels.category(category)}</Text>
                     <Text variant="caption" color="textMuted">
-                      {count} tur
+                      {t('common.roundCount', { count })}
                     </Text>
                   </View>
                   <ProgressBar
                     value={count / mostPlayed}
                     color={categoryAccent[category]}
-                    accessibilityLabel={`${CATEGORY_LABELS[category]} tur sayısı`}
+                    accessibilityLabel={t('progress.categoryRoundsLabel', {
+                      category: labels.category(category),
+                    })}
                   />
                 </View>
               ))}
@@ -193,7 +198,7 @@ export default function ProgressScreen() {
         </Section>
       )}
 
-      <Section title="Rozetler" meta={`${state.badges.length}/${badges.length}`}>
+      <Section title={t('progress.badgesSection')} meta={`${state.badges.length}/${badges.length}`}>
         <BadgeShowcase badges={visibleBadges} earned={state.badges} context={badgeContext} />
       </Section>
     </Screen>

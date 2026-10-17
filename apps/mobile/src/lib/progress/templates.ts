@@ -1,5 +1,7 @@
 import type { DailyTaskTemplate } from '@neuropeak/core';
 
+import type { StringKey } from '@/lib/i18n';
+
 /**
  * Günlük görev havuzu. Her gün buradan üç tanesi seçilir; seçim
  * kullanıcı ve tarihe göre tohumlandığı için gün içinde değişmez.
@@ -17,14 +19,15 @@ export const DAILY_TASK_TEMPLATES: DailyTaskTemplate[] = [
   { id: 'math-2', metric: 'play_category', target: 2, category: 'math', starReward: 20 },
 ];
 
-export const TASK_LABELS: Record<string, string> = {
-  'play-2-games': '2 oyun oyna',
-  'play-4-games': '4 oyun oyna',
-  'earn-300-xp': '300 XP kazan',
-  'earn-600-xp': '600 XP kazan',
-  'finish-test': 'Bir testi tamamla',
-  'memory-2': '2 hafıza oyunu oyna',
-  'attention-2': '2 odaklanma oyunu oyna',
-  'logic-2': '2 mantık oyunu oyna',
-  'math-2': '2 matematik oyunu oyna',
+/** Görev kimliğinden metin anahtarına; metinler i18n kataloğunda. */
+export const TASK_LABEL_KEYS: Record<string, StringKey> = {
+  'play-2-games': 'task.play-2-games',
+  'play-4-games': 'task.play-4-games',
+  'earn-300-xp': 'task.earn-300-xp',
+  'earn-600-xp': 'task.earn-600-xp',
+  'finish-test': 'task.finish-test',
+  'memory-2': 'task.memory-2',
+  'attention-2': 'task.attention-2',
+  'logic-2': 'task.logic-2',
+  'math-2': 'task.math-2',
 };

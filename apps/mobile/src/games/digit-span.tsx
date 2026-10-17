@@ -7,6 +7,7 @@ import { Icon } from '@/components/icons';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /** Rakamların ekranda kalma süresi; zorluk arttıkça kısalır. */
 const DIGIT_MS: Record<GameProps['difficulty'], number> = {
@@ -38,6 +39,7 @@ function randomDigits(length: number): string[] {
  */
 export function DigitSpanGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const digitMs = DIGIT_MS[difficulty];
 
   const [length, setLength] = useState(STARTING_LENGTH[difficulty]);
@@ -191,7 +193,9 @@ export function DigitSpanGame({ difficulty, onFinish, onProgress }: GameProps) {
           <Pressable
             key={key}
             accessibilityRole="button"
-            accessibilityLabel={key === 'clear' ? 'Temizle' : key === 'submit' ? 'Onayla' : key}
+            accessibilityLabel={
+              key === 'clear' ? t('play.clear') : key === 'submit' ? t('play.confirm') : key
+            }
             disabled={phase !== 'input'}
             onPress={() => onKey(key)}
             style={[

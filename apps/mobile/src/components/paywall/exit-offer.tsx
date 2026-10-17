@@ -5,6 +5,7 @@ import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 import { Button, Screen, Text, ThemeProvider, tapFeedback } from '@/components/ui';
 import type { Plan } from '@/lib/billing';
+import { usePlanText, useT } from '@/lib/i18n';
 
 /** Teklifin görünür kalma süresi. */
 const COUNTDOWN_SECONDS = 10 * 60;
@@ -27,7 +28,13 @@ type ExitOfferProps = {
  * bitince teklif kapanır; yapay bir aciliyet değil, gerçekten süreli.
  */
 export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
+  const t = useT();
+  const planText = usePlanText();
   const [remaining, setRemaining] = useState(COUNTDOWN_SECONDS);
+
+  const period = planText.period(plan);
+  const badge = planText.badge(plan);
+  const perWeek = planText.perWeek(plan);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,7 +56,7 @@ export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
         <View style={styles.topBar}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Teklifi kapat"
+            accessibilityLabel={t('exitOffer.close')}
             hitSlop={12}
             onPress={() => {
               tapFeedback();
@@ -64,19 +71,19 @@ export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
 
         <Animated.View entering={FadeInDown.duration(280)} style={styles.header}>
           <Text variant="overline" color="warning">
-            Sana özel
+            {t('exitOffer.eyebrow')}
           </Text>
           <Text variant="title" align="center">
-            Gitmeden önce
+            {t('exitOffer.title')}
           </Text>
           <Text variant="bodySmall" color="textSecondary" align="center">
-            Bu teklif yalnızca bu ekranda geçerli.
+            {t('exitOffer.subtitle')}
           </Text>
         </Animated.View>
 
         <Animated.View entering={ZoomIn.delay(150).duration(320)} style={styles.ticket}>
           <Text variant="display" color="onBrand">
-            {plan.badge ?? 'İndirim'}
+            {badge ?? t('exitOffer.fallbackBadge')}
           </Text>
         </Animated.View>
 
@@ -87,26 +94,25 @@ export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
             </Text>
           )}
           <Text variant="heading">
-            {plan.priceLabel} / {plan.periodLabel}
+            {plan.priceLabel} / {period}
           </Text>
-          {plan.perWeekLabel !== undefined && (
+          {perWeek !== undefined && (
             <Text variant="bodySmall" color="textSecondary">
-              {plan.perWeekLabel}
+              {perWeek}
             </Text>
           )}
         </View>
 
         <View style={styles.countdown}>
           <Text variant="caption" color="textSecondary">
-            Teklifin bitmesine {formatCountdown(remaining)}
+            {t('exitOffer.countdown', { time: formatCountdown(remaining) })}
           </Text>
         </View>
 
-        <Button label="Teklifi al" loading={busy} onPress={onAccept} />
+        <Button label={t('exitOffer.accept')} loading={busy} onPress={onAccept} />
 
         <Text variant="caption" color="textMuted" align="center" style={styles.disclosure}>
-          {plan.priceLabel}/{plan.periodLabel} olarak otomatik yenilenir. İstediğin zaman App Store
-          ayarlarından iptal edebilirsin.
+          {t('exitOffer.renewNote', { price: plan.priceLabel, period })}
         </Text>
 
         <Pressable
@@ -118,7 +124,7 @@ export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
           style={styles.decline}
         >
           <Text variant="caption" color="textMuted" align="center">
-            Teşekkürler, istemiyorum
+            {t('exitOffer.decline')}
           </Text>
         </Pressable>
       </Screen>

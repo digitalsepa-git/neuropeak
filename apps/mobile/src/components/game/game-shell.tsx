@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
 import { Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { useT } from '@/lib/i18n';
 
 type GameShellProps = {
   /** Üst barın solunda görünen ilerleme bilgisi: "Seviye 3" ya da "0:42". */
@@ -29,13 +30,14 @@ export function GameShell({
   toolbar,
 }: GameShellProps) {
   const theme = useTheme();
+  const t = useT();
 
   return (
     <Screen>
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Oyundan çık"
+          accessibilityLabel={t('game.exit')}
           hitSlop={12}
           onPress={() => {
             tapFeedback();
@@ -51,7 +53,9 @@ export function GameShell({
             {progressLabel}
           </Text>
           <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
-          <Text variant="caption">Skor {score}</Text>
+          <Text variant="caption">
+            {t('game.score')} {score}
+          </Text>
         </View>
       </View>
 

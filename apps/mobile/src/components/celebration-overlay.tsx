@@ -4,9 +4,15 @@ import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 
 import { Icon, type IconName } from '@/components/icons';
 import { Button, Text, useTheme } from '@/components/ui';
+import { useT } from '@/lib/i18n';
 import { useProgress, type Celebration } from '@/lib/progress/context';
 
-function contentFor(celebration: Celebration): {
+type Translate = ReturnType<typeof useT>;
+
+function contentFor(
+  celebration: Celebration,
+  t: Translate,
+): {
   icon: IconName;
   title: string;
   body: string;
@@ -15,31 +21,38 @@ function contentFor(celebration: Celebration): {
     case 'level_up':
       return {
         icon: 'star',
-        title: `Seviye ${celebration.level}`,
-        body: 'Yeni seviyeye ulaştın. Bonus yıldızların hesabına eklendi.',
+        title: t('common.levelLabel', { level: celebration.level }),
+        body: t('celebration.levelUpBody'),
       };
     case 'streak':
       return {
         icon: 'flame',
-        title: `${celebration.days} günlük seri`,
-        body: 'Üst üste geldin. Yarın da gel, seriyi büyüt.',
+        title: t('home.streakDays', { days: celebration.days }),
+        body: t('celebration.streakBody'),
       };
     case 'tasks_done':
       return {
         icon: 'check',
-        title: 'Görev tamam',
-        body: `+${celebration.stars} yıldız kazandın.`,
+        title: t('celebration.tasksTitle'),
+        body: t('celebration.starsEarned', { stars: celebration.stars }),
       };
     case 'badge':
       return {
         icon: 'shield',
         // Bir turda birden çok rozet açılabiliyor; tek rozetin adını
         // yazıp hepsinin yıldızını göstermek yanıltıcı oluyordu.
-        title: celebration.count > 1 ? `${celebration.count} yeni rozet` : celebration.title,
+        title:
+          celebration.count > 1
+            ? t('celebration.badgeCount', { count: celebration.count })
+            : celebration.title,
         body:
           celebration.count > 1
-            ? `${celebration.title} ve ${celebration.count - 1} rozet daha. +${celebration.stars} yıldız hesabına eklendi.`
-            : `Yeni rozet kazandın. +${celebration.stars} yıldız hesabına eklendi.`,
+            ? t('celebration.badgeMultiBody', {
+                title: celebration.title,
+                others: celebration.count - 1,
+                stars: celebration.stars,
+              })
+            : t('celebration.badgeSingleBody', { stars: celebration.stars }),
       };
   }
 }
@@ -47,11 +60,12 @@ function contentFor(celebration: Celebration): {
 /** Seviye atlama, seri eşiği ve görev tamamlama kutlaması. */
 export function CelebrationOverlay() {
   const theme = useTheme();
+  const t = useT();
   const { celebration, clearCelebration } = useProgress();
 
   if (celebration === null) return null;
 
-  const content = contentFor(celebration);
+  const content = contentFor(celebration, t);
 
   return (
     <Modal transparent animationType="fade" visible onRequestClose={clearCelebration}>
@@ -81,7 +95,7 @@ export function CelebrationOverlay() {
             {content.body}
           </Text>
 
-          <Button label="Devam" size="md" onPress={clearCelebration} />
+          <Button label={t('common.continue')} size="md" onPress={clearCelebration} />
         </Animated.View>
       </Animated.View>
     </Modal>

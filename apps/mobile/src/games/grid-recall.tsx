@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 300;
 const SHOW_MS = 1600;
@@ -35,6 +36,7 @@ function startRound(level: number, seed: number): RoundState {
  */
 export function GridRecallGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [state, setState] = useState<RoundState>(() => startRound(startLevel, startLevel * 7919));
@@ -99,10 +101,10 @@ export function GridRecallGame({ startLevel, onFinish, onProgress }: GameProps) 
     <View style={styles.root}>
       <Text variant="caption" color="textMuted" style={styles.hint}>
         {phase === 'showing'
-          ? 'Hücreleri aklında tut'
+          ? t('play.rememberCells')
           : phase === 'guessing'
             ? `${picked.length} / ${puzzle.cells.length} işaretlendi`
-            : 'Sıradaki seviye geliyor'}
+            : t('play.nextLevelComing')}
       </Text>
 
       <View

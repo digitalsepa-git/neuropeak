@@ -1,9 +1,4 @@
-import {
-  DIFFICULTY_MULTIPLIERS,
-  turkishDativeSuffix,
-  xpForGameRound,
-  type Difficulty,
-} from '@neuropeak/core';
+import { DIFFICULTY_MULTIPLIERS, xpForGameRound, type Difficulty } from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -28,40 +23,32 @@ import {
 import { findGame } from '@/games/registry';
 import type { RoundOutcome } from '@/games/types';
 import { useAds } from '@/lib/ads/context';
+import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 
 type Phase = 'briefing' | 'playing' | 'result';
 
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: 'Kolay',
-  medium: 'Orta',
-  hard: 'Zor',
-};
-
-const DIFFICULTY_HINTS: Record<Difficulty, string> = {
-  easy: 'Zihnini ısıt',
-  medium: 'Becerini dene',
-  hard: 'Sınırlarını zorla',
-};
-
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
-
-/** Tamamlanmamış turu "tamamladın" diye göstermemek için. */
-function resultSummary(mode: 'levels' | 'timed', result: RoundOutcome): string {
-  if (!result.completed) {
-    return mode === 'levels' ? 'Seviye tamamlanmadı' : 'Tur tamamlanmadı';
-  }
-  return mode === 'levels'
-    ? `Seviye ${result.level}${turkishDativeSuffix(result.level)} ulaştın`
-    : `${result.level} tur tamamladın`;
-}
 
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const t = useT();
+  const { localized } = useI18n();
+  const labels = useLabels();
   const { recordGameRound } = useProgress();
   const { afterRound } = useAds();
+
+  /** Tamamlanmamış turu "tamamladın" diye göstermemek için. */
+  const resultSummary = (mode: 'levels' | 'timed', result: RoundOutcome): string => {
+    if (!result.completed) {
+      return mode === 'levels' ? t('game.levelNotFinished') : t('game.roundNotFinished');
+    }
+    return mode === 'levels'
+      ? t('game.levelReached', { level: result.level })
+      : t('game.roundsFinished', { count: result.level });
+  };
 
   const game = findGame(id ?? '');
 
@@ -121,8 +108,8 @@ export default function GameScreen() {
     return (
       <Screen>
         <View style={styles.centered}>
-          <Text variant="heading">Oyun bulunamadı</Text>
-          <Button label="Geri dön" variant="secondary" onPress={() => router.back()} />
+          <Text variant="heading">{t('game.notFound')}</Text>
+          <Button label={t('common.goBack')} variant="secondary" onPress={() => router.back()} />
         </View>
       </Screen>
     );
@@ -136,7 +123,7 @@ export default function GameScreen() {
         <View style={styles.briefingTop}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Kapat"
+            accessibilityLabel={t('common.close')}
             hitSlop={12}
             onPress={() => router.back()}
             style={styles.backIcon}
@@ -150,14 +137,14 @@ export default function GameScreen() {
         </View>
 
         <Text variant="title" align="center">
-          {game.title}
+          {localized(game.title)}
         </Text>
         <Text variant="bodySmall" color="textSecondary" align="center" style={styles.description}>
-          {game.description}
+          {localized(game.description)}
         </Text>
 
         <Text variant="overline" color="textMuted" style={styles.sectionLabel}>
-          Zorluk seç
+          {t('game.chooseDifficulty')}
         </Text>
         <View style={styles.difficulties}>
           {DIFFICULTIES.map((item) => {
@@ -183,14 +170,18 @@ export default function GameScreen() {
                 ]}
               >
                 <Badge
-                  label={bonus === 0 ? 'Standart' : `+%${bonus} XP`}
+                  label={
+                    bonus === 0
+                      ? t('game.difficultyStandard')
+                      : t('game.difficultyBonus', { percent: bonus })
+                  }
                   tone={selected ? 'brand' : 'neutral'}
                 />
                 <Text variant="subheading" color={selected ? 'brand' : 'textPrimary'}>
-                  {DIFFICULTY_LABELS[item]}
+                  {labels.difficulty(item)}
                 </Text>
                 <Text variant="caption" color="textMuted" align="center">
-                  {DIFFICULTY_HINTS[item]}
+                  {labels.difficultyHint(item)}
                 </Text>
               </Pressable>
             );
@@ -198,14 +189,14 @@ export default function GameScreen() {
         </View>
 
         <Text variant="overline" color="textMuted" style={styles.sectionLabel}>
-          Artırılacak yetenekler
+          {t('game.skillsLabel')}
         </Text>
         <View style={styles.skills}>
           {game.skills.map((skill) => (
-            <Card key={skill} padding="sm">
+            <Card key={skill.en} padding="sm">
               <View style={styles.skillRow}>
                 <Icon name="check" color={theme.colors.success} size={16} strokeWidth={2.4} />
-                <Text variant="bodySmall">{skill}</Text>
+                <Text variant="bodySmall">{localized(skill)}</Text>
               </View>
             </Card>
           ))}
@@ -213,7 +204,7 @@ export default function GameScreen() {
 
         <View style={styles.startButton}>
           <Button
-            label="Başla"
+            label={t('game.start')}
             onPress={() => {
               setStatus({ score: 0, level: 1, completed: false });
               setPhase('playing');
@@ -228,14 +219,17 @@ export default function GameScreen() {
     const Game = game.Component;
     // Süreli oyunlar kendi etiketini (geri sayım) bildirir.
     const progressLabel =
-      status.label ?? (game.mode === 'levels' ? `Seviye ${status.level}` : `Tur ${status.level}`);
+      status.label ??
+      (game.mode === 'levels'
+        ? t('common.levelLabel', { level: status.level })
+        : t('game.roundLabel', { round: status.level }));
 
     return (
       <ThemeProvider name="dark">
         <GameShell
           progressLabel={progressLabel}
           score={status.score}
-          instruction={game.instruction}
+          instruction={localized(game.instruction)}
           onExit={() => setPhase('result')}
         >
           <Game difficulty={difficulty} startLevel={1} onProgress={setStatus} onFinish={onFinish} />
@@ -250,7 +244,7 @@ export default function GameScreen() {
     <Screen scroll>
       <Animated.View entering={FadeInDown.duration(280)} style={styles.resultHeader}>
         <Text variant="overline" color="textMuted">
-          {game.title}
+          {localized(game.title)}
         </Text>
         <Text variant="display" color="brand">
           {result.score}
@@ -267,7 +261,7 @@ export default function GameScreen() {
               +{xpEarned}
             </Text>
             <Text variant="caption" color="textMuted">
-              XP
+              {t('common.xp')}
             </Text>
           </View>
           <View style={[styles.rewardDivider, { backgroundColor: theme.colors.border }]} />
@@ -276,7 +270,7 @@ export default function GameScreen() {
               +{result.completed ? 1 : 0}
             </Text>
             <Text variant="caption" color="textMuted">
-              yıldız
+              {t('common.stars')}
             </Text>
           </View>
         </View>
@@ -288,7 +282,7 @@ export default function GameScreen() {
 
       <View style={styles.resultActions}>
         <Button
-          label="Tekrar oyna"
+          label={t('game.playAgain')}
           loading={leaving}
           onPress={() =>
             leaveResult(() => {
@@ -299,7 +293,7 @@ export default function GameScreen() {
           }
         />
         <Button
-          label="Bitti"
+          label={t('common.done')}
           variant="ghost"
           size="md"
           disabled={leaving}

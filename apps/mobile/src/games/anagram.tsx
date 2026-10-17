@@ -1,5 +1,5 @@
-import { TR_ANAGRAMS } from '@neuropeak/content';
-import { generateAnagram, toTurkishUpper } from '@neuropeak/core';
+import { wordBankFor } from '@neuropeak/content';
+import { generateAnagram, toUpperCaseIn } from '@neuropeak/core';
 import { radius, spacing } from '@neuropeak/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useI18n, useT } from '@/lib/i18n';
 
 type Phase = 'typing' | 'correct' | 'wrong';
 
@@ -17,11 +18,13 @@ type Phase = 'typing' | 'correct' | 'wrong';
  */
 export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
+  const { language } = useI18n();
+  const bank = wordBankFor(language).anagrams;
+  const upper = (value: string) => toUpperCaseIn(language, value);
 
   const [level, setLevel] = useState(startLevel);
-  const [puzzle, setPuzzle] = useState(() =>
-    generateAnagram(TR_ANAGRAMS, startLevel, startLevel * 7919),
-  );
+  const [puzzle, setPuzzle] = useState(() => generateAnagram(bank, startLevel, startLevel * 7919));
   const [picked, setPicked] = useState<readonly number[]>([]);
   const [score, setScore] = useState(0);
   const [phase, setPhase] = useState<Phase>('typing');
@@ -59,7 +62,7 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
         resetTimer.current = setTimeout(() => {
           const nextLevel = level + 1;
           setLevel(nextLevel);
-          setPuzzle(generateAnagram(TR_ANAGRAMS, nextLevel, nextLevel * 7919 + score, puzzle.word));
+          setPuzzle(generateAnagram(bank, nextLevel, nextLevel * 7919 + score, puzzle.word));
           setPicked([]);
           setPhase('typing');
         }, 900);
@@ -75,7 +78,7 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
         setPhase('typing');
       }, 700);
     },
-    [level, phase, picked, puzzle.letters, puzzle.word, score],
+    [bank, level, phase, picked, puzzle.letters, puzzle.word, score],
   );
 
   const undo = useCallback(() => {
@@ -102,7 +105,7 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
       <View style={styles.slots}>
         {puzzle.letters.map((_, index) => (
           <View key={index} style={[styles.slot, { borderColor: slotColor }]}>
-            <Text variant="subheading">{toTurkishUpper(guess[index] ?? '')}</Text>
+            <Text variant="subheading">{upper(guess[index] ?? '')}</Text>
           </View>
         ))}
       </View>
@@ -115,7 +118,7 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={toTurkishUpper(letter)}
+              accessibilityLabel={upper(letter)}
               accessibilityState={{ disabled: used }}
               onPress={() => takeLetter(index)}
               style={[
@@ -126,7 +129,7 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
                 },
               ]}
             >
-              <Text variant="subheading">{toTurkishUpper(letter)}</Text>
+              <Text variant="subheading">{upper(letter)}</Text>
             </Pressable>
           );
         })}
@@ -134,12 +137,12 @@ export function AnagramGame({ startLevel, onFinish, onProgress }: GameProps) {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Son harfi geri al"
+        accessibilityLabel={t('play.undoLetter')}
         onPress={undo}
         style={[styles.undo, { borderColor: theme.colors.border }]}
       >
         <Text variant="caption" color="textMuted">
-          Geri al
+          {t('play.undo')}
         </Text>
       </Pressable>
     </View>

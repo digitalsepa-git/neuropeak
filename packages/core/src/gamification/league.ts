@@ -58,15 +58,26 @@ export function msUntilWeekEnd(now: Date): number {
 }
 
 /** "3 gün 14 saat" / "14 saat 20 dakika" / "12 dakika". */
-export function formatRemaining(ms: number): string {
-  const totalMinutes = Math.floor(ms / 60_000);
+/**
+ * Kalan süre, en büyük iki birime indirgenmiş hâlde.
+ *
+ * Metin değil veri dönüyor: "3 gün 14 saat" ile "3d 14h" arasındaki
+ * fark dilin işi, çekirdeğin değil.
+ */
+export type RemainingTime =
+  | { readonly unit: 'days'; readonly days: number; readonly hours: number }
+  | { readonly unit: 'hours'; readonly hours: number; readonly minutes: number }
+  | { readonly unit: 'minutes'; readonly minutes: number };
+
+export function remainingTime(ms: number): RemainingTime {
+  const totalMinutes = Math.max(0, Math.floor(ms / 60_000));
   const days = Math.floor(totalMinutes / (60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
   const minutes = totalMinutes % 60;
 
-  if (days > 0) return `${days} gün ${hours} saat`;
-  if (hours > 0) return `${hours} saat ${minutes} dakika`;
-  return `${minutes} dakika`;
+  if (days > 0) return { unit: 'days', days, hours };
+  if (hours > 0) return { unit: 'hours', hours, minutes };
+  return { unit: 'minutes', minutes };
 }
 
 export function outcomeForRank(rank: number, size: number): LeagueOutcome {

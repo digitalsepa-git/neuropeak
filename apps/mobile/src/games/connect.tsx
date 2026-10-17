@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 300;
 
@@ -32,6 +33,7 @@ function emptyPaths(count: number): number[][] {
  */
 export function ConnectGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() => generateConnect(startLevel, startLevel * 7919));
@@ -214,7 +216,7 @@ export function ConnectGame({ startLevel, onFinish, onProgress }: GameProps) {
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Tahtayı temizle"
+          accessibilityLabel={t('play.clearBoard')}
           onPress={reset}
           style={[styles.reset, { borderColor: theme.colors.border }]}
         >

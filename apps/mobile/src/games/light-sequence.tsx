@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const PADS = [
   { id: 0, color: palette.accentMemory },
@@ -28,6 +29,7 @@ type Phase = 'watch' | 'repeat' | 'wrong';
  */
 export function LightSequenceGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const playbackMs = PLAYBACK_MS[difficulty];
 
   const [sequence, setSequence] = useState<number[]>([]);
@@ -100,7 +102,12 @@ export function LightSequenceGame({ difficulty, onFinish, onProgress }: GameProp
     [finishNow, inputIndex, phase, playNextRound, sequence],
   );
 
-  const statusText = phase === 'watch' ? 'İzle…' : phase === 'wrong' ? 'Yanlış dizi' : 'Sıra sende';
+  const statusText =
+    phase === 'watch'
+      ? t('play.watch')
+      : phase === 'wrong'
+        ? t('play.wrongSequence')
+        : t('play.yourTurn');
 
   return (
     <View style={styles.root}>

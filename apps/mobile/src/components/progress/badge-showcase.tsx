@@ -5,6 +5,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
 import { Text, useTheme } from '@/components/ui';
+import { useI18n, useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 
 /** Bronz, Gümüş, Altın, Platin. */
 const TIER_COLORS: Record<BadgeTier, string> = {
@@ -14,21 +16,11 @@ const TIER_COLORS: Record<BadgeTier, string> = {
   4: palette.accentLogic,
 };
 
-/**
- * Büyük hedeflerde "1086 / 10000" rozet altına sığmıyor ve kırpılıyordu.
- * Binin üstündeki hedeflerde yüzde yazılıyor; küçük hedeflerde sayı
- * daha anlamlı olduğu için olduğu gibi kalıyor.
- */
-function progressLabel(current: number, target: number): string {
-  if (target >= 1000) return `%${Math.floor((current / target) * 100)}`;
-  return `${current} / ${target}`;
-}
-
-const TIER_LABELS: Record<BadgeTier, string> = {
-  1: 'Bronz',
-  2: 'Gümüş',
-  3: 'Altın',
-  4: 'Platin',
+const TIER_KEYS: Record<BadgeTier, StringKey> = {
+  1: 'badgeTier.1',
+  2: 'badgeTier.2',
+  3: 'badgeTier.3',
+  4: 'badgeTier.4',
 };
 
 /**
@@ -46,7 +38,19 @@ export function BadgeShowcase({
   context: BadgeContext;
 }) {
   const theme = useTheme();
+  const t = useT();
+  const { localized } = useI18n();
   const owned = new Set(earned);
+
+  /**
+   * Büyük hedeflerde "1086 / 10000" rozet altına sığmıyor ve
+   * kırpılıyordu. Binin üstündeki hedeflerde yüzde yazılıyor; küçük
+   * hedeflerde sayı daha anlamlı olduğu için olduğu gibi kalıyor.
+   */
+  const progressLabel = (current: number, target: number): string =>
+    target >= 1000
+      ? t('badge.percentProgress', { percent: Math.floor((current / target) * 100) })
+      : t('badge.lockedProgress', { current, target });
 
   return (
     <View style={styles.grid}>
@@ -80,12 +84,12 @@ export function BadgeShowcase({
               align="center"
               numberOfLines={2}
             >
-              {badge.title.tr}
+              {localized(badge.title)}
             </Text>
 
             <Text variant="caption" color="textMuted" align="center" numberOfLines={1}>
               {isEarned
-                ? TIER_LABELS[badge.tier]
+                ? t(TIER_KEYS[badge.tier])
                 : progressLabel(progress.current, progress.target)}
             </Text>
           </View>

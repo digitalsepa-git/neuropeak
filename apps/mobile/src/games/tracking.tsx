@@ -12,6 +12,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 310;
 const FRAME_MS = 1000 / 30;
@@ -43,6 +44,7 @@ function startRound(level: number, seed: number): RoundState {
  */
 export function TrackingGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [state, setState] = useState<RoundState>(() => startRound(startLevel, startLevel * 7919));
@@ -123,10 +125,10 @@ export function TrackingGame({ startLevel, onFinish, onProgress }: GameProps) {
     phase === 'preview'
       ? `${round.targetCount} hedefi aklında tut`
       : phase === 'moving'
-        ? 'Gözünle takip et'
+        ? t('play.followWithEyes')
         : phase === 'picking'
           ? `${picked.length} / ${round.targetCount} işaretlendi`
-          : 'Sıradaki tur geliyor';
+          : t('play.nextRoundComing');
 
   return (
     <View style={styles.root}>
