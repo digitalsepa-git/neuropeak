@@ -24,8 +24,8 @@ const ProContext = createContext<ProState>({
   isPro: false,
   expiresAt: null,
   ready: false,
-  purchase: () => Promise.resolve({ status: 'unavailable', message: 'Hazır değil' }),
-  restore: () => Promise.resolve({ status: 'unavailable', message: 'Hazır değil' }),
+  purchase: () => Promise.resolve({ status: 'unavailable', issue: 'store_not_ready' }),
+  restore: () => Promise.resolve({ status: 'unavailable', issue: 'store_not_ready' }),
   refresh: () => Promise.resolve(),
 });
 

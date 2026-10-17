@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { GAME_CATALOGUE } from './games/catalogue';
+import { displayNamesFor, wordBankFor } from './words/bank';
+
 import { CONTENT_TESTS } from './index';
 
 /**
@@ -196,5 +199,102 @@ describe('aritmetik soruların cevabı', () => {
         ).toBe(true);
       }
     }
+  });
+});
+
+describe('oyun kataloğu', () => {
+  it('kimlikler benzersiz', () => {
+    const ids = GAME_CATALOGUE.map((game) => game.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('her metin iki dilde de dolu', () => {
+    for (const game of GAME_CATALOGUE) {
+      for (const field of [game.title, game.instruction, game.description, ...game.skills]) {
+        expect(field.tr.trim().length, `${game.id} tr`).toBeGreaterThan(0);
+        expect(field.en.trim().length, `${game.id} en`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('her oyunun üç yeteneği var', () => {
+    for (const game of GAME_CATALOGUE) {
+      expect(game.skills.length, game.id).toBe(3);
+    }
+  });
+
+  it('süreli oyunlarda seviye sayısı yok, seviyelide var', () => {
+    for (const game of GAME_CATALOGUE) {
+      if (game.mode === 'timed') expect(game.totalLevels, game.id).toBe(0);
+      else expect(game.totalLevels, game.id).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('sözel bankalar', () => {
+  for (const [language, bank] of [
+    ['tr', wordBankFor('tr')],
+    ['en', wordBankFor('en')],
+  ] as const) {
+    describe(language, () => {
+      it('anagram kelimeleri küçük harfli ve benzersiz', () => {
+        const words = bank.anagrams.map((entry) => entry.word);
+        expect(new Set(words).size).toBe(words.length);
+        for (const word of words) {
+          expect(word, word).toBe(word.toLocaleLowerCase(language));
+        }
+      });
+
+      it('her uzunlukta en az sekiz anagram var', () => {
+        const counts = new Map<number, number>();
+        for (const entry of bank.anagrams) {
+          counts.set(entry.word.length, (counts.get(entry.word.length) ?? 0) + 1);
+        }
+        // Seviye yükseldikçe kelime uzuyor; eksik uzunluk, o seviyede
+        // oyunun hep aynı kelimeyi sorması demek.
+        for (const length of [4, 5, 6, 7, 8]) {
+          expect(counts.get(length) ?? 0, `${length} harfli`).toBeGreaterThanOrEqual(8);
+        }
+      });
+
+      it('analoji çeldiricileri doğru cevabı tekrarlamıyor', () => {
+        for (const entry of bank.analogies) {
+          expect(entry.distractors, entry.id).not.toContain(entry.answer);
+          expect(new Set(entry.distractors).size, entry.id).toBe(entry.distractors.length);
+        }
+      });
+
+      it('her kademede en az altı analoji var', () => {
+        for (const level of [1, 2, 3, 4, 5]) {
+          const count = bank.analogies.filter((entry) => entry.level === level).length;
+          expect(count, `kademe ${level}`).toBeGreaterThanOrEqual(6);
+        }
+      });
+
+      it('kelime çiftlerinde çeldirici cevaba eşit değil', () => {
+        for (const entry of bank.wordPairs) {
+          expect(entry.distractors, entry.id).not.toContain(entry.answer);
+          expect(entry.distractors, entry.id).not.toContain(entry.word);
+          expect(new Set(entry.distractors).size, entry.id).toBe(entry.distractors.length);
+        }
+      });
+
+      it('eş ve zıt anlam soruları dengeli', () => {
+        const synonyms = bank.wordPairs.filter((entry) => entry.mode === 'synonym').length;
+        const antonyms = bank.wordPairs.filter((entry) => entry.mode === 'antonym').length;
+        expect(synonyms).toBeGreaterThanOrEqual(20);
+        expect(antonyms).toBeGreaterThanOrEqual(20);
+      });
+
+      it('kimlikler benzersiz', () => {
+        const ids = [...bank.analogies, ...bank.wordPairs].map((entry) => entry.id);
+        expect(new Set(ids).size).toBe(ids.length);
+      });
+    });
+  }
+
+  it('iki dilin ad havuzu aynı boyutta', () => {
+    // Aynı tohumla aynı sıralama çıksın diye havuzlar eşit tutuluyor.
+    expect(displayNamesFor('en').length).toBe(displayNamesFor('tr').length);
   });
 });

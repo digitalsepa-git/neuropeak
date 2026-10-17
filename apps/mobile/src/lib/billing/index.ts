@@ -22,13 +22,13 @@ const localProvider: BillingProvider = {
   purchase: () =>
     Promise.resolve<PurchaseOutcome>({
       status: 'unavailable',
-      message: 'Mağaza bağlantısı henüz kurulmadı. Abonelik yakında açılacak.',
+      issue: 'store_not_ready',
     }),
 
   restore: () =>
     Promise.resolve<PurchaseOutcome>({
       status: 'unavailable',
-      message: 'Mağaza bağlantısı henüz kurulmadı.',
+      issue: 'restore_not_ready',
     }),
 
   async getEntitlement(): Promise<Entitlement> {
@@ -60,4 +60,4 @@ export async function setDevProOverride(value: boolean): Promise<void> {
 }
 
 export { EXIT_OFFER_PLAN, FALLBACK_PLANS };
-export type { Entitlement, Plan, PlanId, PurchaseOutcome } from './types';
+export type { BillingIssue, Entitlement, Plan, PlanId, PurchaseOutcome } from './types';

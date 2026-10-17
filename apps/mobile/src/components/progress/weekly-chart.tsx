@@ -3,18 +3,28 @@ import { radius, spacing } from '@neuropeak/ui';
 import { StyleSheet, View } from 'react-native';
 
 import { Text, useTheme } from '@/components/ui';
+import { useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 
 const BAR_HEIGHT = 96;
 /**
  * İki harf, tek harf değil: Pazar, Pazartesi ve Perşembe tek harfte
  * aynı görünüyor ve grafik okunmaz oluyordu.
  */
-const DAY_LABELS = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa'] as const;
+const DAY_KEYS: readonly StringKey[] = [
+  'day.mon',
+  'day.tue',
+  'day.wed',
+  'day.thu',
+  'day.fri',
+  'day.sat',
+  'day.sun',
+];
 
-function dayLabel(date: string): string {
+function dayKey(date: string): StringKey {
   // Pazartesi haftanın ilk günü; getUTCDay() pazarı 0 verdiği için kaydırılıyor.
   const index = (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7;
-  return DAY_LABELS[index] as string;
+  return DAY_KEYS[index] ?? 'day.mon';
 }
 
 /**
@@ -23,6 +33,7 @@ function dayLabel(date: string): string {
  */
 export function WeeklyChart({ days }: { days: readonly DayActivity[] }) {
   const theme = useTheme();
+  const t = useT();
   const peak = Math.max(1, ...days.map((day) => day.xp));
 
   return (
@@ -46,7 +57,7 @@ export function WeeklyChart({ days }: { days: readonly DayActivity[] }) {
               ]}
             />
             <Text variant="caption" color={isToday ? 'brand' : 'textMuted'}>
-              {dayLabel(day.date)}
+              {t(dayKey(day.date))}
             </Text>
           </View>
         );

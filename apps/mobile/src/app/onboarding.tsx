@@ -1,4 +1,5 @@
 import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
+import { CONTENT_TESTS, GAME_CATALOGUE } from '@neuropeak/content';
 import { spacing } from '@neuropeak/ui';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState } from 'react';
@@ -12,7 +13,8 @@ import { OptionRow } from '@/components/onboarding/option-row';
 import { StepProgress } from '@/components/onboarding/step-progress';
 import { PaywallView } from '@/components/paywall/paywall-view';
 import { Button, ProgressBar, Text, tapFeedback, useTheme } from '@/components/ui';
-import { CATEGORY_LABELS } from '@/data/placeholder';
+import { useLabels, useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 import { useOnboardingGate } from '@/lib/onboarding-context';
 import { enqueueMutation } from '@/lib/sync';
 import {
@@ -42,28 +44,51 @@ type StepId = (typeof STEPS)[number];
 /** İlerleme çizgisinde sayılan adımlar — karşılama, plan ve izin ekranları hariç. */
 const QUESTION_STEPS: StepId[] = ['age', 'focus', 'goal', 'concern', 'habit'];
 
-const CONCERN_OPTIONS: { id: Concern; label: string; hint: string }[] = [
-  { id: 'forgetfulness', label: 'Unutkanlık', hint: 'İsimler, yapılacaklar, nereye koyduğum' },
-  { id: 'distraction', label: 'Dikkat dağınıklığı', hint: 'Bir işe uzun süre odaklanamıyorum' },
-  { id: 'slowThinking', label: 'Yavaş düşünme', hint: 'Karar vermem eskisinden uzun sürüyor' },
-  { id: 'none', label: 'Hiçbiri', hint: 'Sadece zihnimi geliştirmek istiyorum' },
+const CONCERN_OPTIONS: { id: Concern; label: StringKey; hint: StringKey }[] = [
+  {
+    id: 'forgetfulness',
+    label: 'onboarding.concern.forgetfulness',
+    hint: 'onboarding.concern.forgetfulnessHint',
+  },
+  {
+    id: 'distraction',
+    label: 'onboarding.concern.distraction',
+    hint: 'onboarding.concern.distractionHint',
+  },
+  {
+    id: 'slowThinking',
+    label: 'onboarding.concern.slowThinking',
+    hint: 'onboarding.concern.slowThinkingHint',
+  },
+  { id: 'none', label: 'onboarding.concern.none', hint: 'onboarding.concern.noneHint' },
 ];
 
-const HABIT_OPTIONS: { id: Habit; label: string }[] = [
-  { id: 'daily', label: 'Her gün' },
-  { id: 'sometimes', label: 'Haftada birkaç kez' },
-  { id: 'rarely', label: 'Nadiren' },
-  { id: 'never', label: 'Hiç yapmadım' },
+const HABIT_OPTIONS: { id: Habit; label: StringKey }[] = [
+  { id: 'daily', label: 'onboarding.habit.daily' },
+  { id: 'sometimes', label: 'onboarding.habit.sometimes' },
+  { id: 'rarely', label: 'onboarding.habit.rarely' },
+  { id: 'never', label: 'onboarding.habit.never' },
 ];
 
-const GOAL_HINTS: Record<number, string> = {
-  5: 'Kısa ve sürdürülebilir',
-  10: 'Çoğu kişinin tercihi',
-  20: 'Hızlı ilerlemek isteyenler için',
+const GOAL_HINTS: Record<number, StringKey> = {
+  5: 'onboarding.goal.hint5',
+  10: 'onboarding.goal.hint10',
+  20: 'onboarding.goal.hint20',
 };
+
+/** Karşılama metnindeki sayılar katalogdan; elle yazılınca eskiyordu. */
+const GAME_COUNT = GAME_CATALOGUE.length;
+const TEST_COUNT = CONTENT_TESTS.length;
 
 export default function OnboardingScreen() {
   const theme = useTheme();
+  const t = useT();
+  const labels = useLabels();
+
+  const goalHint = (minutes: number) => {
+    const key = GOAL_HINTS[minutes];
+    return key === undefined ? undefined : t(key);
+  };
   const { setCompleted } = useOnboardingGate();
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>(EMPTY_ANSWERS);
@@ -145,7 +170,7 @@ export default function OnboardingScreen() {
         {stepIndex > 0 && step !== 'plan' ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Geri"
+            accessibilityLabel={t('common.back')}
             hitSlop={10}
             onPress={goBack}
           >
@@ -180,19 +205,18 @@ export default function OnboardingScreen() {
             <View style={styles.welcome}>
               <HeroOrbit />
               <Text variant="title" align="center">
-                Zihnini her gün biraz daha ileri taşı
+                {t('onboarding.welcome.title')}
               </Text>
               <Text variant="body" color="textSecondary" align="center">
-                28 mini oyun ve 11 test ile hafızanı, odaklanmanı ve mantığını ölç, geliştir, takip
-                et.
+                {t('onboarding.welcome.body', { games: GAME_COUNT, tests: TEST_COUNT })}
               </Text>
             </View>
           )}
 
           {step === 'age' && (
             <StepBody
-              title="Kaç yaşındasın?"
-              description="Sonuçlarını aynı yaş grubundakilerle karşılaştırabilmek için gerekli."
+              title={t('onboarding.age.title')}
+              description={t('onboarding.age.description')}
             >
               {AGE_RANGES.map((range) => (
                 <OptionRow
@@ -207,14 +231,14 @@ export default function OnboardingScreen() {
 
           {step === 'focus' && (
             <StepBody
-              title="Hangi alanları geliştirmek istiyorsun?"
-              description="Birden fazla seçebilirsin. Günlük planın buna göre kurulur."
+              title={t('onboarding.focus.title')}
+              description={t('onboarding.focus.description')}
             >
               {GAME_CATEGORIES.map((category) => (
                 <OptionRow
                   key={category}
                   multi
-                  label={CATEGORY_LABELS[category]}
+                  label={labels.category(category)}
                   selected={answers.focusAreas.includes(category)}
                   onPress={() => toggleFocusArea(category)}
                 />
@@ -224,14 +248,14 @@ export default function OnboardingScreen() {
 
           {step === 'goal' && (
             <StepBody
-              title="Günde ne kadar vakit ayırabilirsin?"
-              description="Küçük başlamak, hiç başlamamaktan iyidir. Sonradan değiştirebilirsin."
+              title={t('onboarding.goal.title')}
+              description={t('onboarding.goal.description')}
             >
               {DAILY_GOALS.map((minutes) => (
                 <OptionRow
                   key={minutes}
-                  label={`${minutes} dakika`}
-                  hint={GOAL_HINTS[minutes]}
+                  label={t('onboarding.goal.minutes', { minutes })}
+                  hint={goalHint(minutes)}
                   selected={answers.dailyGoalMinutes === minutes}
                   onPress={() =>
                     setAnswers((current) => ({ ...current, dailyGoalMinutes: minutes }))
@@ -243,14 +267,14 @@ export default function OnboardingScreen() {
 
           {step === 'concern' && (
             <StepBody
-              title="Son zamanlarda seni en çok ne zorluyor?"
-              description="Planını bu alana ağırlık verecek şekilde kurarız."
+              title={t('onboarding.concern.title')}
+              description={t('onboarding.concern.description')}
             >
               {CONCERN_OPTIONS.map((option) => (
                 <OptionRow
                   key={option.id}
-                  label={option.label}
-                  hint={option.hint}
+                  label={t(option.label)}
+                  hint={t(option.hint)}
                   selected={answers.concern === option.id}
                   onPress={() => setAnswers((current) => ({ ...current, concern: option.id }))}
                 />
@@ -260,13 +284,13 @@ export default function OnboardingScreen() {
 
           {step === 'habit' && (
             <StepBody
-              title="Ne sıklıkla zihinsel egzersiz yapıyorsun?"
-              description="Başlangıç zorluğunu buna göre ayarlarız."
+              title={t('onboarding.habit.title')}
+              description={t('onboarding.habit.description')}
             >
               {HABIT_OPTIONS.map((option) => (
                 <OptionRow
                   key={option.id}
-                  label={option.label}
+                  label={t(option.label)}
                   selected={answers.habit === option.id}
                   onPress={() => setAnswers((current) => ({ ...current, habit: option.id }))}
                 />
@@ -278,12 +302,12 @@ export default function OnboardingScreen() {
 
           {step === 'notifications' && (
             <StepBody
-              title="Seriyi kaçırma"
-              description="Günde en fazla bir hatırlatma göndeririz. İstediğin an kapatabilirsin."
+              title={t('onboarding.notifications.title')}
+              description={t('onboarding.notifications.description')}
             >
-              <BenefitRow text="Serin bitmek üzereyken haber veririz" />
-              <BenefitRow text="Günün görevleri hazır olduğunda hatırlatırız" />
-              <BenefitRow text="Ligdeki sıralaman değişince bildiririz" />
+              <BenefitRow text={t('onboarding.notifications.benefit1')} />
+              <BenefitRow text={t('onboarding.notifications.benefit2')} />
+              <BenefitRow text={t('onboarding.notifications.benefit3')} />
             </StepBody>
           )}
         </Animated.View>
@@ -293,14 +317,14 @@ export default function OnboardingScreen() {
         {step === 'notifications' ? (
           <>
             <Button
-              label="Bildirimleri aç"
+              label={t('onboarding.notifications.enable')}
               loading={saving}
               onPress={() => {
                 void requestNotifications();
               }}
             />
             <Button
-              label="Şimdi değil"
+              label={t('common.notNow')}
               variant="ghost"
               size="md"
               disabled={saving}
@@ -312,7 +336,7 @@ export default function OnboardingScreen() {
         ) : (
           step !== 'plan' && (
             <Button
-              label={step === 'welcome' ? 'Başlayalım' : 'Devam et'}
+              label={step === 'welcome' ? t('onboarding.start') : t('common.continueAction')}
               disabled={!canContinue}
               onPress={goNext}
             />
@@ -356,14 +380,16 @@ function BenefitRow({ text }: { text: string }) {
   );
 }
 
-const PLAN_CAPTIONS = [
-  'Cevapların işleniyor…',
-  'Yetenek alanların eşleştiriliyor…',
-  'Günlük planın hazırlanıyor…',
+const PLAN_CAPTIONS: StringKey[] = [
+  'onboarding.plan.caption1',
+  'onboarding.plan.caption2',
+  'onboarding.plan.caption3',
 ];
 
 /** Cevapların bir karşılığı olduğunu hissettiren kısa bekleme ekranı. */
 function PlanStep({ answers, onDone }: { answers: OnboardingAnswers; onDone: () => void }) {
+  const t = useT();
+  const labels = useLabels();
   const [progress, setProgress] = useState(0.08);
   const [captionIndex, setCaptionIndex] = useState(0);
 
@@ -386,22 +412,26 @@ function PlanStep({ answers, onDone }: { answers: OnboardingAnswers; onDone: () 
     };
   }, [onDone]);
 
-  const focusLabels = answers.focusAreas.map((area) => CATEGORY_LABELS[area]).join(', ');
+  const focusLabels = answers.focusAreas.map((area) => labels.category(area)).join(', ');
 
   return (
     <View style={styles.plan}>
       <Text variant="title" align="center">
-        Planın hazırlanıyor
+        {t('onboarding.plan.title')}
       </Text>
       <Text variant="bodySmall" color="textSecondary" align="center">
-        {PLAN_CAPTIONS[captionIndex]}
+        {t(PLAN_CAPTIONS[captionIndex] ?? 'onboarding.plan.caption1')}
       </Text>
       <View style={styles.planBar}>
-        <ProgressBar value={progress} height={10} accessibilityLabel="Plan hazırlanıyor" />
+        <ProgressBar
+          value={progress}
+          height={10}
+          accessibilityLabel={t('onboarding.plan.progressLabel')}
+        />
       </View>
       {focusLabels.length > 0 && (
         <Text variant="caption" color="textMuted" align="center">
-          Odak alanların: {focusLabels}
+          {t('onboarding.plan.focusAreas', { areas: focusLabels })}
         </Text>
       )}
     </View>

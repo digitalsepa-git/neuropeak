@@ -1,9 +1,6 @@
-import type { QuestionKind, ReportDimension, ScoringNorm } from '@neuropeak/core';
+import type { Localized, QuestionKind, ReportDimension, ScoringNorm } from '@neuropeak/core';
 
-export type Localized = {
-  readonly tr: string;
-  readonly en: string;
-};
+export type { Localized } from '@neuropeak/core';
 
 export type ContentQuestion = {
   readonly id: string;

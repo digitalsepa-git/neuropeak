@@ -1,4 +1,4 @@
-import { TR_WORD_PAIRS } from '@neuropeak/content';
+import { wordBankFor } from '@neuropeak/content';
 import { generateWordPair } from '@neuropeak/core';
 import { radius, spacing } from '@neuropeak/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -8,11 +8,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
-
-const MODE_LABEL = {
-  synonym: 'eş anlamlısı',
-  antonym: 'zıt anlamlısı',
-} as const;
+import { useI18n, useT } from '@/lib/i18n';
 
 /**
  * Kelime Bağı — süreli. Verilen kelimenin eş ya da zıt anlamlısını
@@ -22,8 +18,11 @@ const MODE_LABEL = {
  */
 export function WordLinkGame({ onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
+  const { language } = useI18n();
+  const bank = wordBankFor(language).wordPairs;
 
-  const [puzzle, setPuzzle] = useState(() => generateWordPair(TR_WORD_PAIRS, 1));
+  const [puzzle, setPuzzle] = useState(() => generateWordPair(bank, 1));
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
@@ -54,12 +53,12 @@ export function WordLinkGame({ onFinish, onProgress }: GameProps) {
       setFeedback(correct ? 'correct' : 'wrong');
 
       puzzleSeed.current += 1;
-      setPuzzle(generateWordPair(TR_WORD_PAIRS, puzzleSeed.current * 104_729, puzzle.id));
+      setPuzzle(generateWordPair(bank, puzzleSeed.current * 104_729, puzzle.id));
 
       if (feedbackTimer.current !== null) clearTimeout(feedbackTimer.current);
       feedbackTimer.current = setTimeout(() => setFeedback(null), 240);
     },
-    [puzzle.correctIndex, puzzle.id],
+    [bank, puzzle.correctIndex, puzzle.id],
   );
 
   const borderColor =
@@ -76,7 +75,7 @@ export function WordLinkGame({ onFinish, onProgress }: GameProps) {
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.question}>
-        kelimesinin {MODE_LABEL[puzzle.mode]} hangisi?
+        {puzzle.mode === 'synonym' ? t('play.askSynonym') : t('play.askAntonym')}
       </Text>
 
       <View style={styles.options}>

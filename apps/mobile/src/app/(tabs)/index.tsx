@@ -9,30 +9,40 @@ import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
 import { GAME_CATALOGUE } from '@neuropeak/content';
 
-import { CATEGORY_LABELS } from '@/data/placeholder';
 import { useAds } from '@/lib/ads/context';
+import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
-import { TASK_LABELS } from '@/lib/progress/templates';
+import { TASK_LABEL_KEYS } from '@/lib/progress/templates';
 
 const SUGGESTED = GAME_CATALOGUE[3];
 
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const t = useT();
+  const { localized } = useI18n();
+  const labels = useLabels();
   const { getString } = useRemoteConfig();
   const announcement = getString('announcement.text');
   const { isPro } = usePro();
   const { state, level, neuropeak } = useProgress();
   const { canWatchRewarded } = useAds();
 
+  // Görev kimliği katalogda yoksa kimliğin kendisi görünür; sessizce
+  // boş bir satır göstermekten iyi.
+  const taskLabel = (id: string) => {
+    const key = TASK_LABEL_KEYS[id];
+    return key === undefined ? id : t(key);
+  };
+
   const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;
   const streakDays = state.streak.currentDays;
 
   return (
     <Screen scroll>
-      <AppHeader title="Ana Sayfa" />
+      <AppHeader title={t('home.title')} />
 
       {announcement.length > 0 && (
         <Card padding="md">
@@ -47,30 +57,34 @@ export default function HomeScreen() {
           </View>
           <View style={styles.streakText}>
             <Text variant="heading">
-              {streakDays > 0 ? `${streakDays} günlük seri` : 'Seriyi başlat'}
+              {streakDays > 0 ? t('home.streakDays', { days: streakDays }) : t('home.streakStart')}
             </Text>
             <Text variant="bodySmall" color="textSecondary">
-              {streakDays > 0
-                ? 'Bugün bir oyun oyna, seriyi sürdür.'
-                : 'Bugün bir test veya oyun bitir, seri başlasın.'}
+              {streakDays > 0 ? t('home.streakKeep') : t('home.streakStartBody')}
             </Text>
           </View>
         </View>
 
         <View style={styles.levelRow}>
           <Text variant="caption" color="textSecondary">
-            Seviye {level.level}
+            {t('common.levelLabel', { level: level.level })}
           </Text>
           <Text variant="caption" color="textMuted">
             {level.isMaxLevel
-              ? 'En yüksek seviye'
-              : `Seviye ${level.level + 1}'e ${level.xpForNextLevel - level.xpIntoLevel} XP`}
+              ? t('home.levelMax')
+              : t('home.levelNext', {
+                  level: level.level + 1,
+                  xp: level.xpForNextLevel - level.xpIntoLevel,
+                })}
           </Text>
         </View>
-        <ProgressBar value={level.ratio} accessibilityLabel="Seviye ilerlemesi" />
+        <ProgressBar value={level.ratio} accessibilityLabel={t('home.levelProgress')} />
       </Card>
 
-      <Section title="Günün görevleri" meta={`${completedTasks}/${state.tasks.length} tamamlandı`}>
+      <Section
+        title={t('home.dailyTasks')}
+        meta={t('home.dailyTasksMeta', { done: completedTasks, total: state.tasks.length })}
+      >
         <View style={styles.stack}>
           {state.tasks.map((task) => {
             const done = task.progress >= task.target;
@@ -80,7 +94,7 @@ export default function HomeScreen() {
                   <View style={styles.taskTitle}>
                     {done && <Icon name="check" color={theme.colors.success} size={18} />}
                     <Text variant="subheading" color={done ? 'textMuted' : 'textPrimary'}>
-                      {TASK_LABELS[task.id] ?? task.id}
+                      {taskLabel(task.id)}
                     </Text>
                   </View>
                   <Badge label={`+${task.starReward}`} tone={done ? 'success' : 'neutral'} />
@@ -88,7 +102,7 @@ export default function HomeScreen() {
                 <ProgressBar
                   value={task.progress / task.target}
                   color={done ? theme.colors.success : undefined}
-                  accessibilityLabel={`${TASK_LABELS[task.id] ?? task.id} ilerlemesi`}
+                  accessibilityLabel={t('home.taskProgressLabel', { task: taskLabel(task.id) })}
                 />
               </Card>
             );
@@ -97,12 +111,12 @@ export default function HomeScreen() {
       </Section>
 
       {canWatchRewarded && (
-        <Section title="Yıldız kazan">
+        <Section title={t('home.earnStars')}>
           <RewardedAdCard />
         </Section>
       )}
 
-      <Section title="NeuroPeak skorun">
+      <Section title={t('home.scoreSection')}>
         <Card padding="lg">
           <View style={styles.scoreRow}>
             <Text variant="display" color="brand">
@@ -110,12 +124,12 @@ export default function HomeScreen() {
             </Text>
             <View style={styles.scoreMeta}>
               <Text variant="bodySmall" color="textSecondary">
-                Beş eksenin ağırlıklı ortalaması. Oynadıkça yükselir.
+                {t('home.scoreBody')}
               </Text>
             </View>
           </View>
           <Button
-            label={isPro ? 'Beyin haritanı gör' : 'Beyin haritanı aç'}
+            label={isPro ? t('home.seeBrainMap') : t('home.openBrainMap')}
             variant="secondary"
             size="md"
             onPress={() => {
@@ -129,17 +143,17 @@ export default function HomeScreen() {
       </Section>
 
       {SUGGESTED !== undefined && (
-        <Section title="Bugünün önerisi">
+        <Section title={t('home.suggestionSection')}>
           <Card
             accentColor={categoryAccent[SUGGESTED.category]}
             onPress={() => router.push({ pathname: '/game/[id]', params: { id: SUGGESTED.id } })}
           >
             <View style={styles.taskHead}>
-              <Text variant="subheading">{SUGGESTED.title}</Text>
-              <Badge label={CATEGORY_LABELS[SUGGESTED.category]} />
+              <Text variant="subheading">{localized(SUGGESTED.title)}</Text>
+              <Badge label={labels.category(SUGGESTED.category)} />
             </View>
             <Text variant="bodySmall" color="textSecondary">
-              {SUGGESTED.instruction}
+              {localized(SUGGESTED.instruction)}
             </Text>
           </Card>
         </Section>

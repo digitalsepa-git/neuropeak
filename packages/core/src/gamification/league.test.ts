@@ -5,7 +5,7 @@ import {
   LEAGUE_TIERS,
   PROMOTION_COUNT,
   RELEGATION_COUNT,
-  formatRemaining,
+  remainingTime,
   generatePracticeCohort,
   msUntilWeekEnd,
   outcomeForRank,
@@ -65,9 +65,19 @@ describe('hafta sınırları', () => {
   });
 
   it('kalan süreyi okunur yazar', () => {
-    expect(formatRemaining(3 * 86_400_000 + 14 * 3_600_000)).toBe('3 gün 14 saat');
-    expect(formatRemaining(14 * 3_600_000 + 20 * 60_000)).toBe('14 saat 20 dakika');
-    expect(formatRemaining(12 * 60_000)).toBe('12 dakika');
+    expect(remainingTime(3 * 86_400_000 + 14 * 3_600_000)).toEqual({
+      unit: 'days',
+      days: 3,
+      hours: 14,
+    });
+    expect(remainingTime(14 * 3_600_000 + 20 * 60_000)).toEqual({
+      unit: 'hours',
+      hours: 14,
+      minutes: 20,
+    });
+    expect(remainingTime(12 * 60_000)).toEqual({ unit: 'minutes', minutes: 12 });
+    // Hafta bitmişse geriye sayı taşmasın.
+    expect(remainingTime(-5_000)).toEqual({ unit: 'minutes', minutes: 0 });
   });
 });
 

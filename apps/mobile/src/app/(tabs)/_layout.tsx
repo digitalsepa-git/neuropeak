@@ -3,18 +3,21 @@ import { Tabs } from 'expo-router';
 
 import { Icon, type IconName } from '@/components/icons';
 import { tapFeedback, useTheme } from '@/components/ui';
+import { useT } from '@/lib/i18n';
+import type { StringKey } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 
-const TABS: { name: string; title: string; icon: IconName }[] = [
-  { name: 'index', title: 'Ana Sayfa', icon: 'home' },
-  { name: 'games', title: 'Oyunlar', icon: 'games' },
-  { name: 'tests', title: 'Testler', icon: 'tests' },
-  { name: 'progress', title: 'İlerleme', icon: 'progress' },
-  { name: 'league', title: 'Lig', icon: 'league' },
+const TABS: { name: string; title: StringKey; icon: IconName }[] = [
+  { name: 'index', title: 'tab.home', icon: 'home' },
+  { name: 'games', title: 'tab.games', icon: 'games' },
+  { name: 'tests', title: 'tab.tests', icon: 'tests' },
+  { name: 'progress', title: 'tab.progress', icon: 'progress' },
+  { name: 'league', title: 'tab.league', icon: 'league' },
 ];
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const t = useT();
   const { getBoolean } = useRemoteConfig();
 
   // Lig sekmesi uzaktan kapatılabiliyor: sunucu tarafı sorun çıkarırsa
@@ -52,7 +55,7 @@ export default function TabsLayout() {
           key={tab.name}
           name={tab.name}
           options={{
-            title: tab.title,
+            title: t(tab.title),
             tabBarIcon: ({ color, focused }) => (
               // react-navigation ColorValue döndürür; SVG'ye yalnızca düz renk dizesi verilir.
               <Icon

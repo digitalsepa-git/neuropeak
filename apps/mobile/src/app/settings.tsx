@@ -1,10 +1,13 @@
+import { APP_LANGUAGES, LANGUAGE_NAMES } from '@neuropeak/core';
 import { spacing } from '@neuropeak/ui';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Card, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { useI18n, useT } from '@/lib/i18n';
 import { setDevProOverride } from '@/lib/billing';
 import { usePro } from '@/lib/billing/context';
 import { resetOnboarding } from '@/lib/onboarding';
@@ -20,31 +23,47 @@ type Row = {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const theme = useTheme();
+  const t = useT();
+  const { language, setLanguage } = useI18n();
   const { setCompleted } = useOnboardingGate();
   const { isPro, refresh } = usePro();
 
+  const [languageOpen, setLanguageOpen] = useState(false);
+
   const preferences: Row[] = [
-    { id: 'sound', label: 'Ses', value: 'Açık', icon: 'sound' },
-    { id: 'language', label: 'Dil', value: 'Türkçe', icon: 'globe' },
-    { id: 'notifications', label: 'Bildirimler', value: 'Açık', icon: 'bell' },
+    { id: 'sound', label: t('settings.sound'), value: t('common.on'), icon: 'sound' },
+    {
+      id: 'language',
+      label: t('settings.language'),
+      value: LANGUAGE_NAMES[language],
+      icon: 'globe',
+      onPress: () => setLanguageOpen(true),
+    },
+    {
+      id: 'notifications',
+      label: t('settings.notifications'),
+      value: t('common.on'),
+      icon: 'bell',
+    },
   ];
 
   const about: Row[] = [
-    { id: 'privacy', label: 'Gizlilik Politikası', icon: 'shield' },
-    { id: 'terms', label: 'Kullanım Şartları', icon: 'document' },
-    { id: 'support', label: 'E-posta Desteği', icon: 'mail' },
+    { id: 'privacy', label: t('settings.privacy'), icon: 'shield' },
+    { id: 'terms', label: t('settings.terms'), icon: 'document' },
+    { id: 'support', label: t('settings.support'), icon: 'mail' },
   ];
 
   const developer: Row[] = [
     {
       id: 'showcase',
-      label: 'Tasarım sistemi',
+      label: t('settings.designSystem'),
       icon: 'progress',
       onPress: () => router.push('/showcase'),
     },
     {
       id: 'reset-onboarding',
-      label: "Onboarding'i sıfırla",
+      label: t('settings.resetOnboarding'),
       icon: 'flame',
       onPress: () => {
         void resetOnboarding().then(() => {
@@ -56,8 +75,8 @@ export default function SettingsScreen() {
       // Yalnızca geliştirme derlemelerinde çalışır; setDevProOverride
       // yayın derlemesinde hiçbir şey yapmaz.
       id: 'toggle-pro',
-      label: 'PRO durumunu değiştir',
-      value: isPro ? 'Açık' : 'Kapalı',
+      label: t('settings.togglePro'),
+      value: isPro ? t('common.on') : t('common.off'),
       icon: 'star',
       onPress: () => {
         void setDevProOverride(!isPro).then(() => refresh());
@@ -67,7 +86,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen scroll edges={['left', 'right']}>
-      <Section title="Tercihler">
+      <Section title={t('settings.preferences')}>
         <Card padding="xs">
           {preferences.map((row) => (
             <SettingsRow key={row.id} row={row} />
@@ -75,7 +94,7 @@ export default function SettingsScreen() {
         </Card>
       </Section>
 
-      <Section title="Hakkında">
+      <Section title={t('settings.about')}>
         <Card padding="xs">
           {about.map((row) => (
             <SettingsRow key={row.id} row={row} />
@@ -83,7 +102,7 @@ export default function SettingsScreen() {
         </Card>
       </Section>
 
-      <Section title="Geliştirici">
+      <Section title={t('settings.developer')}>
         <Card padding="xs">
           {developer.map((row) => (
             <SettingsRow key={row.id} row={row} />
@@ -92,9 +111,48 @@ export default function SettingsScreen() {
       </Section>
 
       <Text variant="caption" color="textMuted" align="center" style={styles.disclaimer}>
-        NeuroPeak testleri eğlence ve zihinsel egzersiz amaçlıdır; klinik veya psikometrik bir
-        teşhis aracı değildir.
+        {t('common.disclaimer')}
       </Text>
+
+      <Modal
+        visible={languageOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLanguageOpen(false)}
+      >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+          style={styles.backdrop}
+          onPress={() => setLanguageOpen(false)}
+        >
+          <View style={styles.sheet}>
+            <Card padding="xs">
+              <Text variant="overline" color="textMuted" style={styles.sheetTitle}>
+                {t('settings.languageSheetTitle')}
+              </Text>
+              {APP_LANGUAGES.map((item) => (
+                <Pressable
+                  key={item}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: item === language }}
+                  style={styles.row}
+                  onPress={() => {
+                    tapFeedback();
+                    setLanguage(item);
+                    setLanguageOpen(false);
+                  }}
+                >
+                  <Text variant="body" style={styles.rowLabel}>
+                    {LANGUAGE_NAMES[item]}
+                  </Text>
+                  {item === language && <Icon name="check" color={theme.colors.brand} size={18} />}
+                </Pressable>
+              ))}
+            </Card>
+          </View>
+        </Pressable>
+      </Modal>
     </Screen>
   );
 }
@@ -127,6 +185,12 @@ function SettingsRow({ row }: { row: Row }) {
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    flex: 1,
+    justifyContent: 'flex-end',
+    padding: spacing.lg,
+  },
   disclaimer: {
     marginTop: spacing.xl,
   },
@@ -139,5 +203,12 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     flex: 1,
+  },
+  sheet: {
+    paddingBottom: spacing.xl,
+  },
+  sheetTitle: {
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.xs,
   },
 });

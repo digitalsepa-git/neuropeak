@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /** Bir turda kaç ölçüm alınır. */
 const TRIALS = 5;
@@ -25,6 +26,7 @@ type Phase = 'idle' | 'waiting' | 'ready' | 'early' | 'done';
  */
 export function ReactionGame({ onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [times, setTimes] = useState<readonly number[]>([]);
@@ -124,18 +126,18 @@ export function ReactionGame({ onFinish, onProgress }: GameProps) {
 
   const headline =
     phase === 'idle'
-      ? 'Başlamak için dokun'
+      ? t('play.tapToStart')
       : phase === 'waiting'
-        ? 'Bekle…'
+        ? t('play.wait')
         : phase === 'ready'
-          ? 'Bas!'
+          ? t('play.tapNow')
           : phase === 'early'
-            ? 'Erken bastın'
+            ? t('play.tooEarly')
             : `Tepki süren ${median} ms`;
 
   const caption =
     phase === 'early'
-      ? 'Tekrar denemek için dokun'
+      ? t('play.tapToRetry')
       : phase === 'done'
         ? `En iyi ${Math.min(...times)} ms`
         : last !== null
@@ -160,7 +162,7 @@ export function ReactionGame({ onFinish, onProgress }: GameProps) {
       {phase === 'done' && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Turu bitir"
+          accessibilityLabel={t('play.finishRound')}
           onPress={finish}
           style={[styles.finish, { backgroundColor: theme.colors.brand }]}
         >

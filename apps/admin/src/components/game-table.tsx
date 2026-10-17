@@ -94,7 +94,7 @@ export function GameTable({
                   style={{ backgroundColor: categoryAccent[game.category] }}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-bodysmall font-medium">{game.title}</span>
+                  <span className="block truncate text-bodysmall font-medium">{game.title.tr}</span>
                   <span className="mt-0.5 block text-caption text-fg-muted">
                     {game.id} · {categoryLabels[game.category]} · {MODE_LABELS[game.mode]} ·{' '}
                     {game.baseXp} XP
@@ -107,19 +107,29 @@ export function GameTable({
 
               {isOpen && (
                 <div className="border-t border-border px-md py-sm">
-                  <p className="text-bodysmall">{game.instruction}</p>
-                  <p className="mt-1 text-bodysmall text-fg-muted">{game.description}</p>
+                  <p className="text-bodysmall">{game.instruction.tr}</p>
+                  <p className="mt-1 text-bodysmall text-fg-muted">{game.description.tr}</p>
 
                   <ul className="mt-sm flex flex-wrap gap-xs">
                     {game.skills.map((skill) => (
                       <li
-                        key={skill}
+                        key={skill.tr}
                         className="rounded-pill bg-surface-sunken px-sm py-0.5 text-caption text-fg-muted"
                       >
-                        {skill}
+                        {skill.tr}
                       </li>
                     ))}
                   </ul>
+
+                  {/* İngilizce karşılıklar da burada: panelden metin
+                      düzenlenirken iki dilin birlikte görünmesi, birini
+                      güncelleyip diğerini unutmayı zorlaştırıyor. */}
+                  <div className="mt-sm border-t border-border pt-sm">
+                    <p className="text-caption font-medium text-fg-muted">EN</p>
+                    <p className="mt-1 text-bodysmall">{game.title.en}</p>
+                    <p className="text-bodysmall text-fg-muted">{game.instruction.en}</p>
+                    <p className="mt-1 text-bodysmall text-fg-muted">{game.description.en}</p>
+                  </div>
 
                   <p className="mt-sm text-caption text-fg-muted">
                     {game.mode === 'levels'

@@ -7,6 +7,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const SYMBOLS = ['🍓', '🥑', '🍋', '🍇', '🍊', '🥝', '🍒', '🫐', '🍑', '🥥'] as const;
 
@@ -43,6 +44,7 @@ function buildDeck(level: number, pairCount: number): Card[] {
  */
 export function CardMatchGame({ difficulty, startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [cards, setCards] = useState<Card[]>(() =>
@@ -129,7 +131,7 @@ export function CardMatchGame({ difficulty, startLevel, onFinish, onProgress }: 
             <Pressable
               key={card.id}
               accessibilityRole="button"
-              accessibilityLabel={isOpen ? card.symbol : 'Kapalı kart'}
+              accessibilityLabel={isOpen ? card.symbol : t('play.hiddenCard')}
               onPress={() => onCardPress(card.id)}
               style={[
                 styles.tile,

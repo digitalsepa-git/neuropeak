@@ -16,19 +16,17 @@ export const FALLBACK_PLANS: Plan[] = [
   {
     id: 'weekly',
     productId: PRODUCT_IDS.weekly,
-    title: 'Haftalık',
+    period: 'week',
     priceLabel: '₺349,99',
-    periodLabel: 'hafta',
     trialDays: 3,
   },
   {
     id: 'annual',
     productId: PRODUCT_IDS.annual,
-    title: 'Yıllık',
+    period: 'year',
     priceLabel: '₺999,99',
-    periodLabel: 'yıl',
-    badge: '%94 tasarruf',
-    perWeekLabel: 'haftada ₺19,23',
+    savingPercent: 94,
+    perWeekPrice: '₺19,23',
     strikethroughLabel: '₺18.199,48',
   },
 ];
@@ -37,10 +35,9 @@ export const FALLBACK_PLANS: Plan[] = [
 export const EXIT_OFFER_PLAN: Plan = {
   id: 'annual_discounted',
   productId: PRODUCT_IDS.annual_discounted,
-  title: 'Yıllık',
+  period: 'year',
   priceLabel: '₺199,99',
-  periodLabel: 'yıl',
-  badge: '%80 indirim',
-  perWeekLabel: 'haftada ₺3,85',
+  discountPercent: 80,
+  perWeekPrice: '₺3,85',
   strikethroughLabel: '₺999,99',
 };

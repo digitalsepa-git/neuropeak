@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const OPERATORS = ['+', '−', '×', '÷'] as const;
 type Operator = (typeof OPERATORS)[number];
@@ -32,6 +33,7 @@ function apply(a: number, operator: Operator, b: number): number | null {
  */
 export function TargetNumberGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() => generateTargetNumber(startLevel, startLevel * 31_337));
@@ -170,7 +172,7 @@ export function TargetNumberGame({ startLevel, onFinish, onProgress }: GameProps
 
       <Pressable accessibilityRole="button" onPress={reset} style={styles.reset}>
         <Text variant="caption" color={stuck ? 'danger' : 'textMuted'}>
-          {stuck ? 'Çıkmaza girdin — baştan başla' : 'Baştan başla'}
+          {stuck ? t('play.deadEnd') : t('play.startOver')}
         </Text>
       </Pressable>
     </View>

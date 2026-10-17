@@ -279,7 +279,8 @@ export {
   LEAGUE_TIERS,
   PROMOTION_COUNT,
   RELEGATION_COUNT,
-  formatRemaining,
+  remainingTime,
+  type RemainingTime,
   generatePracticeCohort,
   msUntilWeekEnd,
   outcomeForRank,
@@ -365,3 +366,14 @@ export {
   shouldShowInterstitial,
   type InterstitialInput,
 } from './ads/pacing';
+
+export {
+  APP_LANGUAGES,
+  LANGUAGE_NAMES,
+  parseLanguage,
+  pickLocalized,
+  resolveLanguage,
+  toUpperCaseIn,
+  type AppLanguage,
+  type Localized,
+} from './i18n/language';

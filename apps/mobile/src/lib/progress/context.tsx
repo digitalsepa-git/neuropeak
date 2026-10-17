@@ -35,6 +35,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { useI18n } from '@/lib/i18n';
 import { enqueueMutation } from '@/lib/sync';
 
 import { BADGES, type ContentBadge } from '@neuropeak/content';
@@ -105,6 +106,9 @@ const ProgressContext = createContext<ProgressContextValue>({
 });
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
+  const { language, t } = useI18n();
+  const userName = t('league.you');
+
   const [state, setState] = useState<ProgressState>(EMPTY_PROGRESS);
   const [ready, setReady] = useState(false);
   const [celebration, setCelebration] = useState<Celebration | null>(null);
@@ -135,7 +139,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       const stored = await loadProgress();
       const now = new Date();
       const today = toDateKey(now);
-      const league = rolloverLeague(stored.league, now, deviceId.current);
+      const league = rolloverLeague(stored.league, now, deviceId.current, language, userName);
 
       // Gün değiştiyse görevler yenilenir ve reklam sayacı sıfırlanır.
       const withLeague: ProgressState = league === stored.league ? stored : { ...stored, league };
@@ -160,6 +164,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
 
     void bootstrap();
+    // Dil yalnızca deneme ligindeki adları etkiliyor; açılışta
+    // okunan değerle hesaplanması yeterli.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

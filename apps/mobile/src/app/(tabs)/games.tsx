@@ -10,12 +10,15 @@ import { Badge, Card, Chip, Screen, Text } from '@/components/ui';
 import { GAME_CATALOGUE, type ContentGame } from '@neuropeak/content';
 
 import { isGamePlayable } from '@/games/registry';
-import { CATEGORY_LABELS, GAME_PROGRESS } from '@/data/placeholder';
+import { GAME_PROGRESS } from '@/data/placeholder';
+import { useI18n, useLabels, useT } from '@/lib/i18n';
 
 type Filter = GameCategory | 'all';
 
 export default function GamesScreen() {
   const [filter, setFilter] = useState<Filter>('all');
+  const t = useT();
+  const labels = useLabels();
 
   const visibleCategories = GAME_CATEGORIES.filter(
     (category) => filter === 'all' || filter === category,
@@ -24,7 +27,7 @@ export default function GamesScreen() {
   return (
     <Screen scroll padded={false}>
       <View style={styles.padded}>
-        <AppHeader title="Oyunlar" />
+        <AppHeader title={t('games.title')} />
       </View>
 
       <ScrollView
@@ -32,11 +35,15 @@ export default function GamesScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chipRow}
       >
-        <Chip label="Tümü" selected={filter === 'all'} onPress={() => setFilter('all')} />
+        <Chip
+          label={t('common.all')}
+          selected={filter === 'all'}
+          onPress={() => setFilter('all')}
+        />
         {GAME_CATEGORIES.map((category) => (
           <Chip
             key={category}
-            label={CATEGORY_LABELS[category]}
+            label={labels.category(category)}
             selected={filter === category}
             onPress={() => setFilter(category)}
           />
@@ -45,7 +52,7 @@ export default function GamesScreen() {
 
       <View style={styles.padded}>
         {visibleCategories.map((category) => (
-          <Section key={category} title={CATEGORY_LABELS[category]}>
+          <Section key={category} title={labels.category(category)}>
             <View style={styles.grid}>
               {GAME_CATALOGUE.filter((game) => game.category === category).map((game) => (
                 <GameCard key={game.id} game={game} />
@@ -60,6 +67,8 @@ export default function GamesScreen() {
 
 function GameCard({ game }: { game: ContentGame }) {
   const router = useRouter();
+  const t = useT();
+  const { localized } = useI18n();
   const accent = categoryAccent[game.category];
   const isEndless = game.totalLevels === 0;
   const playable = isGamePlayable(game.id);
@@ -71,7 +80,7 @@ function GameCard({ game }: { game: ContentGame }) {
     <Card
       style={styles.gameCard}
       padding="sm"
-      accessibilityLabel={game.title}
+      accessibilityLabel={localized(game.title)}
       onPress={() => {
         if (playable) {
           router.push({ pathname: '/game/[id]', params: { id: game.id } });
@@ -82,14 +91,16 @@ function GameCard({ game }: { game: ContentGame }) {
         <View style={[styles.thumbDot, { backgroundColor: accent }]} />
       </View>
       <Text variant="subheading" numberOfLines={1}>
-        {game.title}
+        {localized(game.title)}
       </Text>
       {playable ? (
         <Text variant="caption" color="textMuted">
-          {isEndless ? `En iyi seviye ${level}` : `Seviye ${level}/${game.totalLevels}`}
+          {isEndless
+            ? t('games.bestLevel', { level })
+            : t('games.levelOf', { level, total: game.totalLevels })}
         </Text>
       ) : (
-        <Badge label="Yakında" />
+        <Badge label={t('common.soon')} />
       )}
     </Card>
   );

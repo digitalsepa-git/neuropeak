@@ -13,6 +13,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 300;
 const WALL_WIDTH = 2;
@@ -26,6 +27,7 @@ type Direction = { readonly label: string; readonly name: string; readonly delta
  */
 export function MazeGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [maze, setMaze] = useState(() => generateMaze(startLevel, startLevel * 7919));
@@ -73,10 +75,10 @@ export function MazeGame({ startLevel, onFinish, onProgress }: GameProps) {
   );
 
   const directions: readonly Direction[] = [
-    { label: '↑', name: 'Yukarı', delta: -maze.size },
-    { label: '←', name: 'Sola', delta: -1 },
-    { label: '→', name: 'Sağa', delta: 1 },
-    { label: '↓', name: 'Aşağı', delta: maze.size },
+    { label: '↑', name: t('play.up'), delta: -maze.size },
+    { label: '←', name: t('play.left'), delta: -1 },
+    { label: '→', name: t('play.right'), delta: 1 },
+    { label: '↓', name: t('play.down'), delta: maze.size },
   ];
 
   return (

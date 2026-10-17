@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
+import { useT } from '@/lib/i18n';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
 
@@ -12,6 +13,7 @@ import { useProgress } from '@/lib/progress/context';
  * ve ayarlar. PRO rozeti abone olmayanlarda paywall'a götürür (PR#7).
  */
 export function AppHeader({ title }: { title: string }) {
+  const t = useT();
   const theme = useTheme();
   const router = useRouter();
   const { isPro } = usePro();
@@ -31,7 +33,7 @@ export function AppHeader({ title }: { title: string }) {
       {!isPro && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="PRO'ya geç"
+          accessibilityLabel={t('header.goPro')}
           onPress={() => {
             tapFeedback();
             router.push({ pathname: '/paywall', params: { variant: 'generic' } });

@@ -19,6 +19,7 @@ import { ScoreReveal } from '@/components/test/score-reveal';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useAds } from '@/lib/ads/context';
 import { track } from '@/lib/analytics';
+import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
 import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
@@ -26,24 +27,13 @@ import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
 type Phase = 'intro' | 'running' | 'result';
 
 /**
- * Soru türünden "ölçülecek yetenek" kartına. Liste önceden sabitti ve
- * Sözel IQ testinin girişinde "sayı dizilerini çözme" yazıyordu;
- * artık testin kendi havuzundan türetiliyor.
+ * Havuzda en çok geçen üç soru türü.
+ *
+ * Liste önceden sabitti ve Sözel IQ testinin girişinde "sayı
+ * dizilerini çözme" yazıyordu; artık testin kendi havuzundan
+ * türetiliyor, metinleri de i18n kataloğundan geliyor.
  */
-const SKILL_FOR_KIND: Record<QuestionKind, { title: string; hint: string }> = {
-  number_series: { title: 'Örüntü tanıma', hint: 'Sayı dizilerindeki kuralı bulma' },
-  arithmetic: { title: 'Aritmetik akıl yürütme', hint: 'İşlem sırasını doğru kurma' },
-  verbal_analogy: { title: 'Sözel akıl yürütme', hint: 'Kavramlar arası bağ kurma' },
-  odd_one_out: { title: 'Sınıflandırma', hint: 'Ortak özelliği ve istisnayı görme' },
-  logic: { title: 'Mantıksal çıkarım', hint: 'Öncüllerden sonuca ulaşma' },
-  coding: { title: 'Kural uygulama', hint: 'Verilen kuralı yeni duruma taşıma' },
-  matrix: { title: 'Görsel örüntü', hint: 'Şekil ilişkilerini tamamlama' },
-  shape_analogy: { title: 'Şekil analojisi', hint: 'Şekiller arası ilişki kurma' },
-  spatial: { title: 'Uzamsal muhakeme', hint: 'Zihinde döndürme ve katlama' },
-};
-
-/** Havuzda en çok geçen üç soru türünün kartı. */
-function skillBulletsFor(questions: readonly ContentQuestion[]) {
+function topKinds(questions: readonly ContentQuestion[]): QuestionKind[] {
   const counts = new Map<QuestionKind, number>();
   for (const question of questions) {
     counts.set(question.kind, (counts.get(question.kind) ?? 0) + 1);
@@ -52,13 +42,16 @@ function skillBulletsFor(questions: readonly ContentQuestion[]) {
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
-    .map(([kind]) => SKILL_FOR_KIND[kind]);
+    .map(([kind]) => kind);
 }
 
 export default function TestRunnerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const t = useT();
+  const { localized } = useI18n();
+  const labels = useLabels();
   const { recordTestFinished } = useProgress();
   const { afterRound } = useAds();
 
@@ -152,8 +145,8 @@ export default function TestRunnerScreen() {
     return (
       <Screen>
         <View style={styles.centered}>
-          <Text variant="heading">Test bulunamadı</Text>
-          <Button label="Geri dön" variant="secondary" onPress={() => router.back()} />
+          <Text variant="heading">{t('test.notFound')}</Text>
+          <Button label={t('common.goBack')} variant="secondary" onPress={() => router.back()} />
         </View>
       </Screen>
     );
@@ -165,7 +158,7 @@ export default function TestRunnerScreen() {
         <View style={styles.introHeader}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Kapat"
+            accessibilityLabel={t('common.close')}
             hitSlop={10}
             onPress={() => router.back()}
           >
@@ -175,36 +168,39 @@ export default function TestRunnerScreen() {
 
         <View style={styles.intro}>
           <Text variant="overline" color="brand">
-            {test.questionCount} soru · {test.estMinutes[0]}-{test.estMinutes[1]} dk
+            {t('common.questionCount', { count: test.questionCount })} ·{' '}
+            {t('common.minutesShort', { value: `${test.estMinutes[0]}-${test.estMinutes[1]}` })}
           </Text>
-          <Text variant="title">{test.title.tr}</Text>
+          <Text variant="title">{localized(test.title)}</Text>
           <Text variant="body" color="textSecondary">
-            {test.description.tr}
+            {localized(test.description)}
           </Text>
         </View>
 
         <Text variant="overline" color="textMuted" style={styles.sectionLabel}>
-          Ölçülecek yetenekler
+          {t('test.skillsLabel')}
         </Text>
         <View style={styles.bullets}>
-          {skillBulletsFor(test.questions).map((bullet) => (
-            <Card key={bullet.title}>
-              <Text variant="subheading">{bullet.title}</Text>
-              <Text variant="bodySmall" color="textSecondary">
-                {bullet.hint}
-              </Text>
-            </Card>
-          ))}
+          {topKinds(test.questions).map((kind) => {
+            const bullet = labels.skill(kind);
+            return (
+              <Card key={kind}>
+                <Text variant="subheading">{bullet.title}</Text>
+                <Text variant="bodySmall" color="textSecondary">
+                  {bullet.hint}
+                </Text>
+              </Card>
+            );
+          })}
         </View>
 
         <Text variant="caption" color="textMuted" style={styles.disclaimer}>
-          Bu test eğlence ve zihinsel egzersiz amaçlıdır; klinik veya psikometrik bir teşhis aracı
-          değildir.
+          {t('common.testDisclaimer')}
         </Text>
 
         <View style={styles.introAction}>
           <Button
-            label="Teste başla"
+            label={t('test.start')}
             onPress={() => {
               track('test_start', { test: test.id, questions: test.questionCount });
               setSessionSeed(`${test.id}-${Date.now()}`);
@@ -222,7 +218,7 @@ export default function TestRunnerScreen() {
     return (
       <ScoreReveal
         result={result}
-        testTitle={test.title.tr}
+        testTitle={localized(test.title)}
         onDone={() => {
           void afterRound().finally(() => router.back());
         }}
@@ -241,23 +237,26 @@ export default function TestRunnerScreen() {
       <View style={styles.runnerHeader}>
         <View style={styles.runnerHeaderRow}>
           <Text variant="caption" color="textMuted">
-            Soru {questionIndex + 1}/{questions.length}
+            {t('test.questionCounter', {
+              index: questionIndex + 1,
+              total: questions.length,
+            })}
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Testten çık"
+            accessibilityLabel={t('test.exit')}
             hitSlop={10}
             onPress={() => router.back()}
           >
             <Text variant="caption" color="textMuted">
-              Çık
+              {t('common.exit')}
             </Text>
           </Pressable>
         </View>
         <ProgressBar
           value={(questionIndex + 1) / questions.length}
           height={6}
-          accessibilityLabel="Test ilerlemesi"
+          accessibilityLabel={t('test.progressLabel')}
         />
       </View>
 
@@ -268,7 +267,7 @@ export default function TestRunnerScreen() {
         style={styles.questionArea}
       >
         <Text variant="heading" align="center" style={styles.prompt}>
-          {question.prompt.tr}
+          {localized(question.prompt)}
         </Text>
 
         <View style={styles.options}>
@@ -276,7 +275,7 @@ export default function TestRunnerScreen() {
             const isSelected = selectedIndex === index;
             return (
               <Pressable
-                key={option.tr}
+                key={option.en}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: isSelected }}
                 disabled={selectedIndex !== null}
@@ -290,7 +289,7 @@ export default function TestRunnerScreen() {
                 ]}
               >
                 <Text variant="bodyStrong" color={isSelected ? 'onBrand' : 'textPrimary'}>
-                  {option.tr}
+                  {localized(option)}
                 </Text>
               </Pressable>
             );

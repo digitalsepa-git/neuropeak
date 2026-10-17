@@ -4,6 +4,7 @@ import Animated from 'react-native-reanimated';
 
 import { Badge, Text, tapFeedback, usePressScale, useTheme } from '@/components/ui';
 import type { Plan } from '@/lib/billing';
+import { usePlanText, useT } from '@/lib/i18n';
 
 type PlanCardProps = {
   plan: Plan;
@@ -13,14 +14,21 @@ type PlanCardProps = {
 
 export function PlanCard({ plan, selected, onPress }: PlanCardProps) {
   const theme = useTheme();
+  const t = useT();
+  const planText = usePlanText();
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
+
+  const title = planText.title(plan);
+  const period = planText.period(plan);
+  const badge = planText.badge(plan);
+  const perWeek = planText.perWeek(plan);
 
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
         accessibilityRole="radio"
         accessibilityState={{ checked: selected }}
-        accessibilityLabel={`${plan.title} ${plan.priceLabel}`}
+        accessibilityLabel={`${title} ${plan.priceLabel}`}
         onPress={() => {
           tapFeedback();
           onPress();
@@ -39,20 +47,24 @@ export function PlanCard({ plan, selected, onPress }: PlanCardProps) {
         <View style={styles.left}>
           <View style={styles.titleRow}>
             <Text variant="subheading" color={selected ? 'brand' : 'textPrimary'}>
-              {plan.title}
+              {title}
             </Text>
-            {plan.badge !== undefined && <Badge label={plan.badge} tone="brand" />}
+            {badge !== undefined && <Badge label={badge} tone="brand" />}
           </View>
 
           {plan.trialDays !== undefined && (
             <Text variant="caption" color="textSecondary">
-              {plan.trialDays} gün ücretsiz, sonra {plan.priceLabel}/{plan.periodLabel}
+              {t('plan.trialLine', {
+                days: plan.trialDays,
+                price: plan.priceLabel,
+                period,
+              })}
             </Text>
           )}
 
-          {plan.perWeekLabel !== undefined && (
+          {perWeek !== undefined && (
             <Text variant="caption" color="textSecondary">
-              {plan.perWeekLabel}
+              {perWeek}
             </Text>
           )}
         </View>
@@ -67,7 +79,7 @@ export function PlanCard({ plan, selected, onPress }: PlanCardProps) {
             {plan.priceLabel}
           </Text>
           <Text variant="caption" color="textMuted">
-            /{plan.periodLabel}
+            /{period}
           </Text>
         </View>
       </Pressable>

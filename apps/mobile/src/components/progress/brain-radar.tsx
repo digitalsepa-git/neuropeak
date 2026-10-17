@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Polygon } from 'react-native-svg';
 
 import { Text, useTheme } from '@/components/ui';
-import { AXIS_LABELS } from '@/data/placeholder';
+import { useLabels } from '@/lib/i18n';
 
 const SIZE = 240;
 const CENTER = SIZE / 2;
@@ -41,6 +41,7 @@ function polygonFor(ratios: readonly number[]): string {
  */
 export function BrainRadar({ map }: { map: BrainMap }) {
   const theme = useTheme();
+  const labels = useLabels();
   const ratios = BRAIN_AXES.map((axis) => Math.max(0.04, map[axis] / 100));
 
   return (
@@ -102,7 +103,7 @@ export function BrainRadar({ map }: { map: BrainMap }) {
             pointerEvents="none"
           >
             <Text variant="caption" color="textMuted" align="center" numberOfLines={2}>
-              {AXIS_LABELS[axis as BrainAxis]}
+              {labels.axis(axis as BrainAxis)}
             </Text>
           </View>
         );
