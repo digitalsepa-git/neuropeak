@@ -2,7 +2,7 @@
   "name": "neuropeak",
   "version": "0.1.0",
   "private": true,
-  "description": "NeuroPeak: IQ Arena — oyunlaştırılmış IQ testi ve beyin antrenmanı uygulaması",
+  "description": "NeuroPeak: IQ Arena \u2014 oyunla\u015ft\u0131r\u0131lm\u0131\u015f IQ testi ve beyin antrenman\u0131 uygulamas\u0131",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -14,6 +14,8 @@
     "dev:mobile": "npm run start --workspace @neuropeak/mobile",
     "dev:admin": "npm run dev --workspace @neuropeak/admin",
     "build:admin": "npm run build --workspace @neuropeak/admin",
+    "assets:icons": "python3 -I scripts/make-icons.py",
+    "assets:screenshots": "python3 -I scripts/make-screenshots.py",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "vitest run",

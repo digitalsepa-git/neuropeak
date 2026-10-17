@@ -7,6 +7,7 @@ import Svg, { Circle, Polygon, Rect } from 'react-native-svg';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const CELL_COLORS = [
   palette.accentMemory,
@@ -56,6 +57,7 @@ function CellArt({ cell, size }: { cell: MatrixCell; size: number }) {
  */
 export function MatrixPuzzleGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [level, setLevel] = useState(startLevel);
   const [puzzle, setPuzzle] = useState(() =>
@@ -126,7 +128,7 @@ export function MatrixPuzzleGame({ startLevel, onFinish, onProgress }: GameProps
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        Eksik hücreyi tamamla
+        {t('play.completeMissingCell')}
       </Text>
 
       <View style={styles.options}>

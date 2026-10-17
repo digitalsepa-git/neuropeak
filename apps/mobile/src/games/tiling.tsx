@@ -208,7 +208,7 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
           style={[styles.action, { borderColor: theme.colors.border }]}
         >
           <Text variant="caption" color="textMuted">
-            Döndür
+            {t('play.rotate')}
           </Text>
         </Pressable>
         <Pressable
@@ -218,7 +218,7 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
           style={[styles.action, { borderColor: theme.colors.border }]}
         >
           <Text variant="caption" color="textMuted">
-            Çıkar
+            {t('play.remove')}
           </Text>
         </Pressable>
       </View>

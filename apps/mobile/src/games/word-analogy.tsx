@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
-import { useI18n } from '@/lib/i18n';
+import { useI18n, useT } from '@/lib/i18n';
 
 /**
  * Sözel Analoji — seviyeli. "A : B :: C : ?" ilişkisini kurup eksik
@@ -16,6 +16,7 @@ import { useI18n } from '@/lib/i18n';
  */
 export function WordAnalogyGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
   const { language } = useI18n();
   const bank = wordBankFor(language).analogies;
 
@@ -77,7 +78,7 @@ export function WordAnalogyGame({ startLevel, onFinish, onProgress }: GameProps)
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.like}>
-        ilişkisi gibi
+        {t('play.analogyLike')}
       </Text>
 
       <View style={styles.relationRow}>

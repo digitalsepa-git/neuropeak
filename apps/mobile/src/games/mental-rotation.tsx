@@ -119,7 +119,7 @@ export function MentalRotationGame({ difficulty, onFinish, onProgress }: GamePro
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        Sağdaki şekil solun döndürülmüş hâli mi?
+        {t('play.rotationQuestion')}
       </Text>
 
       <View style={styles.actions}>
