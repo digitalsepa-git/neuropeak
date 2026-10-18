@@ -51,4 +51,17 @@ export { GAME_CATALOGUE, findGameContent, type ContentGame } from './games/catal
 
 export { BRAIN_AGE_STEPS, brainAgeTest, type BrainAgeStep } from './tests/brain-age';
 
+export {
+  PROFILE_TESTS,
+  archetypeTest,
+  findProfileTest,
+  focusProfileTest,
+  personaMapTest,
+  type ProfileAnswer,
+  type ProfileOutcome,
+  type ProfileQuestion,
+  type ProfileTest,
+  type ProfileTrait,
+} from './tests/profiles';
+
 export { DEFAULT_SEGMENTS } from './crm/segments';

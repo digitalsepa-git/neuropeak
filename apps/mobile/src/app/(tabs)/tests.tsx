@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
-import { BRAIN_AGE_STEPS, brainAgeTest, findTest } from '@neuropeak/content';
+import { BRAIN_AGE_STEPS, brainAgeTest, findProfileTest, findTest } from '@neuropeak/content';
 
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
@@ -84,10 +84,12 @@ function TestCard({ test }: { test: PlaceholderTest }) {
 
   // Soru bankası yazılmamış testler listede kalır ama açılmaz;
   // yol haritası görünsün, boş ekran açılmasın.
-  // Beyin Yaşı soru sormuyor, dört ölçüm yaptırıyor; kendi ekranı var.
+  // Beyin Yaşı soru sormuyor, dört ölçüm yaptırıyor; profil
+  // testlerinin doğru cevabı yok. Üçünün de kendi ekranı var.
   const isMeasureTest = test.id === brainAgeTest.id;
+  const profile = findProfileTest(test.id);
   const content = findTest(test.id);
-  const ready = content !== undefined || isMeasureTest;
+  const ready = content !== undefined || isMeasureTest || profile !== undefined;
   const locked = test.pro && !isPro;
 
   return (
@@ -103,6 +105,10 @@ function TestCard({ test }: { test: PlaceholderTest }) {
           router.push('/brain-age');
           return;
         }
+        if (profile !== undefined) {
+          router.push({ pathname: '/profile/[id]', params: { id: test.id } });
+          return;
+        }
         router.push({ pathname: '/test/[id]', params: { id: test.id } });
       }}
     >
@@ -110,7 +116,11 @@ function TestCard({ test }: { test: PlaceholderTest }) {
         <View style={[styles.info, !ready && styles.dimmed]}>
           <View style={styles.titleRow}>
             <Text variant="subheading" numberOfLines={1}>
-              {content === undefined ? localized(test.title) : localized(content.title)}
+              {content !== undefined
+                ? localized(content.title)
+                : profile !== undefined
+                  ? localized(profile.title)
+                  : localized(test.title)}
             </Text>
             {!ready ? (
               <Badge label={t('common.soon')} />
@@ -128,7 +138,9 @@ function TestCard({ test }: { test: PlaceholderTest }) {
                     count: BRAIN_AGE_STEPS.length,
                     minutes: brainAgeTest.estMinutes[1],
                   })
-                : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
+                : profile !== undefined
+                  ? `${t('common.questionCount', { count: profile.questions.length })} · ${t('common.minutesShort', { value: `${profile.estMinutes[0]}-${profile.estMinutes[1]}` })}`
+                  : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
           </Text>
         </View>
         {ready && (
