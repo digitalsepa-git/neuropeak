@@ -15,7 +15,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 
 import { Icon } from '@/components/icons';
+import { Figure } from '@/components/test/figure';
 import { ScoreReveal } from '@/components/test/score-reveal';
+import { VisualPrompt } from '@/components/test/visual-prompt';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useAds } from '@/lib/ads/context';
 import { track } from '@/lib/analytics';
@@ -266,31 +268,52 @@ export default function TestRunnerScreen() {
         exiting={FadeOutLeft.duration(140)}
         style={styles.questionArea}
       >
-        <Text variant="heading" align="center" style={styles.prompt}>
+        <Text
+          variant={question.visual === undefined ? 'heading' : 'body'}
+          color={question.visual === undefined ? 'textPrimary' : 'textSecondary'}
+          align="center"
+          style={styles.prompt}
+        >
           {localized(question.prompt)}
         </Text>
 
-        <View style={styles.options}>
+        {question.visual !== undefined && (
+          <View style={styles.visual}>
+            <VisualPrompt visual={question.visual} />
+          </View>
+        )}
+
+        {/* Görsel soruda şıklar ızgarada, metin sorusunda alt alta:
+            şekil kartları yan yana okunuyor, cümleler okunmuyor. */}
+        <View style={question.visual === undefined ? styles.options : styles.choiceGrid}>
           {question.options.map((option, index) => {
             const isSelected = selectedIndex === index;
+            const figure = question.visual?.choices[index];
+
             return (
               <Pressable
-                key={option.en}
+                // Görsel soruda şıkların metni tekrar edebiliyor.
+                key={`${question.id}-${index}`}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: isSelected }}
+                accessibilityLabel={localized(option)}
                 disabled={selectedIndex !== null}
                 onPress={() => answer(index)}
                 style={[
-                  styles.option,
+                  figure === undefined ? styles.option : styles.choice,
                   {
                     backgroundColor: isSelected ? theme.colors.brand : theme.colors.surface,
                     borderColor: isSelected ? theme.colors.brand : theme.colors.border,
                   },
                 ]}
               >
-                <Text variant="bodyStrong" color={isSelected ? 'onBrand' : 'textPrimary'}>
-                  {localized(option)}
-                </Text>
+                {figure === undefined ? (
+                  <Text variant="bodyStrong" color={isSelected ? 'onBrand' : 'textPrimary'}>
+                    {localized(option)}
+                  </Text>
+                ) : (
+                  <Figure figure={figure} size={56} />
+                )}
               </Pressable>
             );
           })}
@@ -325,6 +348,22 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '180deg' }],
     width: 22,
   },
+  choice: {
+    alignItems: 'center',
+    aspectRatio: 1,
+    borderRadius: radius.md,
+    borderWidth: 2,
+    flexBasis: '44%',
+    flexGrow: 0,
+    justifyContent: 'center',
+  },
+  choiceGrid: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    justifyContent: 'center',
+  },
   option: {
     borderRadius: radius.md,
     borderWidth: 1.5,
@@ -348,6 +387,10 @@ const styles = StyleSheet.create({
   runnerHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  visual: {
+    marginBottom: spacing.xl,
+    marginTop: spacing.md,
   },
   sectionLabel: {
     marginBottom: spacing.sm,
