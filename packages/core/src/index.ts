@@ -405,3 +405,21 @@ export {
   type RuleSignature,
   type VisualQuestion,
 } from './content/figures';
+
+export {
+  BRAIN_AGE_MAX,
+  BRAIN_AGE_MEASURES,
+  BRAIN_AGE_MIN,
+  MEANINGFUL_SPREAD,
+  brainAge,
+  focusScore,
+  measureSpread,
+  median,
+  memoryScore,
+  overallScore,
+  rankMeasures,
+  reactionScore,
+  speedScore,
+  type BrainAgeMeasure,
+  type BrainAgeScores,
+} from './scoring/brain-age';

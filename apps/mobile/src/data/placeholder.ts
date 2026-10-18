@@ -114,10 +114,12 @@ export const TESTS: PlaceholderTest[] = [
     pro: true,
   },
   {
+    // Soru sormuyor, dört ölçüm yaptırıyor; sayılar kendi
+    // tanımından geliyor ve bu satırdakiler kullanılmıyor.
     id: 'brain-age',
     title: { tr: 'Beyin Yaşı Testi', en: 'Brain Age Test' },
-    questions: 15,
-    minutes: '6-8',
+    questions: 0,
+    minutes: '3-5',
     group: 'fun',
     pro: true,
   },

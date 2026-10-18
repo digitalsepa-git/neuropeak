@@ -49,4 +49,6 @@ export { BADGES, type ContentBadge } from './badges/catalogue';
 
 export { GAME_CATALOGUE, findGameContent, type ContentGame } from './games/catalogue';
 
+export { BRAIN_AGE_STEPS, brainAgeTest, type BrainAgeStep } from './tests/brain-age';
+
 export { DEFAULT_SEGMENTS } from './crm/segments';
