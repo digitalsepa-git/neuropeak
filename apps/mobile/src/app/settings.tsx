@@ -2,12 +2,13 @@ import { APP_LANGUAGES, LANGUAGE_NAMES } from '@neuropeak/core';
 import { spacing } from '@neuropeak/ui';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Card, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useI18n, useT } from '@/lib/i18n';
+import { PRIVACY_URL, SUPPORT_EMAIL, TERMS_URL, supportMailto } from '@/lib/links';
 import { setDevProOverride } from '@/lib/billing';
 import { usePro } from '@/lib/billing/context';
 import { resetOnboarding } from '@/lib/onboarding';
@@ -48,10 +49,29 @@ export default function SettingsScreen() {
     },
   ];
 
+  // Bu üç satır önce hiçbir şey yapmıyordu; App Store gizlilik
+  // politikasına ulaşılabilmesini şart koşuyor, çalışmayan bir satır
+  // da kullanıcıya olmayan bir sayfa vaat ediyordu.
   const about: Row[] = [
-    { id: 'privacy', label: t('settings.privacy'), icon: 'shield' },
-    { id: 'terms', label: t('settings.terms'), icon: 'document' },
-    { id: 'support', label: t('settings.support'), icon: 'mail' },
+    {
+      id: 'privacy',
+      label: t('settings.privacy'),
+      icon: 'shield',
+      onPress: () => void Linking.openURL(PRIVACY_URL),
+    },
+    {
+      id: 'terms',
+      label: t('settings.terms'),
+      icon: 'document',
+      onPress: () => void Linking.openURL(TERMS_URL),
+    },
+    {
+      id: 'support',
+      label: t('settings.support'),
+      value: SUPPORT_EMAIL,
+      icon: 'mail',
+      onPress: () => void Linking.openURL(supportMailto(t('settings.supportSubject'))),
+    },
   ];
 
   const developer: Row[] = [

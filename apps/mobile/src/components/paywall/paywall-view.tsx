@@ -11,6 +11,7 @@ import { EXIT_OFFER_PLAN, billing, type Plan, type PlanId } from '@/lib/billing'
 import { track } from '@/lib/analytics';
 import { usePro } from '@/lib/billing/context';
 import { usePlanText, useT } from '@/lib/i18n';
+import { PRIVACY_URL, TERMS_URL } from '@/lib/links';
 import type { StringKey } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 
@@ -32,9 +33,6 @@ const BENEFITS: StringKey[] = [
   'paywall.benefit4',
   'paywall.benefit5',
 ];
-
-const TERMS_URL = 'https://neuropeak.app/terms';
-const PRIVACY_URL = 'https://neuropeak.app/privacy';
 
 type PaywallViewProps = {
   variant: PaywallVariant;

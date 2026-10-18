@@ -2,14 +2,17 @@
   "expo": {
     "name": "NeuroPeak",
     "slug": "neuropeak",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "neuropeak",
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.neuropeak.iqarena",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.neuropeak.iqarena",
