@@ -423,3 +423,17 @@ export {
   type BrainAgeMeasure,
   type BrainAgeScores,
 } from './scoring/brain-age';
+
+export {
+  MEANINGFUL_TRAIT_SPREAD,
+  rankOutcomes,
+  rankTraits,
+  scoreProfile,
+  traitSpread,
+  type OutcomeMatch,
+  type ProfileOption,
+  type ProfileOutcomeShape,
+  type ProfileQuestionShape,
+  type TraitScores,
+  type TraitWeights,
+} from './scoring/profile';

@@ -6,12 +6,15 @@ import {
   figureKey,
   hasDiscoverableRule,
   isAmbiguousGlyph,
+  rankOutcomes,
+  scoreProfile,
   ruleSignature,
   satisfiesAllRules,
   type ContentFigure,
 } from '@neuropeak/core';
 
 import { GAME_CATALOGUE } from './games/catalogue';
+import { PROFILE_TESTS } from './tests/profiles';
 import { displayNamesFor, wordBankFor } from './words/bank';
 
 import { CONTENT_TESTS } from './index';
@@ -439,6 +442,130 @@ describe('görsel sorular', () => {
 
         it('işaretli cevap ayrışan şık', () => {
           expect(discriminators[0], question.id).toBe(question.correctIndex);
+        });
+      }
+    });
+  }
+});
+
+describe('profil testleri', () => {
+  for (const test of PROFILE_TESTS) {
+    describe(test.id, () => {
+      it('soru ve şık kimlikleri benzersiz', () => {
+        const ids = test.questions.map((question) => question.id);
+        expect(new Set(ids).size).toBe(ids.length);
+      });
+
+      it('her soruda en az üç şık var', () => {
+        for (const question of test.questions) {
+          expect(question.options.length, question.id).toBeGreaterThanOrEqual(3);
+        }
+      });
+
+      it('her metin iki dilde de dolu', () => {
+        const texts = [
+          test.title,
+          test.description,
+          test.caveat,
+          ...test.traits.flatMap((trait) => [trait.label, trait.description]),
+          ...test.questions.flatMap((question) => [
+            question.prompt,
+            ...question.options.map((option) => option.label),
+          ]),
+          ...(test.outcomes ?? []).flatMap((outcome) => [outcome.title, outcome.description]),
+        ];
+        for (const text of texts) {
+          expect(text.tr.trim().length).toBeGreaterThan(0);
+          expect(text.en.trim().length).toBeGreaterThan(0);
+        }
+      });
+
+      it('şıkların yazdığı eksenler tanımlı', () => {
+        // Tanımsız bir eksene puan yazmak sonuç ekranında sessizce
+        // kaybolurdu.
+        const known = new Set(test.traits.map((trait) => trait.id));
+        for (const question of test.questions) {
+          for (const option of question.options) {
+            for (const trait of Object.keys(option.weights)) {
+              expect(known.has(trait), `${question.id} → ${trait}`).toBe(true);
+            }
+          }
+        }
+      });
+
+      it('her eksene en az iki soru yazıyor', () => {
+        // Tek soruya bağlı bir eksen sonucu ya tavana ya tabana
+        // yapıştırıyor.
+        for (const trait of test.traits) {
+          const touching = test.questions.filter((question) =>
+            question.options.some((option) => trait.id in option.weights),
+          );
+          expect(touching.length, trait.id).toBeGreaterThanOrEqual(2);
+        }
+      });
+
+      it('her eksen bir şıkla tavana çıkabiliyor', () => {
+        const scores = scoreProfile(
+          test.questions,
+          test.questions.map((question) => {
+            const index = question.options.findIndex(
+              (option) => Object.keys(option.weights).length > 0,
+            );
+            return index === -1 ? null : index;
+          }),
+        );
+        for (const value of Object.values(scores)) {
+          expect(value).toBeGreaterThanOrEqual(0);
+          expect(value).toBeLessThanOrEqual(1);
+        }
+      });
+
+      it('uyarı metni tanı iddiasını reddediyor', () => {
+        expect(test.caveat.tr.length).toBeGreaterThan(40);
+        expect(test.caveat.en.length).toBeGreaterThan(40);
+      });
+
+      if (test.outcomes !== undefined) {
+        it('her sonucun eksenleri tanımlı', () => {
+          const known = new Set(test.traits.map((trait) => trait.id));
+          for (const outcome of test.outcomes ?? []) {
+            for (const trait of outcome.traits) {
+              expect(known.has(trait), `${outcome.id} → ${trait}`).toBe(true);
+            }
+          }
+        });
+
+        it('her sonuç bir cevap kümesiyle kazanılabiliyor', () => {
+          // Hiçbir cevapla çıkmayan bir arketip, bankada ölü ağırlık.
+          const reachable = new Set<string>();
+          const outcomes = test.outcomes ?? [];
+
+          // Her sonuç için o sonucun kendi eksenlerini en çok
+          // besleyen cevapları seç: "bu arketibi hedefleyerek
+          // cevaplayan onu almalı".
+          for (const target of outcomes) {
+            const answers = test.questions.map((question) => {
+              let bestIndex = 0;
+              let bestWeight = -1;
+              question.options.forEach((option, index) => {
+                const weight = target.traits.reduce(
+                  (sum, trait) => sum + (option.weights[trait] ?? 0),
+                  0,
+                );
+                if (weight > bestWeight) {
+                  bestWeight = weight;
+                  bestIndex = index;
+                }
+              });
+              return bestIndex;
+            });
+            const winner = rankOutcomes(outcomes, scoreProfile(test.questions, answers))[0];
+            if (winner !== undefined) reachable.add(winner.outcome.id);
+          }
+
+          for (const outcome of outcomes) {
+            expect(reachable.has(outcome.id), `${outcome.id} hiçbir cevapla çıkmıyor`).toBe(true);
+          }
         });
       }
     });

@@ -557,6 +557,26 @@ export const STRINGS = {
     en: 'Rotating and folding in your head',
   },
 
+  // --------------------------------------------------------------- profil
+  'profile.axes': { tr: 'Eksenler', en: 'Axes' },
+  'profile.yourMap': { tr: 'Haritan', en: 'Your map' },
+  'profile.percent': {
+    tr: (p: { value: number }) => `%${p.value}`,
+    en: (p: { value: number }) => `${p.value}%`,
+  },
+  'profile.highest': {
+    tr: (p: { trait: string }) => `En yüksek eksenin: ${p.trait}.`,
+    en: (p: { trait: string }) => `Your highest axis: ${p.trait}.`,
+  },
+  'profile.lowest': {
+    tr: (p: { trait: string }) => `En düşük eksenin: ${p.trait}.`,
+    en: (p: { trait: string }) => `Your lowest axis: ${p.trait}.`,
+  },
+  'profile.evenSpread': {
+    tr: 'Eksenler birbirine çok yakın çıktı; öne çıkan ya da geride kalan bir yan yok.',
+    en: 'The axes came out very close; nothing stands out either way.',
+  },
+
   // ------------------------------------------------------------ beyin yaşı
   'brainAge.stepCount': {
     tr: (p: { count: number; minutes: number }) => `${p.count} ölçüm · ${p.minutes} dk`,

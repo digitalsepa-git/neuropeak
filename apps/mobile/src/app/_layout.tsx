@@ -123,6 +123,7 @@ function RootStack() {
         />
         <Stack.Screen name="test/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="brain-age" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="profile/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="game/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
       </Stack.Protected>
