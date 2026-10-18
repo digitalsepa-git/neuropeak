@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
-import { findTest } from '@neuropeak/content';
+import { BRAIN_AGE_STEPS, brainAgeTest, findTest } from '@neuropeak/content';
 
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
@@ -84,8 +84,10 @@ function TestCard({ test }: { test: PlaceholderTest }) {
 
   // Soru bankası yazılmamış testler listede kalır ama açılmaz;
   // yol haritası görünsün, boş ekran açılmasın.
+  // Beyin Yaşı soru sormuyor, dört ölçüm yaptırıyor; kendi ekranı var.
+  const isMeasureTest = test.id === brainAgeTest.id;
   const content = findTest(test.id);
-  const ready = content !== undefined;
+  const ready = content !== undefined || isMeasureTest;
   const locked = test.pro && !isPro;
 
   return (
@@ -97,6 +99,10 @@ function TestCard({ test }: { test: PlaceholderTest }) {
           router.push({ pathname: '/paywall', params: { variant: 'generic' } });
           return;
         }
+        if (isMeasureTest) {
+          router.push('/brain-age');
+          return;
+        }
         router.push({ pathname: '/test/[id]', params: { id: test.id } });
       }}
     >
@@ -104,7 +110,7 @@ function TestCard({ test }: { test: PlaceholderTest }) {
         <View style={[styles.info, !ready && styles.dimmed]}>
           <View style={styles.titleRow}>
             <Text variant="subheading" numberOfLines={1}>
-              {ready ? localized(content.title) : localized(test.title)}
+              {content === undefined ? localized(test.title) : localized(content.title)}
             </Text>
             {!ready ? (
               <Badge label={t('common.soon')} />
@@ -115,9 +121,14 @@ function TestCard({ test }: { test: PlaceholderTest }) {
             )}
           </View>
           <Text variant="caption" color="textMuted">
-            {ready
+            {content !== undefined
               ? `${t('common.questionCount', { count: content.questionCount })} · ${t('common.minutesShort', { value: `${content.estMinutes[0]}-${content.estMinutes[1]}` })}`
-              : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
+              : isMeasureTest
+                ? t('brainAge.stepCount', {
+                    count: BRAIN_AGE_STEPS.length,
+                    minutes: brainAgeTest.estMinutes[1],
+                  })
+                : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
           </Text>
         </View>
         {ready && (

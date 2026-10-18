@@ -557,6 +557,63 @@ export const STRINGS = {
     en: 'Rotating and folding in your head',
   },
 
+  // ------------------------------------------------------------ beyin yaşı
+  'brainAge.stepCount': {
+    tr: (p: { count: number; minutes: number }) => `${p.count} ölçüm · ${p.minutes} dk`,
+    en: (p: { count: number; minutes: number }) => `${p.count} measurements · ${p.minutes} min`,
+  },
+  'brainAge.stepProgress': {
+    tr: (p: { index: number; total: number; title: string }) =>
+      `Ölçüm ${p.index}/${p.total} · ${p.title}`,
+    en: (p: { index: number; total: number; title: string }) =>
+      `Measurement ${p.index}/${p.total} · ${p.title}`,
+  },
+  'brainAge.trialCounter': {
+    tr: (p: { done: number; total: number }) => `${p.done}/${p.total} ölçüm alındı`,
+    en: (p: { done: number; total: number }) => `${p.done}/${p.total} measured`,
+  },
+  'brainAge.livesLeft': {
+    tr: (p: { lives: number }) => `${p.lives} hak kaldı`,
+    en: (p: { lives: number }) => `${p.lives} ${p.lives === 1 ? 'life' : 'lives'} left`,
+  },
+  'brainAge.scaleNote': {
+    tr: 'Dört ölçümden türetilen ölçek değeri',
+    en: 'A scale value derived from four measurements',
+  },
+  'brainAge.measurements': { tr: 'Ölçümlerin', en: 'Your measurements' },
+  'brainAge.measure.reaction': { tr: 'Tepki süresi', en: 'Reaction time' },
+  'brainAge.measure.memory': { tr: 'Hane menzili', en: 'Digit span' },
+  'brainAge.measure.speed': { tr: 'İşlem hızı', en: 'Processing speed' },
+  'brainAge.measure.focus': { tr: 'Dürtü kontrolü', en: 'Impulse control' },
+  'brainAge.valueMs': {
+    tr: (p: { value: number }) => `${p.value} ms`,
+    en: (p: { value: number }) => `${p.value} ms`,
+  },
+  'brainAge.valueDigits': {
+    tr: (p: { value: number }) => `${p.value} hane`,
+    en: (p: { value: number }) => `${p.value} digits`,
+  },
+  'brainAge.valuePerMinute': {
+    tr: (p: { value: number }) => `${p.value} doğru/dk`,
+    en: (p: { value: number }) => `${p.value} correct/min`,
+  },
+  'brainAge.valuePercent': {
+    tr: (p: { value: number }) => `%${p.value}`,
+    en: (p: { value: number }) => `${p.value}%`,
+  },
+  'brainAge.strongest': {
+    tr: (p: { measure: string }) => `En güçlü ölçümün: ${p.measure}.`,
+    en: (p: { measure: string }) => `Your strongest measurement: ${p.measure}.`,
+  },
+  'brainAge.evenSpread': {
+    tr: 'Dört ölçüm birbirine çok yakın çıktı; öne çıkan ya da geride kalan bir alan yok.',
+    en: 'The four measurements came out very close; no area stands out either way.',
+  },
+  'brainAge.weakest': {
+    tr: (p: { measure: string }) => `En çok gelişime açık olan: ${p.measure}.`,
+    en: (p: { measure: string }) => `The one with most room to grow: ${p.measure}.`,
+  },
+
   // ---------------------------------------------------------------- sonuç
   'band.developing': { tr: 'Gelişime açık', en: 'Developing' },
   'band.average': { tr: 'Ortalama', en: 'Average' },
