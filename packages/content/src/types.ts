@@ -1,4 +1,10 @@
-import type { Localized, QuestionKind, ReportDimension, ScoringNorm } from '@neuropeak/core';
+import type {
+  Localized,
+  QuestionKind,
+  ReportDimension,
+  ScoringNorm,
+  VisualQuestion,
+} from '@neuropeak/core';
 
 export type { Localized } from '@neuropeak/core';
 
@@ -14,6 +20,12 @@ export type ContentQuestion = {
    */
   readonly difficultyWeight: number;
   readonly explanation?: Localized;
+  /**
+   * Görsel sorularda çizilecek şekiller. Varsa şıklar metin yerine
+   * şekil olarak gösterilir; `options` metinleri ekran okuyucu
+   * etiketi olarak kalır.
+   */
+  readonly visual?: VisualQuestion;
 };
 
 export type ContentTest = {

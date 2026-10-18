@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  FIGURE_ATTRIBUTES,
+  attributeOf,
+  figureKey,
+  hasDiscoverableRule,
+  isAmbiguousGlyph,
+  ruleSignature,
+  satisfiesAllRules,
+  type ContentFigure,
+} from '@neuropeak/core';
+
 import { GAME_CATALOGUE } from './games/catalogue';
 import { displayNamesFor, wordBankFor } from './words/bank';
 
@@ -93,6 +104,11 @@ describe('soru bankası', () => {
       it('her soruda en az iki şık var ve şıklar tekrar etmiyor', () => {
         for (const question of test.questions) {
           expect(question.options.length).toBeGreaterThanOrEqual(2);
+
+          // "Farklı olan" sorusunda şıkların üçü bilerek aynı; metin
+          // etiketleri de aynı oluyor. Ayrışmayı görsel denetim
+          // sağlıyor, burada tekrar aranmıyor.
+          if (question.visual?.layout === 'odd_one_out') continue;
 
           const turkish = question.options.map((option) => option.tr);
           expect(new Set(turkish).size, `${question.id} şıkları tekrar ediyor`).toBe(
@@ -297,4 +313,134 @@ describe('sözel bankalar', () => {
     // Aynı tohumla aynı sıralama çıksın diye havuzlar eşit tutuluyor.
     expect(displayNamesFor('en').length).toBe(displayNamesFor('tr').length);
   });
+});
+
+describe('görsel sorular', () => {
+  const visualQuestions = CONTENT_TESTS.flatMap((test) =>
+    test.questions.flatMap((question) =>
+      question.visual === undefined ? [] : [{ test: test.id, question }],
+    ),
+  );
+
+  it('görsel soru bankası boş değil', () => {
+    expect(visualQuestions.length).toBeGreaterThan(0);
+  });
+
+  for (const { test, question } of visualQuestions) {
+    const visual = question.visual as NonNullable<typeof question.visual>;
+
+    describe(`${test} · ${question.id}`, () => {
+      it('şık sayısı metin şıklarıyla aynı', () => {
+        // Şıkların metni ekran okuyucu etiketi; biri eksikse o şık
+        // sesli okumada boş kalır.
+        expect(visual.choices.length).toBe(question.options.length);
+      });
+
+      if (visual.layout !== 'odd_one_out') {
+        it('şıklar birbirinden farklı', () => {
+          const keys = visual.choices.map(figureKey);
+          expect(new Set(keys).size).toBe(keys.length);
+        });
+      }
+
+      it('aranan hücre sayısı düzene uygun', () => {
+        const blanks = visual.cells.filter((cell) => cell === null).length;
+        // "Farklı olan" sorusunda gövde yok: şıkların kendisi soru.
+        expect(blanks).toBe(visual.layout === 'odd_one_out' ? 0 : 1);
+      });
+
+      it('hücre sayısı düzene uygun', () => {
+        const expected = { matrix: 9, analogy: 4, odd_one_out: 0 }[visual.layout];
+        expect(visual.cells.length).toBe(expected);
+      });
+
+      it('her hücrede en az bir simge var', () => {
+        for (const cell of visual.cells) {
+          if (cell !== null) expect(cell.glyphs.length).toBeGreaterThan(0);
+        }
+        for (const choice of visual.choices) {
+          expect(choice.glyphs.length).toBeGreaterThan(0);
+        }
+      });
+
+      it('dönünce başka şekle benzeyen simge yok', () => {
+        // 45 derece dönmüş kare baklava gibi görünüyor; oyuncu
+        // "dönük olan" yerine "farklı şekil" okuyor.
+        const glyphs = [...visual.cells, ...visual.choices].flatMap((cell) =>
+          cell === null ? [] : [...cell.glyphs],
+        );
+        expect(glyphs.filter(isAmbiguousGlyph), question.id).toEqual([]);
+      });
+
+      it('açıklaması var', () => {
+        // Görsel soruda "neden bu cevap" metinsiz anlaşılmıyor.
+        expect(question.explanation?.tr.length ?? 0).toBeGreaterThan(0);
+        expect(question.explanation?.en.length ?? 0).toBeGreaterThan(0);
+      });
+
+      if (visual.layout === 'matrix') {
+        it('doğru şıkla tamamlanan matrisin keşfedilebilir bir kuralı var', () => {
+          // Kuralı olmayan matris tahmin oyunudur; cevap ancak bir
+          // özellik satır/sütun boyunca düzenliyse bulunabilir.
+          const completed = visual.cells.map(
+            (cell) => cell ?? (visual.choices[question.correctIndex] as ContentFigure),
+          );
+          expect(hasDiscoverableRule(completed), question.id).toBe(true);
+        });
+
+        it('kuralların tamamını yalnızca doğru şık sağlıyor', () => {
+          // Tek bir kuralın ayakta kalmasına bakmak yetmiyor: sayı
+          // kuralı bozulmadan şekli yanlış olan şık da geçiyordu.
+          const completed = visual.cells.map(
+            (cell) => cell ?? (visual.choices[question.correctIndex] as ContentFigure),
+          );
+          const expectedRules = ruleSignature(completed);
+
+          const valid = visual.choices.filter((choice) =>
+            satisfiesAllRules(
+              expectedRules,
+              visual.cells.map((cell) => cell ?? choice),
+            ),
+          );
+          expect(valid.length, question.id).toBe(1);
+        });
+      }
+
+      if (visual.layout === 'odd_one_out') {
+        /**
+         * Ayrıştıran özellik: diğer hepsinin aynı değeri paylaştığı,
+         * tek bir şıkkın farklı olduğu özellik. Şekiller başka
+         * özelliklerde de farklı olabilir (ör. hepsi başka şekil ama
+         * yalnızca biri dolu); soruyu çözülebilir yapan, tek bir
+         * özellikte tek bir aykırının olması.
+         */
+        const discriminators = FIGURE_ATTRIBUTES.flatMap((attribute) => {
+          const values = visual.choices.map((choice) => attributeOf(choice, attribute));
+          const counts = new Map<string, number[]>();
+          values.forEach((value, index) => {
+            counts.set(value, [...(counts.get(value) ?? []), index]);
+          });
+          const groups = [...counts.values()];
+          if (groups.length !== 2) return [];
+          const single = groups.find((group) => group.length === 1);
+          const rest = groups.find((group) => group.length === visual.choices.length - 1);
+          return single === undefined || rest === undefined ? [] : [single[0] as number];
+        });
+
+        it('bir özellikte tek bir aykırı var', () => {
+          expect(discriminators.length, question.id).toBeGreaterThan(0);
+        });
+
+        it('ayrıştıran özellikler aynı şıkkı gösteriyor', () => {
+          // İki özellik iki farklı şıkkı gösterirse sorunun iki
+          // cevabı olur.
+          expect(new Set(discriminators).size, question.id).toBe(1);
+        });
+
+        it('işaretli cevap ayrışan şık', () => {
+          expect(discriminators[0], question.id).toBe(question.correctIndex);
+        });
+      }
+    });
+  }
 });

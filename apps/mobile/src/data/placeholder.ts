@@ -74,8 +74,18 @@ export const TESTS: PlaceholderTest[] = [
   {
     id: 'visual-iq',
     title: { tr: 'Görsel IQ Testi', en: 'Visual IQ Test' },
-    questions: 30,
-    minutes: '10-12',
+    questions: 20,
+    minutes: '8-12',
+    group: 'iq',
+    pro: true,
+  },
+  {
+    // Soru bankası PR#20'de yazılmıştı ama bu listeye eklenmediği
+    // için teste hiç ulaşılamıyordu.
+    id: 'logic-reasoning',
+    title: { tr: 'Mantıksal Akıl Yürütme', en: 'Logical Reasoning' },
+    questions: 25,
+    minutes: '8-12',
     group: 'iq',
     pro: true,
   },

@@ -4,6 +4,7 @@ import { logicReasoningTest } from './tests/logic-reasoning';
 import { numericIqTest } from './tests/numeric-iq';
 import { quickIqTest } from './tests/quick-iq';
 import { verbalIqTest } from './tests/verbal-iq';
+import { visualIqTest } from './tests/visual-iq';
 import type { ContentTest } from './types';
 
 export type { ContentQuestion, ContentTest, Localized } from './types';
@@ -16,6 +17,7 @@ export const CONTENT_TESTS: readonly ContentTest[] = [
   basicIqTest,
   advancedIqTest,
   numericIqTest,
+  visualIqTest,
   verbalIqTest,
   logicReasoningTest,
   quickIqTest,
@@ -32,6 +34,7 @@ export {
   numericIqTest,
   quickIqTest,
   verbalIqTest,
+  visualIqTest,
 };
 
 export { TR_ANAGRAMS, TR_ANALOGIES, TR_WORD_PAIRS } from './words/tr';

@@ -100,6 +100,9 @@ export function QuestionTable({
                   <span className="mt-0.5 block text-caption text-fg-muted">
                     {question.id} · {kindLabels[question.kind] ?? question.kind} · ağırlık{' '}
                     {question.difficultyWeight}
+                    {/* Görsel soruda metin şıkları ekranda görünmüyor;
+                        panelde düzenleyen bunu bilmeli. */}
+                    {question.visual !== undefined && ' · görsel'}
                   </span>
                 </span>
                 <span aria-hidden className="shrink-0 text-fg-muted">
@@ -111,10 +114,17 @@ export function QuestionTable({
                 <div className="border-t border-border px-md py-sm">
                   <p className="text-caption text-fg-muted">EN: {question.prompt.en}</p>
 
+                  {question.visual !== undefined && (
+                    <p className="mt-xs text-caption text-fg-muted">
+                      Görsel soru — şekiller {question.visual.layout} düzeninde çiziliyor. Aşağıdaki
+                      metinler ekranda görünmüyor, ekran okuyucu etiketi olarak duruyor.
+                    </p>
+                  )}
+
                   <ol className="mt-sm space-y-1">
                     {question.options.map((option, index) => (
                       <li
-                        key={option.tr}
+                        key={`${question.id}-${index}`}
                         className={`flex items-center gap-xs rounded-md px-sm py-1 text-bodysmall ${
                           index === question.correctIndex
                             ? 'bg-success/10 font-medium'
