@@ -209,7 +209,7 @@ export {
   type QuickDecisionTrial,
 } from './puzzles/quick-decision';
 
-export { toTurkishUpper, turkishDativeSuffix } from './utils/turkish';
+export { toTurkishUpper, turkishAblativeSuffix, turkishDativeSuffix } from './utils/turkish';
 
 export {
   generateGridRecall,
@@ -273,6 +273,19 @@ export {
   type CategoryCounts,
   type DayActivity,
 } from './gamification/activity';
+
+export {
+  EMPTY_GAME_RECORD,
+  gameRecord,
+  hasPlayed,
+  pickSuggestedGame,
+  playedGameCount,
+  recentlyPlayed,
+  recordGameResult,
+  resumeLevel,
+  type GameProgress,
+  type GameRecord,
+} from './gamification/game-progress';
 
 export {
   GROUP_SIZE,

@@ -12,7 +12,7 @@ import { useProgress } from '@/lib/progress/context';
  * Her sekmenin üstündeki bar: ekran başlığı, yıldız bakiyesi, PRO rozeti
  * ve ayarlar. PRO rozeti abone olmayanlarda paywall'a götürür (PR#7).
  */
-export function AppHeader({ title }: { title: string }) {
+export function AppHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   const t = useT();
   const theme = useTheme();
   const router = useRouter();
@@ -21,9 +21,16 @@ export function AppHeader({ title }: { title: string }) {
 
   return (
     <View style={styles.row}>
-      <Text variant="title" numberOfLines={1} style={styles.title}>
-        {title}
-      </Text>
+      <View style={styles.title}>
+        <Text variant="title" numberOfLines={1}>
+          {title}
+        </Text>
+        {subtitle !== undefined && (
+          <Text variant="caption" color="textMuted" numberOfLines={1}>
+            {subtitle}
+          </Text>
+        )}
+      </View>
 
       <View style={[styles.pill, { backgroundColor: theme.colors.surface }]}>
         <Icon name="star" color={theme.colors.brand} size={16} filled />
@@ -48,7 +55,7 @@ export function AppHeader({ title }: { title: string }) {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Ayarlar"
+        accessibilityLabel={t('settings.title')}
         hitSlop={8}
         onPress={() => {
           tapFeedback();

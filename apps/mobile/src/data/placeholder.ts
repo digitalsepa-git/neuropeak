@@ -1,49 +1,14 @@
 import type { Localized } from '@neuropeak/core';
 
 /**
- * GEÇİCİ VERİ — sekme iskeletinin dolu görünmesi için.
- * Gerçek içerik Supabase'den gelecek (PR#5), oyunlar PR#9–15,
- * testler PR#6 ve PR#19, lig PR#17 ile bağlanacak.
+ * Testler sekmesinin listesi.
  *
- * Kategori ve eksen adları i18n kataloğuna taşındı; buradaki tek
- * metin, soru bankası henüz yazılmamış testlerin adları.
+ * Oyun ilerlemesi artık gerçek kayıttan okunuyor; burada kalan tek
+ * şey testlerin listesi. Testlerin soru sayısı ve süresi kendi
+ * içerik tanımlarında da yazılı, ama sekme listesini tek yerden
+ * sıralamak için bu tablo duruyor; gerçek içerik Supabase'e
+ * taşındığında bu da gidecek.
  */
-
-/**
- * GEÇİCİ — oyun başına ilerleme henüz kaydedilmiyor. Oyunlar sekmesi
- * kartları dolu göstersin diye bu değerleri kullanıyor; gerçek
- * ilerleme kaydı eklendiğinde bu tablo silinecek.
- */
-export const GAME_PROGRESS: Record<string, number> = {
-  'card-match': 12,
-  'n-back': 4,
-  'light-sequence': 9,
-  'grid-recall': 11,
-  stroop: 21,
-  'odd-one-out': 7,
-  'symbol-hunt': 3,
-  'go-no-go': 5,
-  tracking: 6,
-  matrix: 18,
-  'logic-chain': 8,
-  'liquid-sort': 46,
-  'one-line': 31,
-  connect: 17,
-  maze: 24,
-  'quick-math': 15,
-  'number-series': 22,
-  'target-number': 9,
-  balance: 19,
-  rotation: 6,
-  'shadow-match': 4,
-  'paper-fold': 11,
-  tiling: 7,
-  reaction: 28,
-  'quick-decision': 13,
-  anagram: 14,
-  'word-analogy': 5,
-  'word-link': 8,
-};
 
 export type PlaceholderTest = {
   id: string;

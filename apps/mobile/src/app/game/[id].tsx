@@ -1,4 +1,9 @@
-import { DIFFICULTY_MULTIPLIERS, xpForGameRound, type Difficulty } from '@neuropeak/core';
+import {
+  DIFFICULTY_MULTIPLIERS,
+  resumeLevel,
+  xpForGameRound,
+  type Difficulty,
+} from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -14,6 +19,7 @@ import {
   Badge,
   Button,
   Card,
+  Chip,
   Screen,
   Text,
   ThemeProvider,
@@ -37,7 +43,7 @@ export default function GameScreen() {
   const t = useT();
   const { localized } = useI18n();
   const labels = useLabels();
-  const { recordGameRound } = useProgress();
+  const { recordGameRound, gameProgress } = useProgress();
   const { afterRound } = useAds();
 
   /** Tamamlanmamış turu "tamamladın" diye göstermemek için. */
@@ -58,6 +64,10 @@ export default function GameScreen() {
   const [outcome, setOutcome] = useState<RoundOutcome | null>(null);
   const [xpEarned, setXpEarned] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  /** Kalınan seviyeden devam etmek yerine baştan oynama isteği. */
+  const [fromStart, setFromStart] = useState(false);
+
+  const record = gameProgress(id ?? '');
 
   /**
    * Ödül ekranından çıkışta reklam.
@@ -93,12 +103,14 @@ export default function GameScreen() {
       setPhase('result');
 
       void recordGameRound({
+        gameId: game.id,
         category: game.category,
         difficulty,
         completed: result.completed,
         baseXp: game.baseXp,
         mode: game.mode,
         level: result.level,
+        score: result.score,
       });
     },
     [difficulty, game, recordGameRound],
@@ -117,6 +129,10 @@ export default function GameScreen() {
 
   if (phase === 'briefing') {
     const accent = categoryAccent[game.category];
+    const resume = resumeLevel(record, game);
+    // Seviyeli oyunda kalınan yer bir seçim sunuyor; süreli oyunda
+    // seviye yok, gösterilecek tek şey en iyi skor.
+    const canResume = game.mode === 'levels' && resume > 1;
 
     return (
       <Screen scroll>
@@ -142,6 +158,40 @@ export default function GameScreen() {
         <Text variant="bodySmall" color="textSecondary" align="center" style={styles.description}>
           {localized(game.description)}
         </Text>
+
+        {record.plays > 0 && (
+          <>
+            <Text variant="overline" color="textMuted" style={styles.sectionLabel}>
+              {t('game.yourRecord')}
+            </Text>
+            <Card padding="md">
+              <View style={styles.recordRow}>
+                <Text variant="bodyStrong">
+                  {game.mode === 'levels'
+                    ? t('games.levelOf', { level: resume, total: game.totalLevels })
+                    : t('games.bestScore', { score: record.bestScore })}
+                </Text>
+                <Text variant="caption" color="textMuted">
+                  {t('game.playCount', { count: record.plays })}
+                </Text>
+              </View>
+              {canResume && (
+                <View style={styles.recordChips}>
+                  <Chip
+                    label={t('game.resumeAt', { level: resume })}
+                    selected={!fromStart}
+                    onPress={() => setFromStart(false)}
+                  />
+                  <Chip
+                    label={t('game.fromStart')}
+                    selected={fromStart}
+                    onPress={() => setFromStart(true)}
+                  />
+                </View>
+              )}
+            </Card>
+          </>
+        )}
 
         <Text variant="overline" color="textMuted" style={styles.sectionLabel}>
           {t('game.chooseDifficulty')}
@@ -232,7 +282,12 @@ export default function GameScreen() {
           instruction={localized(game.instruction)}
           onExit={() => setPhase('result')}
         >
-          <Game difficulty={difficulty} startLevel={1} onProgress={setStatus} onFinish={onFinish} />
+          <Game
+            difficulty={difficulty}
+            startLevel={fromStart ? 1 : resumeLevel(record, game)}
+            onProgress={setStatus}
+            onFinish={onFinish}
+          />
         </GameShell>
       </ThemeProvider>
     );
@@ -347,6 +402,16 @@ const styles = StyleSheet.create({
     gap: spacing.xs2,
     paddingHorizontal: spacing.xs,
     paddingVertical: spacing.sm,
+  },
+  recordChips: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  recordRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   resultActions: {
     gap: spacing.xs,

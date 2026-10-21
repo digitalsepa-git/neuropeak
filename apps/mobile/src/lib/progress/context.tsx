@@ -1,4 +1,5 @@
 import {
+  EMPTY_GAME_RECORD,
   STAR_REWARDS,
   applyRoundToBrainMap,
   applyTaskEvent,
@@ -6,7 +7,9 @@ import {
   neuropeakScore,
   pickDailyTasks,
   recordActivity,
+  gameRecord,
   recordCategoryRound,
+  recordGameResult,
   LEAGUE_TIERS,
   newlyEarnedBadges,
   recordDayActivity,
@@ -19,6 +22,8 @@ import {
   type Difficulty,
   type GameCategory,
   type GameMode,
+  type GameProgress,
+  type GameRecord,
   type BadgeContext,
   type LeagueTier,
   type LevelProgress,
@@ -67,6 +72,8 @@ type ProgressContextValue = {
   /** Lig grubunu tohumlayan kalıcı kimlik. */
   readonly userId: string;
   recordGameRound: (options: {
+    /** Oyun başına ilerleme kaydı için. */
+    gameId: string;
     category: GameCategory;
     difficulty: Difficulty;
     completed: boolean;
@@ -74,7 +81,13 @@ type ProgressContextValue = {
     /** Beyin haritası için: oyunun yapısı ve ulaşılan seviye. */
     mode: GameMode;
     level: number;
+    /** Oyunun kendi puanı; o oyunun en iyisiyle karşılaştırılır. */
+    score: number;
   }) => Promise<void>;
+  /** Bir oyunun kaydı; hiç oynanmadıysa boş kayıt. */
+  gameProgress: (gameId: string) => GameRecord;
+  /** Bütün oyunların kaydı; öneri ve "son oynananlar" buradan okunuyor. */
+  readonly games: GameProgress;
   recordTestFinished: (iq: number) => Promise<void>;
   /** Rozet vitrini için tanımlar; içerik paketinden geliyor. */
   readonly badges: readonly ContentBadge[];
@@ -100,6 +113,8 @@ const ProgressContext = createContext<ProgressContextValue>({
   celebration: null,
   clearCelebration: () => undefined,
   recordGameRound: noop,
+  gameProgress: () => EMPTY_GAME_RECORD,
+  games: {},
   recordTestFinished: noop,
   spendStars: () => Promise.resolve(false),
   grantRewardedAdStars: noop,
@@ -180,6 +195,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       taskEvents: TaskEvent[];
       /** Oyun turuysa beyin haritasına işlenecek bilgi. */
       round?: { category: GameCategory; performance: number };
+      /** Oyun turuysa o oyunun kaydına işlenecek bilgi. */
+      game?: { id: string; level: number; score: number };
       /** Test tamamlandıysa alınan skor. */
       testIq?: number;
     }) => {
@@ -226,6 +243,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         options.round === undefined
           ? current.categoryRounds
           : recordCategoryRound(current.categoryRounds, options.round.category);
+
+      const games =
+        options.game === undefined
+          ? current.games
+          : recordGameResult(current.games, options.game.id, {
+              level: options.game.level,
+              score: options.game.score,
+              date: today,
+            });
 
       const weeklyXp = current.league.weeklyXp + options.xpGain;
       const league = {
@@ -290,6 +316,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         tasks,
         brainMap,
         categoryRounds,
+        games,
         league,
         testsFinished,
         bestIq,
@@ -309,6 +336,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         xpGain: xpForGameRound(options),
         starGain: options.completed ? STAR_REWARDS.gameComplete : 0,
         taskEvents: [{ type: 'game_played', category: options.category }],
+        game: { id: options.gameId, level: options.level, score: options.score },
         round: {
           category: options.category,
           performance: roundPerformance({
@@ -321,6 +349,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       });
     },
     [applyActivity],
+  );
+
+  // Okuma güncel durumdan: bir tur bittikten hemen sonra kart yeni
+  // seviyeyi göstersin.
+  const gameProgress = useCallback<ProgressContextValue['gameProgress']>(
+    (gameId) => gameRecord(state.games, gameId),
+    [state.games],
   );
 
   const recordTestFinished = useCallback<ProgressContextValue['recordTestFinished']>(
@@ -370,12 +405,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       celebration,
       clearCelebration: () => setCelebration(null),
       recordGameRound,
+      gameProgress,
+      games: state.games,
       recordTestFinished,
       spendStars,
       grantRewardedAdStars,
     }),
     [
       celebration,
+      gameProgress,
       grantRewardedAdStars,
       ready,
       recordGameRound,

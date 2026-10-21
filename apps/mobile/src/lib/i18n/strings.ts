@@ -1,4 +1,4 @@
-import { turkishDativeSuffix } from '@neuropeak/core';
+import { turkishAblativeSuffix, turkishDativeSuffix } from '@neuropeak/core';
 
 import type { StringCatalogue } from './types';
 
@@ -364,6 +364,9 @@ export const STRINGS = {
   'home.seeBrainMap': { tr: 'Beyin haritanı gör', en: 'See your brain map' },
   'home.levelProgress': { tr: 'Seviye ilerlemesi', en: 'Level progress' },
   'home.suggestionSection': { tr: 'Bugünün önerisi', en: "Today's pick" },
+  // Rozet olarak duruyor; uzun cümle karta sığmıyordu.
+  'home.suggestionNew': { tr: 'Yeni', en: 'New' },
+  'home.continueSection': { tr: 'Kaldığın yerden', en: 'Pick up where you left off' },
   'home.taskProgressLabel': {
     tr: (p: { task: string }) => `${p.task} ilerlemesi`,
     en: (p: { task: string }) => `${p.task} progress`,
@@ -382,13 +385,19 @@ export const STRINGS = {
 
   // -------------------------------------------------------------------- oyunlar
   'games.title': { tr: 'Oyunlar', en: 'Games' },
-  'games.bestLevel': {
-    tr: (p: { level: number }) => `En iyi seviye ${p.level}`,
-    en: (p: { level: number }) => `Best level ${p.level}`,
-  },
   'games.levelOf': {
     tr: (p: { level: number; total: number }) => `Seviye ${p.level}/${p.total}`,
     en: (p: { level: number; total: number }) => `Level ${p.level}/${p.total}`,
+  },
+  // Süreli oyunlarda seviye yok; kartta en iyi skor duruyor.
+  'games.bestScore': {
+    tr: (p: { score: number }) => `En iyi skor ${p.score}`,
+    en: (p: { score: number }) => `Best score ${p.score}`,
+  },
+  'games.notPlayed': { tr: 'Henüz oynamadın', en: 'Not played yet' },
+  'games.playedCount': {
+    tr: (p: { played: number; total: number }) => `${p.total} oyunun ${p.played} tanesi`,
+    en: (p: { played: number; total: number }) => `${p.played} of ${p.total} games`,
   },
   'game.notFound': { tr: 'Oyun bulunamadı', en: 'Game not found' },
   'game.chooseDifficulty': { tr: 'Zorluk seç', en: 'Choose difficulty' },
@@ -404,6 +413,16 @@ export const STRINGS = {
     en: (p: { percent: number }) => `+${p.percent}% XP`,
   },
   'game.skillsLabel': { tr: 'Artırılacak yetenekler', en: 'Skills you will train' },
+  'game.yourRecord': { tr: 'Kaydın', en: 'Your record' },
+  'game.resumeAt': {
+    tr: (p: { level: number }) => `Seviye ${p.level}${turkishAblativeSuffix(p.level)} devam`,
+    en: (p: { level: number }) => `Resume at level ${p.level}`,
+  },
+  'game.fromStart': { tr: 'Baştan', en: 'From the start' },
+  'game.playCount': {
+    tr: (p: { count: number }) => `${p.count} kez oynadın`,
+    en: (p: { count: number }) => `Played ${p.count} time${p.count === 1 ? '' : 's'}`,
+  },
   'game.start': { tr: 'Başla', en: 'Start' },
   'game.playAgain': { tr: 'Tekrar oyna', en: 'Play again' },
   'game.exit': { tr: 'Oyundan çık', en: 'Leave game' },
