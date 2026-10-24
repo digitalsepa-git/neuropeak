@@ -23,7 +23,7 @@ Brain games and IQ tests
 ## Promotional text (170 characters, editable any time)
 
 ```
-29 mini games, 6 IQ tests and a weekly league. Give it ten minutes a day and watch memory, focus, logic, math and speed move on your brain map.
+29 mini games, 7 IQ tests and a weekly league. Give it ten minutes a day and watch memory, focus, logic, math and speed move on your brain map.
 ```
 
 142 characters.
@@ -33,7 +33,7 @@ Brain games and IQ tests
 ```
 Push your mind a little further every day.
 
-NeuroPeak gives you 29 mini games and 6 IQ tests that train memory,
+NeuroPeak gives you 29 mini games and 7 IQ tests that train memory,
 focus, logic, math and speed. Ten minutes a day is enough.
 
 MEASURE
@@ -41,7 +41,8 @@ MEASURE
   verbal relationships, logic and arithmetic.
 • The result screen shows your score, your percentile and your verbal,
   numeric, visual and logical sub-dimensions.
-• Advanced, Numerical, Verbal and Quick IQ tests unlock with PRO.
+• Advanced, Visual, Logical, Numerical, Verbal and Quick IQ tests
+  unlock with PRO.
 
 TRAIN
 • Memory: Card Match, Light Sequence, Digit Span, N-Back, Grid Recall
@@ -100,7 +101,7 @@ iq,brain,test,memory,logic,puzzle,training,focus,attention,mind,reasoning,quiz,c
 ## Release notes (first release)
 
 ```
-First release. 29 mini games, 6 IQ tests, a brain map, daily tasks and
+First release. 29 mini games, 7 IQ tests, a brain map, daily tasks and
 a weekly league. English and Turkish.
 ```
 
