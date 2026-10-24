@@ -1,6 +1,6 @@
 # NeuroPeak Gizlilik Politikası
 
-**Son güncelleme:** 17 Ekim 2026
+**Son güncelleme:** 24 Ekim 2026
 
 NeuroPeak: IQ Arena ("uygulama"), zihinsel egzersiz ve eğlence amaçlı
 mini oyunlar ve testler sunar. Bu belge, uygulamanın hangi verileri
@@ -32,6 +32,7 @@ rastgele kimliğinle birlikte gönderilir:
 
 | Veri                 | İçeriği                                                                                                                                                                                                                                              | Niçin                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Bildirim kimliği     | Bildirimleri açtıysan cihazının push token'ı, platformu ve dili                                                                                                                                                                                      | Hatırlatma gönderebilmek                                     |
 | Onboarding cevapları | Yaş **aralığı** (doğum tarihi değil), odak alanları, günlük hedef, zorlandığın alan, egzersiz alışkanlığı, bildirim izni                                                                                                                             | Günlük planı ve başlangıç zorluğunu kurmak                   |
 | Test sonuçları       | Test kimliği, ham puan, IQ puanı, yüzdelik, doğru/cevaplanan soru sayısı, alt boyut puanları, süre, tarih                                                                                                                                            | Sonuç geçmişini göstermek, puanı yaş grubuyla karşılaştırmak |
 | İlerleme             | XP, seviye, seri gün sayısı, en uzun seri, son etkin gün, seri dondurma hakkı                                                                                                                                                                        | Cihaz değiştirsen de ilerlemenin kaybolmaması                |
@@ -58,9 +59,19 @@ fotoğraf ya da cihaz kimliği yoktur.
 
 ### 4. Bildirimler
 
-Onboarding'de bildirim izni isteriz. **Bu sürümde bildirim gönderilmiyor
-ve cihazının bildirim kimliği saklanmıyor.** Hatırlatmalar açıldığında
-bu belge güncellenecek ve üstündeki tarih değişecek.
+Bildirimler varsayılan olarak kapalıdır. Ayarlar'dan açtığında —
+yalnızca o anda — cihazının bildirim izni istenir ve izin verirsen
+cihazının **bildirim kimliği (push token)** sunucumuzda saklanır.
+Saklanan şey cihazı adresleyen bir dizgidir; adını, e-postanı ya da
+konumunu içermez.
+
+Bildirimleri kapattığında kayıt silinmez, pasife alınır: aynı cihazı
+yeniden açtığında tanıyabilmek için. Kaydın tamamen silinmesini
+istersen hesabını silmen yeterli; bildirim kimliği de onunla gider.
+
+**Bu sürümde henüz bildirim gönderilmiyor:** kimlik saklanıyor ama
+gönderim altyapısı kurulmadı. Gönderim başladığında bu belge
+güncellenecek ve üstündeki tarih değişecek.
 
 ## Yapmadıklarımız
 

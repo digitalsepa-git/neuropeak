@@ -1,4 +1,4 @@
-import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
+import { GAME_CATEGORIES, PUSH_BODY_MAX, PUSH_TITLE_MAX, type GameCategory } from '@neuropeak/core';
 
 /**
  * Düzenleme formlarının doğrulaması.
@@ -400,6 +400,77 @@ export function parseTest(values: FormValues, poolSize: number): Parsed<TestEdit
       est_minutes_max: max.value,
       is_pro: text(values, 'is_pro') === 'on',
       is_active: text(values, 'is_active') === 'on',
+    },
+  };
+}
+
+// ---------------------------------------------------------------- push
+
+export type CampaignEdit = {
+  readonly segment_id: string | null;
+  readonly title_tr: string;
+  readonly body_tr: string;
+  readonly title_en: string;
+  readonly body_en: string;
+  readonly local_hour: number | null;
+};
+
+/**
+ * Push kampanyası taslağı.
+ *
+ * Uzunluk sınırları çekirdekteki `validateCampaign` ile aynı işi
+ * yapıyor ama burada tekrar ediliyor: form istemcide doğrulansa da
+ * sunucuya gelen veriye güvenilmiyor.
+ *
+ * Yerel saat boş bırakılabiliyor — o zaman kampanya hemen
+ * gönderiliyor. Sıfır geçerli bir saat, bu yüzden "boş" ile "0"
+ * ayrı okunuyor.
+ */
+export function parseCampaign(values: FormValues): Parsed<CampaignEdit> {
+  const fields: [key: string, label: string, max: number][] = [
+    // Sınırlar çekirdekten: besteci kutusu da aynı sayıyı sayıyor.
+    // Burada ayrı bir sayı yazsaydık form "48/48" derken sunucu
+    // daha uzun metni kabul ederdi; kilit ekranında kırpılan da o
+    // metin olurdu.
+    ['title_tr', 'Türkçe başlık', PUSH_TITLE_MAX],
+    ['body_tr', 'Türkçe metin', PUSH_BODY_MAX],
+    ['title_en', 'İngilizce başlık', PUSH_TITLE_MAX],
+    ['body_en', 'İngilizce metin', PUSH_BODY_MAX],
+  ];
+
+  const texts: Record<string, string> = {};
+  for (const [key, label, max] of fields) {
+    const parsed = required(values, key, label);
+    if (!parsed.ok) return parsed;
+    if (parsed.value.length > max) {
+      return { ok: false, message: `${label} ${max} karakteri geçemez.` };
+    }
+    texts[key] = parsed.value;
+  }
+
+  const rawHour = text(values, 'local_hour');
+  let hour: number | null = null;
+
+  if (rawHour.length > 0) {
+    const parsed = integer(values, 'local_hour', 'Gönderim saati');
+    if (!parsed.ok) return parsed;
+    if (parsed.value < 0 || parsed.value > 23) {
+      return { ok: false, message: 'Gönderim saati 0–23 arasında olmalı.' };
+    }
+    hour = parsed.value;
+  }
+
+  const segment = text(values, 'segment_id');
+
+  return {
+    ok: true,
+    value: {
+      segment_id: segment.length === 0 ? null : segment,
+      title_tr: texts.title_tr as string,
+      body_tr: texts.body_tr as string,
+      title_en: texts.title_en as string,
+      body_en: texts.body_en as string,
+      local_hour: hour,
     },
   };
 }

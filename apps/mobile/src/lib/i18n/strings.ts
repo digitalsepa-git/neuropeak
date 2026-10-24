@@ -24,6 +24,7 @@ export const STRINGS = {
   'common.free': { tr: 'Ücretsiz', en: 'Free' },
   'common.on': { tr: 'Açık', en: 'On' },
   'common.off': { tr: 'Kapalı', en: 'Off' },
+  'common.wait': { tr: 'Bekle…', en: 'Wait…' },
   'common.all': { tr: 'Tümü', en: 'All' },
   'common.xp': { tr: 'XP', en: 'XP' },
   'common.stars': { tr: 'yıldız', en: 'stars' },
@@ -1042,6 +1043,22 @@ export const STRINGS = {
   'settings.sound': { tr: 'Ses', en: 'Sound' },
   'settings.language': { tr: 'Dil', en: 'Language' },
   'settings.notifications': { tr: 'Bildirimler', en: 'Notifications' },
+  'settings.notificationsDenied': {
+    tr: 'Bildirim izni verilmedi. Telefonun ayarlarından açabilirsin.',
+    en: 'Notification permission was declined. You can turn it on in your phone settings.',
+  },
+  'settings.notificationsUnsupported': {
+    tr: 'Bu cihazda bildirim alınamıyor; simülatörde push jetonu verilmiyor.',
+    en: 'This device cannot receive notifications; simulators get no push token.',
+  },
+  'settings.notificationsNotConfigured': {
+    tr: 'Bu derlemede bildirim yetkilendirmesi yok; jeton alınamıyor.',
+    en: 'This build has no push entitlement, so no token can be issued.',
+  },
+  'settings.notificationsFailed': {
+    tr: 'Bildirimler açılamadı. Daha sonra tekrar dene.',
+    en: 'Could not turn notifications on. Try again later.',
+  },
   'settings.about': { tr: 'Hakkında', en: 'About' },
   'settings.privacy': { tr: 'Gizlilik Politikası', en: 'Privacy Policy' },
   'settings.terms': { tr: 'Kullanım Şartları', en: 'Terms of Use' },

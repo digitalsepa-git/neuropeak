@@ -7,6 +7,7 @@ import { canEditContent } from '@/lib/content-mode';
 import {
   parseBadge,
   parseDailyTask,
+  parseCampaign,
   parseGame,
   parseQuestion,
   parseTest,
@@ -184,4 +185,47 @@ export async function updateTest(_previous: ActionState, formData: FormData): Pr
 
   const { id, ...patch } = parsed.value;
   return save('tests', id, patch, '/content/tests');
+}
+
+/**
+ * Push kampanyasını taslak olarak kaydeder.
+ *
+ * Gönderme değil kaydetme: kampanyayı gerçekten yollayacak servis
+ * henüz yok (dağıtılmış bir Edge Function istiyor). Taslak
+ * saklamak yine de işe yarıyor — metin iki dilde hazırlanıyor,
+ * kitle seçiliyor ve kayıt duruyor.
+ *
+ * Durum `draft`te bırakılıyor; `sending`e geçirmek gönderen
+ * servisin işi, panelin değil.
+ */
+export async function saveCampaign(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  if (!canEditContent) return { status: 'error', message: 'Bağlantı yokken kayıt kapalı.' };
+
+  const values = toValues(formData);
+  const parsed = parseCampaign(values);
+  if (!parsed.ok) return { status: 'error', message: parsed.message };
+
+  const supabase = await createClient();
+  if (supabase === null) {
+    return { status: 'error', message: 'Veritabanı bağlı değil.' };
+  }
+
+  const { data, error } = await supabase.from('push_campaigns').insert(parsed.value).select('id');
+
+  if (error !== null) {
+    return { status: 'error', message: `Kaydedilemedi: ${error.message}` };
+  }
+
+  if (data === null || data.length === 0) {
+    return {
+      status: 'error',
+      message: 'Kaydedilemedi: bu hesabın yazma yetkisi yok.',
+    };
+  }
+
+  revalidatePath('/users/push');
+  return { status: 'saved' };
 }

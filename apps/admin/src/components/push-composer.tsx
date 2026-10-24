@@ -9,7 +9,9 @@ import {
   type PushCampaign,
   type Segment,
 } from '@neuropeak/core';
-import { useMemo, useState } from 'react';
+import { useActionState, useMemo, useState } from 'react';
+
+import { IDLE, saveCampaign } from '@/app/content/actions';
 
 /**
  * Push besteci.
@@ -18,6 +20,10 @@ import { useMemo, useState } from 'react';
  * alınamadığı için hatayı son adımda göstermek geç oluyor. Kilit
  * ekranı önizlemesi de aynı sebeple — başlığın nerede kesildiğini
  * görmeden uzunluk sınırı soyut kalıyor.
+ *
+ * Düğme "Gönder" değil "Taslak olarak kaydet": kampanyayı gerçekten
+ * yollayan servis henüz yok. Gönderemediğimiz bir şeye "Gönder"
+ * demek, basıldığında hiçbir şey olmayan bir düğme bırakırdı.
  */
 export function PushComposer({
   segments,
@@ -32,6 +38,7 @@ export function PushComposer({
   const [enTitle, setEnTitle] = useState('Keep your streak');
   const [enBody, setEnBody] = useState('Play one round today to keep it going.');
   const [hour, setHour] = useState('');
+  const [state, action, pending] = useActionState(saveCampaign, IDLE);
 
   const campaign: PushCampaign = useMemo(
     () => ({
@@ -116,20 +123,39 @@ export function PushComposer({
           </ul>
         )}
 
-        <div className="flex flex-wrap items-center gap-sm">
+        <form action={action} className="flex flex-wrap items-center gap-sm">
+          <input type="hidden" name="segment_id" value={segmentId} />
+          <input type="hidden" name="title_tr" value={trTitle} />
+          <input type="hidden" name="body_tr" value={trBody} />
+          <input type="hidden" name="title_en" value={enTitle} />
+          <input type="hidden" name="body_en" value={enBody} />
+          <input type="hidden" name="local_hour" value={hour} />
+
           <button
-            type="button"
-            disabled={!canSend || issues.length > 0}
+            type="submit"
+            disabled={!canSend || issues.length > 0 || pending}
             className="rounded-md bg-brand px-md py-1.5 text-bodysmall font-medium text-on-brand disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Gönder
+            {pending ? 'Kaydediliyor…' : 'Taslak olarak kaydet'}
           </button>
-          {!canSend && (
-            <span className="text-caption text-fg-muted">
-              Gönderim Supabase bağlanınca açılır; metin ve kitle şimdiden hazırlanabilir.
+
+          {state.status === 'saved' && (
+            <span role="status" className="text-bodysmall text-success">
+              Taslak kaydedildi.
             </span>
           )}
-        </div>
+          {state.status === 'error' && (
+            <span role="alert" className="text-bodysmall text-danger">
+              {state.message}
+            </span>
+          )}
+
+          {!canSend && (
+            <span className="text-caption text-fg-muted">
+              Kayıt Supabase bağlanınca açılır; metin ve kitle şimdiden hazırlanabilir.
+            </span>
+          )}
+        </form>
       </div>
 
       <aside className="space-y-md">
