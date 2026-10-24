@@ -427,6 +427,71 @@ $$;
 reset role;
 reset request.jwt.claims;
 
+-- ---------------------------------------------------------------- analitik
+
+-- İki kullanıcı: biri huninin tamamını, diğeri yarısını yapmış.
+insert into public.analytics_events (user_id, name, created_at)
+values
+  ('11111111-1111-1111-1111-111111111111', 'app_open', now()),
+  ('11111111-1111-1111-1111-111111111111', 'onboarding_complete', now()),
+  ('11111111-1111-1111-1111-111111111111', 'test_complete', now()),
+  ('11111111-1111-1111-1111-111111111111', 'game_complete', now()),
+  ('11111111-1111-1111-1111-111111111111', 'paywall_view', now()),
+  ('11111111-1111-1111-1111-111111111111', 'purchase_complete', now()),
+  ('22222222-2222-2222-2222-222222222222', 'app_open', now()),
+  ('22222222-2222-2222-2222-222222222222', 'onboarding_complete', now());
+
+do $$
+declare
+  overview record;
+  funnel record;
+begin
+  -- Yönetici olmayan çağrı reddedilmeli; sayıları `security definer`
+  -- bir işlevden sızdırmak, tabloyu açmakla aynı şey olurdu.
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+  begin
+    perform * from public.admin_overview();
+    raise exception 'normal kullanıcı analitik okuyabildi';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  reset role;
+  reset request.jwt.claims;
+
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+  select * into overview from public.admin_overview();
+  assert overview.daily_active = 2, 'günlük aktif yanlış';
+  assert overview.weekly_active = 2, 'haftalık aktif yanlış';
+  assert overview.paywall_viewers = 1, 'paywall gören sayısı yanlış';
+
+  -- Huni daralıyor: ikisi de açtı ve kurulumu bitirdi, yalnızca biri
+  -- sonraki adımları yaptı.
+  select * into funnel from public.admin_funnel() where event = 'app_open';
+  assert funnel.users = 2, 'app_open adımı yanlış';
+
+  select * into funnel from public.admin_funnel() where event = 'onboarding_complete';
+  assert funnel.users = 2, 'onboarding_complete adımı yanlış';
+
+  select * into funnel from public.admin_funnel() where event = 'test_complete';
+  assert funnel.users = 1, 'test_complete adımı yanlış';
+
+  select * into funnel from public.admin_funnel() where event = 'purchase_complete';
+  assert funnel.users = 1, 'purchase_complete adımı yanlış';
+
+  -- Bugün ilk kez görülenler hiçbir kohorta düşmüyor.
+  assert (select sum(cohort) from public.admin_retention()) = 0,
+    'tutundurma kohortu bugünün kullanıcılarını sayıyor';
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
 rollback;
 
 \echo 'Tüm şema ve RLS testleri geçti.'
