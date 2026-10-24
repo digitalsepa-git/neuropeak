@@ -68,4 +68,37 @@ export { logicChainBankFor } from './logic/chain';
 
 export { DAILY_TASKS, findDailyTask, type ContentDailyTask } from './tasks/catalogue';
 
+export {
+  BADGE_COLUMNS,
+  GAME_COLUMNS,
+  MEASURE_TEST_COLUMNS,
+  PROFILE_TEST_COLUMNS,
+  QUESTION_COLUMNS,
+  TASK_COLUMNS,
+  TEST_COLUMNS,
+  toBadge,
+  toDailyTask,
+  toGame,
+  toMeasureStep,
+  toMeasureTest,
+  toProfileOutcome,
+  toProfileQuestion,
+  toProfileTest,
+  toProfileTrait,
+  toQuestion,
+  toQuestionTest,
+  type BadgeRow,
+  type DailyTaskRow,
+  type GameRow,
+  type MeasureStepRow,
+  type MeasureTest,
+  type MeasureTestRow,
+  type ProfileOutcomeRow,
+  type ProfileQuestionRow,
+  type ProfileTestRow,
+  type ProfileTraitRow,
+  type QuestionRow,
+  type TestRow,
+} from './rows';
+
 export { DEFAULT_SEGMENTS } from './crm/segments';

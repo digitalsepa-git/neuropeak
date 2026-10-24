@@ -1,4 +1,3 @@
-import { findProfileTest } from '@neuropeak/content';
 import {
   MEANINGFUL_TRAIT_SPREAD,
   rankOutcomes,
@@ -16,6 +15,7 @@ import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '
 import { track } from '@/lib/analytics';
 import { useI18n, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
+import { useContent } from '@/lib/content/context';
 
 /**
  * Profil testleri: Zihin Arketipi, Odaklanma Profili, Kişilik Haritası.
@@ -32,7 +32,7 @@ export default function ProfileTestScreen() {
   const { localized } = useI18n();
   const { recordTestFinished } = useProgress();
 
-  const test = findProfileTest(id ?? '');
+  const test = useContent().profileTests.find((item) => item.id === (id ?? ''));
 
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);

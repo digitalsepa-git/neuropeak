@@ -1,14 +1,11 @@
-import type {
-  ContentBadge,
-  ContentDailyTask,
-  ContentGame,
-  ContentQuestion,
-  ContentTest,
-  ProfileTest,
-} from '@neuropeak/content';
-
-import { createClient } from './auth';
 import {
+  BADGE_COLUMNS,
+  GAME_COLUMNS,
+  MEASURE_TEST_COLUMNS,
+  PROFILE_TEST_COLUMNS,
+  QUESTION_COLUMNS,
+  TASK_COLUMNS,
+  TEST_COLUMNS,
   toBadge,
   toDailyTask,
   toGame,
@@ -20,6 +17,11 @@ import {
   toQuestion,
   toQuestionTest,
   type BadgeRow,
+  type ContentBadge,
+  type ContentDailyTask,
+  type ContentGame,
+  type ContentQuestion,
+  type ContentTest,
   type DailyTaskRow,
   type GameRow,
   type MeasureStepRow,
@@ -27,11 +29,14 @@ import {
   type MeasureTestRow,
   type ProfileOutcomeRow,
   type ProfileQuestionRow,
+  type ProfileTest,
   type ProfileTestRow,
   type ProfileTraitRow,
   type QuestionRow,
   type TestRow,
-} from './content-rows';
+} from '@neuropeak/content';
+
+import { createClient } from './auth';
 
 /**
  * Canlı içerik sorguları.
@@ -50,24 +55,6 @@ import {
  * Çevrim doğru değilse eşleyici testleri değil, `db:verify`deki
  * seed yakalıyor: içerik şemaya sığmayı bıraktığı anda CI düşüyor.
  */
-
-const GAME_COLUMNS =
-  'id, category, mode, title_tr, title_en, description_tr, description_en, ' +
-  'instruction_tr, instruction_en, skills, total_levels, xp_per_round';
-
-const BADGE_COLUMNS =
-  'id, title_tr, title_en, description_tr, description_en, tier, star_reward, ' +
-  'is_secret, requirement';
-
-const TASK_COLUMNS = 'id, title_tr, title_en, metric, target, category, star_reward';
-
-const TEST_COLUMNS =
-  'id, kind, title_tr, title_en, description_tr, description_en, question_count, ' +
-  'est_minutes_min, est_minutes_max, is_pro, focus, norm_mean, norm_sd';
-
-const QUESTION_COLUMNS =
-  'slug, kind, prompt_tr, prompt_en, options, correct_index, difficulty_weight, ' +
-  'explanation_tr, explanation_en, visual';
 
 export async function fetchGames(): Promise<ContentGame[]> {
   const supabase = await createClient();
@@ -132,11 +119,7 @@ export async function fetchMeasureTests(): Promise<MeasureTest[]> {
 
   const { data } = await supabase
     .from('measure_tests')
-    .select(
-      'id, title_tr, title_en, description_tr, description_en, caveat_tr, caveat_en, ' +
-        'est_minutes_min, est_minutes_max, is_pro, ' +
-        'measure_steps(measure, title_tr, title_en, instruction_tr, instruction_en, seconds, sort_order)',
-    )
+    .select(MEASURE_TEST_COLUMNS)
     .order('sort_order');
 
   const rows = (data ?? []) as unknown as (MeasureTestRow & {
@@ -157,13 +140,7 @@ export async function fetchProfileTests(): Promise<ProfileTest[]> {
 
   const { data } = await supabase
     .from('profile_tests')
-    .select(
-      'id, title_tr, title_en, description_tr, description_en, caveat_tr, caveat_en, ' +
-        'est_minutes_min, est_minutes_max, is_pro, ' +
-        'profile_traits(id, label_tr, label_en, description_tr, description_en, sort_order), ' +
-        'profile_questions(slug, prompt_tr, prompt_en, options, sort_order), ' +
-        'profile_outcomes(id, title_tr, title_en, description_tr, description_en, traits, is_balanced, sort_order)',
-    )
+    .select(PROFILE_TEST_COLUMNS)
     .order('sort_order');
 
   const rows = (data ?? []) as unknown as (ProfileTestRow & {

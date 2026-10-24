@@ -44,6 +44,7 @@ export {
   dimensionOf,
   scoreTest,
   type AnsweredQuestion,
+  QUESTION_KINDS,
   type QuestionKind,
   type ReportDimension,
   type ScoreBand,

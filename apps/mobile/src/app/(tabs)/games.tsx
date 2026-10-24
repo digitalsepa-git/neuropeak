@@ -13,9 +13,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { AppHeader } from '@/components/app-header';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text } from '@/components/ui';
-import { GAME_CATALOGUE, type ContentGame } from '@neuropeak/content';
+import type { ContentGame } from '@neuropeak/content';
 
-import { GAME_DEFINITIONS, isGamePlayable } from '@/games/registry';
+import { PLAYABLE_GAME_IDS } from '@/games/registry';
+import { useContent } from '@/lib/content/context';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 
@@ -26,19 +27,20 @@ export default function GamesScreen() {
   const t = useT();
   const labels = useLabels();
   const { games } = useProgress();
+  const catalogue = useContent();
 
   const played = playedGameCount(games);
 
   const visibleCategories = GAME_CATEGORIES.filter(
     (category) => filter === 'all' || filter === category,
-  ).filter((category) => GAME_CATALOGUE.some((game) => game.category === category));
+  ).filter((category) => catalogue.games.some((game) => game.category === category));
 
   return (
     <Screen scroll padded={false}>
       <View style={styles.padded}>
         <AppHeader
           title={t('games.title')}
-          subtitle={t('games.playedCount', { played, total: GAME_DEFINITIONS.length })}
+          subtitle={t('games.playedCount', { played, total: catalogue.games.length })}
         />
       </View>
 
@@ -66,9 +68,11 @@ export default function GamesScreen() {
         {visibleCategories.map((category) => (
           <Section key={category} title={labels.category(category)}>
             <View style={styles.grid}>
-              {GAME_CATALOGUE.filter((game) => game.category === category).map((game) => (
-                <GameCard key={game.id} game={game} record={games[game.id]} />
-              ))}
+              {catalogue.games
+                .filter((game) => game.category === category)
+                .map((game) => (
+                  <GameCard key={game.id} game={game} record={games[game.id]} />
+                ))}
             </View>
           </Section>
         ))}
@@ -82,7 +86,7 @@ function GameCard({ game, record }: { game: ContentGame; record: GameRecord | un
   const t = useT();
   const { localized } = useI18n();
   const accent = categoryAccent[game.category];
-  const playable = isGamePlayable(game.id);
+  const playable = PLAYABLE_GAME_IDS.has(game.id);
 
   return (
     <Card

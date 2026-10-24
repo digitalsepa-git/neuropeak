@@ -7,12 +7,12 @@ import { AppHeader } from '@/components/app-header';
 import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
-import { BRAIN_AGE_STEPS, brainAgeTest, findProfileTest, findTest } from '@neuropeak/content';
 
 import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
 import { useI18n, useT } from '@/lib/i18n';
 import type { StringKey } from '@/lib/i18n';
+import { useContent } from '@/lib/content/context';
 
 const FILTERS = [
   { id: 'all', label: 'common.all' },
@@ -86,9 +86,12 @@ function TestCard({ test }: { test: PlaceholderTest }) {
   // yol haritası görünsün, boş ekran açılmasın.
   // Beyin Yaşı soru sormuyor, dört ölçüm yaptırıyor; profil
   // testlerinin doğru cevabı yok. Üçünün de kendi ekranı var.
-  const isMeasureTest = test.id === brainAgeTest.id;
-  const profile = findProfileTest(test.id);
-  const content = findTest(test.id);
+  const catalogue = useContent();
+
+  const measure = catalogue.measureTests.find((item) => item.id === test.id);
+  const isMeasureTest = measure !== undefined;
+  const profile = catalogue.profileTests.find((item) => item.id === test.id);
+  const content = catalogue.tests.find((item) => item.id === test.id);
   const ready = content !== undefined || isMeasureTest || profile !== undefined;
   const locked = test.pro && !isPro;
 
@@ -135,8 +138,8 @@ function TestCard({ test }: { test: PlaceholderTest }) {
               ? `${t('common.questionCount', { count: content.questionCount })} · ${t('common.minutesShort', { value: `${content.estMinutes[0]}-${content.estMinutes[1]}` })}`
               : isMeasureTest
                 ? t('brainAge.stepCount', {
-                    count: BRAIN_AGE_STEPS.length,
-                    minutes: brainAgeTest.estMinutes[1],
+                    count: measure?.steps.length ?? 0,
+                    minutes: measure?.estMinutes[1] ?? 0,
                   })
                 : profile !== undefined
                   ? `${t('common.questionCount', { count: profile.questions.length })} · ${t('common.minutesShort', { value: `${profile.estMinutes[0]}-${profile.estMinutes[1]}` })}`

@@ -7,7 +7,7 @@ import {
   type QuestionKind,
   type ScoreResult,
 } from '@neuropeak/core';
-import { findTest, type ContentQuestion } from '@neuropeak/content';
+import type { ContentQuestion } from '@neuropeak/content';
 import { radius, spacing } from '@neuropeak/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -25,6 +25,7 @@ import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
 import { saveTestResult, type StoredTestResult } from '@/lib/test-results';
+import { useContent } from '@/lib/content/context';
 
 type Phase = 'intro' | 'running' | 'result';
 
@@ -57,7 +58,7 @@ export default function TestRunnerScreen() {
   const { recordTestFinished } = useProgress();
   const { afterRound } = useAds();
 
-  const test = findTest(id ?? '');
+  const test = useContent().tests.find((item) => item.id === (id ?? ''));
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [questionIndex, setQuestionIndex] = useState(0);
