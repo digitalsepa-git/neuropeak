@@ -8,11 +8,11 @@ import { Icon } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text, useTheme } from '@/components/ui';
 
-import { TESTS, type PlaceholderTest } from '@/data/placeholder';
 import { usePro } from '@/lib/billing/context';
 import { useI18n, useT } from '@/lib/i18n';
 import type { StringKey } from '@/lib/i18n';
 import { useContent } from '@/lib/content/context';
+import { entriesInGroup, testEntries, type TestEntry } from '@/lib/content/test-list';
 
 const FILTERS = [
   { id: 'all', label: 'common.all' },
@@ -26,8 +26,13 @@ export default function TestsScreen() {
   const [filter, setFilter] = useState<FilterId>('all');
   const t = useT();
 
-  const iqTests = TESTS.filter((test) => test.group === 'iq');
-  const funTests = TESTS.filter((test) => test.group === 'fun');
+  // Liste katalogdan: panelden eklenen test burada da görünsün,
+  // kaldırılan da kaybolsun. Katalogda olmayan bir testi "Yakında"
+  // diye göstermiyoruz artık — gösterilecek bir şey yok.
+  const catalogue = useContent();
+  const entries = testEntries(catalogue);
+  const iqTests = entriesInGroup(entries, 'iq');
+  const funTests = entriesInGroup(entries, 'fun');
 
   return (
     <Screen scroll padded={false}>
@@ -54,8 +59,8 @@ export default function TestsScreen() {
         {(filter === 'all' || filter === 'iq') && (
           <Section title={t('tests.sectionIq')}>
             <View style={styles.stack}>
-              {iqTests.map((test) => (
-                <TestCard key={test.id} test={test} />
+              {iqTests.map((entry) => (
+                <TestCard key={entry.test.id} entry={entry} />
               ))}
             </View>
           </Section>
@@ -64,8 +69,8 @@ export default function TestsScreen() {
         {(filter === 'all' || filter === 'fun') && (
           <Section title={t('tests.sectionFun')}>
             <View style={styles.stack}>
-              {funTests.map((test) => (
-                <TestCard key={test.id} test={test} />
+              {funTests.map((entry) => (
+                <TestCard key={entry.test.id} entry={entry} />
               ))}
             </View>
           </Section>
@@ -75,40 +80,31 @@ export default function TestsScreen() {
   );
 }
 
-function TestCard({ test }: { test: PlaceholderTest }) {
+function TestCard({ entry }: { entry: TestEntry }) {
   const theme = useTheme();
   const router = useRouter();
   const t = useT();
   const { localized } = useI18n();
   const { isPro } = usePro();
 
-  // Soru bankası yazılmamış testler listede kalır ama açılmaz;
-  // yol haritası görünsün, boş ekran açılmasın.
-  // Beyin Yaşı soru sormuyor, dört ölçüm yaptırıyor; profil
-  // testlerinin doğru cevabı yok. Üçünün de kendi ekranı var.
-  const catalogue = useContent();
-
-  const measure = catalogue.measureTests.find((item) => item.id === test.id);
-  const isMeasureTest = measure !== undefined;
-  const profile = catalogue.profileTests.find((item) => item.id === test.id);
-  const content = catalogue.tests.find((item) => item.id === test.id);
-  const ready = content !== undefined || isMeasureTest || profile !== undefined;
-  const locked = test.pro && !isPro;
+  const { test } = entry;
+  const locked = test.isPro && !isPro;
 
   return (
     <Card
       accessibilityLabel={localized(test.title)}
       onPress={() => {
-        if (!ready) return;
         if (locked) {
           router.push({ pathname: '/paywall', params: { variant: 'generic' } });
           return;
         }
-        if (isMeasureTest) {
+        // Üç türün ekranı ayrı: Beyin Yaşı ölçüm yaptırıyor, profil
+        // testinin doğru cevabı yok, kalanı soru soruyor.
+        if (entry.kind === 'measure') {
           router.push('/brain-age');
           return;
         }
-        if (profile !== undefined) {
+        if (entry.kind === 'profile') {
           router.push({ pathname: '/profile/[id]', params: { id: test.id } });
           return;
         }
@@ -116,45 +112,50 @@ function TestCard({ test }: { test: PlaceholderTest }) {
       }}
     >
       <View style={styles.row}>
-        <View style={[styles.info, !ready && styles.dimmed]}>
+        <View style={styles.info}>
           <View style={styles.titleRow}>
             <Text variant="subheading" numberOfLines={1}>
-              {content !== undefined
-                ? localized(content.title)
-                : profile !== undefined
-                  ? localized(profile.title)
-                  : localized(test.title)}
+              {localized(test.title)}
             </Text>
-            {!ready ? (
-              <Badge label={t('common.soon')} />
-            ) : test.pro ? (
-              <Badge label="PRO" tone="brand" />
-            ) : (
-              <Badge label={t('common.free')} />
-            )}
+            {test.isPro ? <Badge label="PRO" tone="brand" /> : <Badge label={t('common.free')} />}
           </View>
           <Text variant="caption" color="textMuted">
-            {content !== undefined
-              ? `${t('common.questionCount', { count: content.questionCount })} · ${t('common.minutesShort', { value: `${content.estMinutes[0]}-${content.estMinutes[1]}` })}`
-              : isMeasureTest
-                ? t('brainAge.stepCount', {
-                    count: measure?.steps.length ?? 0,
-                    minutes: measure?.estMinutes[1] ?? 0,
-                  })
-                : profile !== undefined
-                  ? `${t('common.questionCount', { count: profile.questions.length })} · ${t('common.minutesShort', { value: `${profile.estMinutes[0]}-${profile.estMinutes[1]}` })}`
-                  : `${t('common.questionCount', { count: test.questions })} · ${t('common.minutesShort', { value: test.minutes })}`}
+            <TestSummary entry={entry} />
           </Text>
         </View>
-        {ready && (
-          <Icon
-            name={locked ? 'lock' : 'chevronRight'}
-            color={theme.colors.textMuted}
-            size={locked ? 18 : 20}
-          />
-        )}
+        <Icon
+          name={locked ? 'lock' : 'chevronRight'}
+          color={theme.colors.textMuted}
+          size={locked ? 18 : 20}
+        />
       </View>
     </Card>
+  );
+}
+
+/** Kart altındaki "şu kadar soru · şu kadar dakika" satırı. */
+function TestSummary({ entry }: { entry: TestEntry }) {
+  const t = useT();
+
+  if (entry.kind === 'measure') {
+    return (
+      <>
+        {t('brainAge.stepCount', {
+          count: entry.test.steps.length,
+          minutes: entry.test.estMinutes[1],
+        })}
+      </>
+    );
+  }
+
+  const count = entry.kind === 'profile' ? entry.test.questions.length : entry.test.questionCount;
+  const [min, max] = entry.test.estMinutes;
+
+  return (
+    <>
+      {t('common.questionCount', { count })} ·{' '}
+      {t('common.minutesShort', { value: `${min}-${max}` })}
+    </>
   );
 }
 
@@ -163,9 +164,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingBottom: spacing.xs,
     paddingHorizontal: spacing.lg,
-  },
-  dimmed: {
-    opacity: 0.55,
   },
   info: {
     flex: 1,
