@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { currentSession } from '@/lib/auth';
-import { contentMode } from '@/lib/content-source';
+import { contentMode } from '@/lib/content-mode';
 
 /**
  * Panel kabuğu: solda modül menüsü, üstte başlık. Hazır olmayan

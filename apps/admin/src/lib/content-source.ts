@@ -1,31 +1,46 @@
 import {
+  BADGES,
   CONTENT_TESTS,
+  DAILY_TASKS,
+  GAME_CATALOGUE,
   PROFILE_TESTS,
   brainAgeTest,
-  findProfileTest,
-  findTest,
+  type ContentBadge,
+  type ContentDailyTask,
+  type ContentGame,
   type ContentQuestion,
   type ContentTest,
   type ProfileTest,
 } from '@neuropeak/content';
 
-import { isSupabaseConfigured } from './supabase';
+import {
+  fetchBadges,
+  fetchDailyTasks,
+  fetchGames,
+  fetchMeasureTests,
+  fetchProfileTests,
+  fetchQuestionTests,
+} from './content-live';
+import { contentMode } from './content-mode';
+import type { MeasureTest } from './content-rows';
 
 /**
  * Panelin içerik kaynağı.
  *
- * Supabase bağlıysa testler ve sorular oradan okunup yazılacak.
- * Bağlı değilken panel, mobil uygulamanın gömülü içeriğini salt okunur
- * gösteriyor: boş bir panel yerine gerçek bankayı görmek, yapıyı ve
- * ekranları denemek için yeterli. Yazma işlemleri bu modda kapalı ve
- * arayüz bunu açıkça söylüyor.
+ * İki kaynak var ve sayfalar hangisinden okuduklarını bilmiyor:
+ *
+ *   live     — Supabase bağlı; içerik veritabanından, yöneticinin
+ *              kendi oturumuyla okunuyor.
+ *   embedded — bağlantı yok; uygulamaya gömülü banka salt okunur
+ *              gösteriliyor. Geliştirici ortam değişkenlerini
+ *              doldurmadan da paneli gezebilsin diye.
+ *
+ * Canlı satırlar `content-rows.ts`'te aynı içerik tiplerine
+ * çevriliyor, bu yüzden aşağıdaki işlevlerin dönüş tipleri iki modda
+ * da aynı. Her biri async: gömülü modda beklemeden dönüyor.
  */
 
-export type ContentMode = 'live' | 'embedded';
-
-export const contentMode: ContentMode = isSupabaseConfigured ? 'live' : 'embedded';
-
-export const canEditContent = contentMode === 'live';
+const isLive = contentMode === 'live';
 
 /**
  * Testin hangi türden olduğu.
@@ -67,8 +82,8 @@ function averageWeight(questions: readonly ContentQuestion[]): number {
 }
 
 /** Soru havuzlu testler: Temel IQ, Görsel IQ, Sözel IQ… */
-export function listQuestionTests(): TestSummary[] {
-  return CONTENT_TESTS.map((test) => ({
+function questionTestSummary(test: ContentTest): TestSummary {
+  return {
     id: test.id,
     title: test.title.tr,
     family: 'questions' as const,
@@ -83,22 +98,30 @@ export function listQuestionTests(): TestSummary[] {
       poolSize: test.questions.length,
       averageWeight: averageWeight(test.questions),
     },
-  }));
+  };
+}
+
+/** Soru havuzlu testler: Temel IQ, Görsel IQ, Sözel IQ… */
+export async function listQuestionTests(): Promise<TestSummary[]> {
+  const tests = isLive ? await fetchQuestionTests() : CONTENT_TESTS;
+  return tests.map(questionTestSummary);
 }
 
 /** Soru sormayan testler: Beyin Yaşı ve üç profil testi. */
-export function listOtherTests(): TestSummary[] {
+export async function listOtherTests(): Promise<TestSummary[]> {
+  const [measures, profiles] = await Promise.all([listMeasureTests(), listProfileTests()]);
+
   return [
-    {
-      id: brainAgeTest.id,
-      title: brainAgeTest.title.tr,
+    ...measures.map((test) => ({
+      id: test.id,
+      title: test.title.tr,
       family: 'measures' as const,
-      isPro: brainAgeTest.isPro,
-      estMinutes: brainAgeTest.estMinutes,
-      href: `/content/tests/${brainAgeTest.id}`,
-      scale: `${brainAgeTest.steps.length} ölçüm`,
-    },
-    ...PROFILE_TESTS.map((test) => ({
+      isPro: test.isPro,
+      estMinutes: test.estMinutes,
+      href: `/content/tests/${test.id}`,
+      scale: `${test.steps.length} ölçüm`,
+    })),
+    ...profiles.map((test) => ({
       id: test.id,
       title: test.title.tr,
       family: 'profile' as const,
@@ -110,28 +133,47 @@ export function listOtherTests(): TestSummary[] {
   ];
 }
 
-/** Uygulamanın gerçekten sunduğu bütün testler. */
-export function listTests(): TestSummary[] {
-  return [...listQuestionTests(), ...listOtherTests()];
+export async function listGames(): Promise<readonly ContentGame[]> {
+  return isLive ? fetchGames() : GAME_CATALOGUE;
 }
 
-export function getTest(id: string): ContentTest | undefined {
-  return findTest(id);
+export async function listBadges(): Promise<readonly ContentBadge[]> {
+  return isLive ? fetchBadges() : BADGES;
 }
 
-export function getProfileTest(id: string): ProfileTest | undefined {
-  return findProfileTest(id);
+export async function listDailyTasks(): Promise<readonly ContentDailyTask[]> {
+  return isLive ? fetchDailyTasks() : DAILY_TASKS;
 }
 
-/** Beyin Yaşı tek örnek; kimlik eşleşiyorsa o. */
-export function getMeasureTest(id: string): typeof brainAgeTest | undefined {
-  return id === brainAgeTest.id ? brainAgeTest : undefined;
+async function listMeasureTests(): Promise<readonly MeasureTest[]> {
+  return isLive ? fetchMeasureTests() : [brainAgeTest];
+}
+
+async function listProfileTests(): Promise<readonly ProfileTest[]> {
+  return isLive ? fetchProfileTests() : PROFILE_TESTS;
+}
+
+export async function getTest(id: string): Promise<ContentTest | undefined> {
+  const tests = isLive ? await fetchQuestionTests() : CONTENT_TESTS;
+  return tests.find((test) => test.id === id);
+}
+
+export async function getProfileTest(id: string): Promise<ProfileTest | undefined> {
+  const tests = await listProfileTests();
+  return tests.find((test) => test.id === id);
+}
+
+export async function getMeasureTest(id: string): Promise<MeasureTest | undefined> {
+  const tests = await listMeasureTests();
+  return tests.find((test) => test.id === id);
 }
 
 /** Bütün testlerdeki toplam soru sayısı; aynı soru iki testte sayılmaz. */
-export function totalQuestionCount(): number {
+export async function totalQuestionCount(): Promise<number> {
+  const tests = isLive ? await fetchQuestionTests() : CONTENT_TESTS;
+
   const ids = new Set<string>();
-  for (const test of CONTENT_TESTS) {
+  for (const test of tests) {
     for (const question of test.questions) ids.add(question.id);
   }
   return ids.size;

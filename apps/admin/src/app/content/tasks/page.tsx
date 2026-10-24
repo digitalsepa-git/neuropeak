@@ -1,7 +1,9 @@
-import { DAILY_TASKS, type ContentDailyTask } from '@neuropeak/content';
+import type { ContentDailyTask } from '@neuropeak/content';
 import { DAILY_TASK_COUNT, describeTaskTarget, type TaskMetric } from '@neuropeak/core';
 
+import { EmptyContent } from '@/components/empty-content';
 import { Shell } from '@/components/shell';
+import { listDailyTasks } from '@/lib/content-source';
 
 /**
  * Günlük görev havuzu.
@@ -18,16 +20,18 @@ const METRIC_LABELS: Readonly<Record<TaskMetric, string>> = {
   play_category: 'Kategori turu',
 };
 
-export default function TasksPage() {
-  const totalStars = DAILY_TASKS.reduce((sum, task) => sum + task.starReward, 0);
+export default async function TasksPage() {
+  const tasks = await listDailyTasks();
+
+  const totalStars = tasks.reduce((sum, task) => sum + task.starReward, 0);
 
   return (
     <Shell
       title="Günlük görevler"
-      description={`Havuzda ${DAILY_TASKS.length} görev var; her gün bunlardan ${DAILY_TASK_COUNT} tanesi seçiliyor.`}
+      description={`Havuzda ${tasks.length} görev var; her gün bunlardan ${DAILY_TASK_COUNT} tanesi seçiliyor.`}
     >
       <section className="mb-xl grid gap-md sm:grid-cols-3">
-        <Stat label="Havuzdaki görev" value={`${DAILY_TASKS.length}`} />
+        <Stat label="Havuzdaki görev" value={`${tasks.length}`} />
         <Stat label="Günde verilen" value={`${DAILY_TASK_COUNT}`} />
         <Stat label="Havuzun toplam yıldızı" value={`${totalStars}`} />
       </section>
@@ -36,6 +40,8 @@ export default function TasksPage() {
         Seçim kullanıcıya ve güne göre tohumlanıyor: aynı gün uygulama kaç kez açılırsa açılsın
         görevler değişmiyor, ertesi gün kendiliğinden yenileniyor.
       </p>
+
+      {tasks.length === 0 && <EmptyContent what="Günlük görev" />}
 
       <div className="overflow-x-auto rounded-lg border border-border bg-surface shadow-card">
         <table className="w-full text-bodysmall">
@@ -49,7 +55,7 @@ export default function TasksPage() {
             </tr>
           </thead>
           <tbody>
-            {DAILY_TASKS.map((task) => (
+            {tasks.map((task) => (
               <TaskRow key={task.id} task={task} />
             ))}
           </tbody>

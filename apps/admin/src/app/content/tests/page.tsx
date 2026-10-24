@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { EmptyContent } from '@/components/empty-content';
 import { Shell } from '@/components/shell';
 import { listOtherTests, listQuestionTests, type TestSummary } from '@/lib/content-source';
 
@@ -20,9 +21,8 @@ const FOCUS_LABELS: Record<string, string> = {
   logical: 'Mantık',
 };
 
-export default function TestsPage() {
-  const questionTests = listQuestionTests();
-  const otherTests = listOtherTests();
+export default async function TestsPage() {
+  const [questionTests, otherTests] = await Promise.all([listQuestionTests(), listOtherTests()]);
   const total = questionTests.length + otherTests.length;
 
   return (
@@ -30,6 +30,8 @@ export default function TestsPage() {
       title="Testler"
       description={`Uygulamanın sunduğu ${total} test. Soru havuzlu olanlar ve ölçüm/profil testleri ayrı listelerde.`}
     >
+      {total === 0 && <EmptyContent what="Test" />}
+
       <section className="mb-xl">
         <div className="mb-md flex items-baseline gap-sm">
           <h2 className="text-subheading font-semibold">Soru havuzlu testler</h2>

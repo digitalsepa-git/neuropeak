@@ -1,9 +1,10 @@
-import { GAME_CATALOGUE } from '@neuropeak/content';
 import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
 import { categoryAccent } from '@neuropeak/ui';
 
 import { GameTable } from '@/components/game-table';
+import { EmptyContent } from '@/components/empty-content';
 import { Shell } from '@/components/shell';
+import { listGames } from '@/lib/content-source';
 
 const CATEGORY_LABELS: Record<GameCategory, string> = {
   memory: 'Hafıza',
@@ -15,13 +16,15 @@ const CATEGORY_LABELS: Record<GameCategory, string> = {
   verbal: 'Sözel',
 };
 
-export default function GamesPage() {
+export default async function GamesPage() {
+  const games = await listGames();
+
   const byCategory = GAME_CATEGORIES.map((category) => ({
     category,
-    count: GAME_CATALOGUE.filter((game) => game.category === category).length,
+    count: games.filter((game) => game.category === category).length,
   }));
 
-  const levelled = GAME_CATALOGUE.filter((game) => game.mode === 'levels').length;
+  const levelled = games.filter((game) => game.mode === 'levels').length;
 
   return (
     <Shell
@@ -29,9 +32,9 @@ export default function GamesPage() {
       description="Oyun kataloğu: kategori, yapı, XP değeri ve geliştirdiği yetenekler."
     >
       <section className="grid gap-md sm:grid-cols-3">
-        <Fact label="Oyun" value={`${GAME_CATALOGUE.length}`} />
+        <Fact label="Oyun" value={`${games.length}`} />
         <Fact label="Seviyeli" value={`${levelled}`} />
-        <Fact label="Süreli" value={`${GAME_CATALOGUE.length - levelled}`} />
+        <Fact label="Süreli" value={`${games.length - levelled}`} />
       </section>
 
       <section className="mt-xl">
@@ -56,7 +59,11 @@ export default function GamesPage() {
 
       <section className="mt-xl">
         <h2 className="mb-md text-subheading font-semibold">Katalog</h2>
-        <GameTable games={GAME_CATALOGUE} categoryLabels={CATEGORY_LABELS} />
+        {games.length === 0 ? (
+          <EmptyContent what="Oyun" />
+        ) : (
+          <GameTable games={games} categoryLabels={CATEGORY_LABELS} />
+        )}
       </section>
     </Shell>
   );

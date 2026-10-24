@@ -10,13 +10,8 @@ import { notFound } from 'next/navigation';
 
 import { QuestionTable } from '@/components/question-table';
 import { Shell } from '@/components/shell';
-import {
-  canEditContent,
-  getMeasureTest,
-  getProfileTest,
-  getTest,
-  kindBreakdown,
-} from '@/lib/content-source';
+import { canEditContent, contentMode } from '@/lib/content-mode';
+import { getMeasureTest, getProfileTest, getTest, kindBreakdown } from '@/lib/content-source';
 
 const KIND_LABELS: Record<string, string> = {
   matrix: 'Matris',
@@ -39,6 +34,10 @@ const KIND_LABELS: Record<string, string> = {
  * testleri. Biri eksik kalırsa o testin sayfası 404 verir.
  */
 export function generateStaticParams() {
+  // Canlı modda liste veritabanında; derleme anında bilinmiyor ve
+  // sayfalar istek anında üretiliyor. Gömülü modda hepsi belli.
+  if (contentMode === 'live') return [];
+
   return [
     ...CONTENT_TESTS.map((test) => ({ id: test.id })),
     { id: brainAgeTest.id },
@@ -49,13 +48,13 @@ export function generateStaticParams() {
 export default async function TestDetailPage({ params }: PageProps<'/content/tests/[id]'>) {
   const { id } = await params;
 
-  const questionTest = getTest(id);
+  const questionTest = await getTest(id);
   if (questionTest !== undefined) return <QuestionTestView test={questionTest} />;
 
-  const measureTest = getMeasureTest(id);
+  const measureTest = await getMeasureTest(id);
   if (measureTest !== undefined) return <MeasureTestView />;
 
-  const profileTest = getProfileTest(id);
+  const profileTest = await getProfileTest(id);
   if (profileTest !== undefined) return <ProfileTestView test={profileTest} />;
 
   notFound();
