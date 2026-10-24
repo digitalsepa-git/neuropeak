@@ -23,7 +23,7 @@ Zihin oyunları ve IQ testi
 ## Promosyon metni (170 karakter, her an değiştirilebilir)
 
 ```
-29 mini oyun, 6 IQ testi ve haftalık lig. Günde 10 dakika ayır, beyin haritanda hafıza, odak, mantık, matematik ve hızını izle.
+29 mini oyun, 7 IQ testi ve haftalık lig. Günde 10 dakika ayır, beyin haritanda hafıza, odak, mantık, matematik ve hızını izle.
 ```
 
 126 karakter.
@@ -34,14 +34,15 @@ Zihin oyunları ve IQ testi
 Zihnini her gün biraz daha ileri taşı.
 
 NeuroPeak, hafızanı, odaklanmanı, mantığını, matematiğini ve hızını
-çalıştıran 29 mini oyun ve 6 IQ testi sunar. Günde on dakika yeter.
+çalıştıran 29 mini oyun ve 7 IQ testi sunar. Günde on dakika yeter.
 
 ÖLÇ
 • Temel IQ Testi ücretsiz: sayı örüntüleri, sözel ilişkiler, mantık ve
   aritmetikten 20 soru.
 • Sonuç ekranında puanın, yüzdelik dilimin ve sözel, sayısal, görsel,
   mantıksal alt boyutların.
-• İleri, Sayısal, Sözel ve Hızlı IQ testleri PRO ile açılır.
+• İleri, Görsel, Mantıksal, Sayısal, Sözel ve Hızlı IQ testleri PRO
+  ile açılır.
 
 GELİŞTİR
 • Hafıza: Kart Eşleme, Işık Dizisi, Sayı Menzili, N-Geri, Nerede Kaldı?
@@ -98,7 +99,7 @@ iq,zeka,test,beyin,hafıza,oyun,mantık,bulmaca,egzersiz,odak,dikkat,zihin,eğit
 ## Sürüm notları (ilk sürüm)
 
 ```
-İlk sürüm. 29 mini oyun, 6 IQ testi, beyin haritası, günlük görevler
+İlk sürüm. 29 mini oyun, 7 IQ testi, beyin haritası, günlük görevler
 ve haftalık lig. Türkçe ve İngilizce.
 ```
 
