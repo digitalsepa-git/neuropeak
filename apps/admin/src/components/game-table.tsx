@@ -7,6 +7,8 @@ import { useMemo, useState } from 'react';
 
 import { canEditContent } from '@/lib/content-mode';
 
+import { GameEditor } from './game-editor';
+
 const MODE_LABELS = { levels: 'Seviyeli', timed: 'Süreli' } as const;
 
 /**
@@ -25,6 +27,7 @@ export function GameTable({
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('all');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const categories = useMemo(
     () => [...new Set(games.map((game) => game.category))].sort(),
@@ -137,13 +140,18 @@ export function GameTable({
                       : 'Süreli — seviye sayısı yok'}
                   </p>
 
-                  <button
-                    type="button"
-                    disabled={!canEditContent}
-                    className="mt-md rounded-md border border-border px-sm py-1 text-bodysmall disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Düzenle
-                  </button>
+                  {editingId === game.id ? (
+                    <GameEditor game={game} onClose={() => setEditingId(null)} />
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={!canEditContent}
+                      onClick={() => setEditingId(game.id)}
+                      className="mt-md rounded-md border border-border px-sm py-1 text-bodysmall disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Düzenle
+                    </button>
+                  )}
                 </div>
               )}
             </li>
