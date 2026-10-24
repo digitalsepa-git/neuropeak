@@ -49,7 +49,22 @@ Barındırılan bir Supabase'de bağlantı dizesi proje ayarlarındadır. Seed y
 
 `apps/mobile/.env.example` dosyasını `.env` olarak kopyalayıp Supabase projesinin URL ve anon anahtarını doldurun. Boş bırakılırsa uygulama tamamen çevrimdışı çalışır: veriler cihazda durur, senkronizasyon ilk fırsatta yapılır.
 
-Panel de aynı değişkenleri (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) okur; tanımlı değilken gömülü içeriği salt okunur gösterir ve bunu ekranda söyler. Panelin canlı veriden okuması henüz bağlanmadı: anon anahtarıyla gizli rozetler görünmüyor ve panelde giriş yok, o yüzden önce yetkilendirme kararı gerekiyor.
+Panel de aynı değişkenleri (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) okur; tanımlı değilken gömülü içeriği salt okunur gösterir, giriş istemez ve bunu ekranda söyler.
+
+### Panel girişi
+
+Supabase tanımlıyken panel giriş ister. Panel `service_role` anahtarı taşımaz: yöneticinin kendi oturumuyla konuşur, yetki de RLS'te yazılıdır (`public.is_admin()`). Yönetici, `public.admins` tablosundaki bir satırdır.
+
+Panelde kayıt yok — adresi bilen herkes hesap açabilirdi. İlk yönetici veritabanından eklenir:
+
+```sql
+-- Kullanıcıyı önce Supabase panelinden (Authentication → Users) açın,
+-- sonra kimliğini buraya yazın.
+insert into public.admins (user_id, email)
+values ('<auth.users.id>', 'admin@example.com');
+```
+
+Sonraki yöneticileri mevcut bir yönetici ekleyebilir. Giriş yapmış ama listede olmayan bir hesap paneli açar, canlı veriden okunan bölümleri boş görür ve panel bunun nedenini söyler.
 
 ## Tasarım sistemi
 

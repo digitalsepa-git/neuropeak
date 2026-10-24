@@ -55,6 +55,17 @@ values
 
 update public.profile_tests set is_active = false where id = 'draft-profile';
 
+-- Biri gizli iki rozet: gizli olan normal kullanıcıya kapalı,
+-- yöneticiye açık olmalı.
+insert into public.badges (id, title_tr, title_en, tier, star_reward, is_secret, requirement)
+values
+  ('level-5', 'İlk Adımlar', 'First Steps', 1, 15, false, '{"kind":"level","value":5}'::jsonb),
+  ('secret-owl', 'Gece Kuşu', 'Night Owl', 2, 40, true, '{"kind":"rounds","value":250}'::jsonb);
+
+-- İkinci kullanıcı yönetici; birincisi normal kalıyor.
+insert into public.admins (user_id, email)
+values ('22222222-2222-2222-2222-222222222222', 'admin@example.com');
+
 insert into public.profile_traits (test_id, id, label_tr, label_en, description_tr, description_en)
 values
   ('archetype', 'analytic', 'Çözümleyici', 'Analytic', 'Parçalara ayırır.', 'Breaks it down.'),
@@ -254,6 +265,9 @@ begin
     'anon pasif profil testinin sorusunu görüyor';
   assert (select count(*) from public.profile_outcomes) = 2,
     'anon pasif profil testinin arketipini görüyor';
+  -- Gizli rozet kazanılmadan görünmemeli.
+  assert (select count(*) from public.badges) = 1,
+    'anon gizli rozeti görüyor';
   assert (select count(*) from public.profiles) = 0,
     'anon profilleri görüyor';
 end;
@@ -333,6 +347,80 @@ begin
     'kullanıcı başka grubun üyelerini görüyor';
   assert (select count(*) from public.league_groups) = 1,
     'kullanıcı başka grubu görüyor';
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
+-- ---------------------------------------------------------------- yönetici
+
+-- Normal kullanıcı: içeriğin yalnızca yayındaki kısmını görür ve
+-- hiçbir şey yazamaz.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+do $$
+begin
+  assert not public.is_admin(), 'normal kullanıcı yönetici sayılıyor';
+
+  assert (select count(*) from public.badges) = 1,
+    'normal kullanıcı gizli rozeti görüyor';
+  assert (select count(*) from public.games) = 2,
+    'normal kullanıcı pasif oyunu görüyor';
+  assert (select count(*) from public.admins) = 0,
+    'normal kullanıcı yönetici listesini görüyor';
+
+  begin
+    insert into public.games (id, category, mode, title_tr, title_en, total_levels)
+    values ('sneaky', 'logic', 'timed', 'Sızma', 'Sneak', 0);
+    raise exception 'normal kullanıcı içerik yazabildi';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  begin
+    update public.badges set star_reward = 999 where id = 'level-5';
+    assert not found, 'normal kullanıcı rozeti güncelleyebildi';
+  end;
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
+-- Yönetici: pasif satırları ve gizli rozetleri de görür, yazabilir.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+do $$
+begin
+  assert public.is_admin(), 'yönetici yönetici sayılmıyor';
+
+  assert (select count(*) from public.badges) = 2,
+    'yönetici gizli rozeti göremiyor';
+  assert (select count(*) from public.games) = 3,
+    'yönetici pasif oyunu göremiyor';
+  assert (select count(*) from public.tests) = 2,
+    'yönetici pasif testi göremiyor';
+  assert (select count(*) from public.profile_tests) = 2,
+    'yönetici pasif profil testini göremiyor';
+  assert (select count(*) from public.admins) = 1,
+    'yönetici yönetici listesini göremiyor';
+
+  -- Yazma açık.
+  insert into public.games (id, category, mode, title_tr, title_en, total_levels)
+  values ('new-game', 'logic', 'timed', 'Yeni', 'New', 0);
+  assert (select count(*) from public.games where id = 'new-game') = 1,
+    'yönetici oyun ekleyemedi';
+
+  update public.badges set star_reward = 25 where id = 'level-5';
+  assert (select star_reward from public.badges where id = 'level-5') = 25,
+    'yönetici rozeti güncelleyemedi';
+
+  delete from public.games where id = 'new-game';
+  assert (select count(*) from public.games where id = 'new-game') = 0,
+    'yönetici oyun silemedi';
 end;
 $$;
 
