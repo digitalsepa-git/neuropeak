@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseBadge, parseDailyTask, parseGame, parseQuestion, parseTest } from './content-edit';
+import { PUSH_BODY_MAX, PUSH_TITLE_MAX } from '@neuropeak/core';
+
+import {
+  parseBadge,
+  parseCampaign,
+  parseDailyTask,
+  parseGame,
+  parseQuestion,
+  parseTest,
+} from './content-edit';
 
 /**
  * Doğrulama saf olduğu için testlenebilen tek yazma parçası bu.
@@ -374,5 +383,68 @@ describe('parseTest', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     expect('norm_mean' in parsed.value).toBe(false);
+  });
+});
+
+const CAMPAIGN = {
+  segment_id: 'streak-holders',
+  title_tr: 'Serini koru',
+  body_tr: 'Bugün bir tur oyna, serin devam etsin.',
+  title_en: 'Keep your streak',
+  body_en: 'Play one round today to keep it going.',
+  local_hour: '19',
+};
+
+describe('parseCampaign', () => {
+  it('geçerli formu okur', () => {
+    const parsed = parseCampaign(CAMPAIGN);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.segment_id).toBe('streak-holders');
+    expect(parsed.value.local_hour).toBe(19);
+  });
+
+  it('kitlesiz kampanyayı kabul eder', () => {
+    // Kitle boşsa kampanya herkese; "hiç kimse" demek değil.
+    const parsed = parseCampaign({ ...CAMPAIGN, segment_id: '' });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.segment_id).toBeNull();
+  });
+
+  it('boş saati sıfır saymaz', () => {
+    // Gece yarısı geçerli bir saat; "saat seçilmedi" ondan ayrı.
+    const parsed = parseCampaign({ ...CAMPAIGN, local_hour: '' });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.local_hour).toBeNull();
+  });
+
+  it('gece yarısını saat olarak kabul eder', () => {
+    const parsed = parseCampaign({ ...CAMPAIGN, local_hour: '0' });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.local_hour).toBe(0);
+  });
+
+  it('aralık dışı saati reddeder', () => {
+    expect(parseCampaign({ ...CAMPAIGN, local_hour: '24' }).ok).toBe(false);
+  });
+
+  it('çekirdekteki başlık sınırını uygular', () => {
+    // Besteci kutusu da aynı sayıyı sayıyor; sunucu daha gevşek
+    // olsaydı kilit ekranında kırpılan metin kaydedilirdi.
+    const parsed = parseCampaign({ ...CAMPAIGN, title_tr: 'a'.repeat(PUSH_TITLE_MAX + 1) });
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain(`${PUSH_TITLE_MAX}`);
+  });
+
+  it('sınıra eşit metni kabul eder', () => {
+    expect(parseCampaign({ ...CAMPAIGN, body_en: 'a'.repeat(PUSH_BODY_MAX) }).ok).toBe(true);
+  });
+
+  it('boş metni reddeder', () => {
+    expect(parseCampaign({ ...CAMPAIGN, body_tr: '   ' }).ok).toBe(false);
   });
 });

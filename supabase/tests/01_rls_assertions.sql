@@ -427,6 +427,59 @@ $$;
 reset role;
 reset request.jwt.claims;
 
+-- ---------------------------------------------------------------- push
+
+insert into public.segments (id, title, rules)
+values ('everyone', 'Tüm kullanıcılar', '[]'::jsonb);
+
+do $$
+begin
+  -- Normal kullanıcı segmentleri okur (içerik gibi) ama kampanya
+  -- göremez, yazamaz.
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+  assert (select count(*) from public.segments) = 1, 'normal kullanıcı segmenti göremiyor';
+  assert (select count(*) from public.push_campaigns) = 0,
+    'normal kullanıcı kampanyaları görüyor';
+
+  begin
+    insert into public.push_campaigns (title_tr, body_tr, title_en, body_en)
+    values ('Sızma', 'Metin', 'Sneak', 'Body');
+    raise exception 'normal kullanıcı kampanya yazabildi';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  reset role;
+  reset request.jwt.claims;
+
+  -- Yönetici taslak kaydedebilir.
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+  insert into public.push_campaigns (segment_id, title_tr, body_tr, title_en, body_en)
+  values ('everyone', 'Serini koru', 'Bugün bir tur oyna.', 'Keep your streak', 'Play a round today.');
+
+  assert (select count(*) from public.push_campaigns where status = 'draft') = 1,
+    'yönetici taslak kaydedemedi';
+
+  -- Ama "gönderildi" diyemez: bunu yalnızca gönderen servis söyler.
+  begin
+    update public.push_campaigns set status = 'sent';
+    raise exception 'panelden gönderildi işaretlenebildi';
+  exception
+    when raise_exception then
+      if sqlerrm not like '%gönderen servis%' then
+        raise;
+      end if;
+  end;
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
 -- ---------------------------------------------------------------- analitik
 
 -- İki kullanıcı: biri huninin tamamını, diğeri yarısını yapmış.

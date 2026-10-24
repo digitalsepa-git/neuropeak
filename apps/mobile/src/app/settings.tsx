@@ -1,18 +1,36 @@
 import { APP_LANGUAGES, LANGUAGE_NAMES } from '@neuropeak/core';
 import { spacing } from '@neuropeak/ui';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icons';
 import { Section } from '@/components/section';
 import { Card, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
-import { useI18n, useT } from '@/lib/i18n';
+import { useI18n, useT, type StringKey } from '@/lib/i18n';
 import { PRIVACY_URL, SUPPORT_EMAIL, TERMS_URL, supportMailto } from '@/lib/links';
 import { setDevProOverride } from '@/lib/billing';
 import { usePro } from '@/lib/billing/context';
 import { resetOnboarding } from '@/lib/onboarding';
 import { useOnboardingGate } from '@/lib/onboarding-context';
+import {
+  disableNotifications,
+  enableNotifications,
+  readPreference,
+  type PushOutcome,
+} from '@/lib/push/tokens';
+
+/**
+ * İzin alınamadığında ne söyleneceği. "Reddedildi" ile "bu cihazda
+ * çalışmıyor" ayrı: simülatörde push jetonu alınamıyor ve bunu
+ * izin sorunu gibi göstermek yanıltıcı olurdu.
+ */
+const NOTIFICATION_MESSAGES: Readonly<Record<Exclude<PushOutcome, 'enabled'>, StringKey>> = {
+  denied: 'settings.notificationsDenied',
+  unsupported: 'settings.notificationsUnsupported',
+  notConfigured: 'settings.notificationsNotConfigured',
+  failed: 'settings.notificationsFailed',
+};
 
 type Row = {
   id: string;
@@ -31,6 +49,40 @@ export default function SettingsScreen() {
   const { isPro, refresh } = usePro();
 
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [notificationsOn, setNotificationsOn] = useState(false);
+  const [notificationsBusy, setNotificationsBusy] = useState(false);
+
+  // Tercih cihazda saklı; açılışta okunuyor.
+  useEffect(() => {
+    void readPreference().then(setNotificationsOn);
+  }, []);
+
+  /**
+   * İzin yalnızca kullanıcı açıkça açtığında isteniyor. Reddedilen
+   * izin bir daha sorulamıyor; uygulama açılır açılmaz sormak o
+   * kararı kullanıcı adına harcardı.
+   */
+  const toggleNotifications = async () => {
+    if (notificationsBusy) return;
+    setNotificationsBusy(true);
+
+    try {
+      if (notificationsOn) {
+        await disableNotifications();
+        setNotificationsOn(false);
+        return;
+      }
+
+      const outcome = await enableNotifications(language);
+      setNotificationsOn(outcome === 'enabled');
+
+      if (outcome !== 'enabled') {
+        Alert.alert(t('settings.notifications'), t(NOTIFICATION_MESSAGES[outcome]));
+      }
+    } finally {
+      setNotificationsBusy(false);
+    }
+  };
 
   const preferences: Row[] = [
     { id: 'sound', label: t('settings.sound'), value: t('common.on'), icon: 'sound' },
@@ -44,8 +96,13 @@ export default function SettingsScreen() {
     {
       id: 'notifications',
       label: t('settings.notifications'),
-      value: t('common.on'),
+      value: notificationsBusy
+        ? t('common.wait')
+        : notificationsOn
+          ? t('common.on')
+          : t('common.off'),
       icon: 'bell',
+      onPress: () => void toggleNotifications(),
     },
   ];
 

@@ -8,26 +8,36 @@ Uygulama iki yapılandırmada farklı veri topluyor. Hangi sütunu
 dolduracağın, gönderdiğin derlemede AdMob ve RevenueCat anahtarlarının
 tanımlı olup olmadığına bağlı (`apps/mobile/.env`).
 
-| Veri türü (Apple'ın adlandırması) | Anahtarsız derleme | AdMob + RevenueCat açıkken | Nereden                                                                  |
-| --------------------------------- | ------------------ | -------------------------- | ------------------------------------------------------------------------ |
-| Contact Info                      | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| Health & Fitness                  | Toplanmıyor        | Toplanmıyor                | IQ puanı sağlık verisi değil; testler teşhis aracı değil                 |
-| Financial Info                    | Toplanmıyor        | Toplanmıyor                | Satın alma mağazada; kart bilgisi uygulamaya gelmiyor                    |
-| Location                          | Toplanmıyor        | **Coarse Location**        | AdMob reklam seçimi için yaklaşık konum kullanabiliyor                   |
-| Sensitive Info                    | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| Contacts                          | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| User Content                      | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| Browsing History                  | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| Search History                    | Toplanmıyor        | Toplanmıyor                | —                                                                        |
-| Identifiers → User ID             | **Toplanıyor**     | **Toplanıyor**             | `progress/storage.ts` `getDeviceId()` — cihazda üretilen rastgele kimlik |
-| Identifiers → Device ID           | Toplanmıyor        | **Toplanıyor**             | AdMob reklam kimliği (IDFA/GAID)                                         |
-| Purchases                         | Toplanmıyor        | **Toplanıyor**             | RevenueCat abonelik durumu                                               |
-| Usage Data → Product Interaction  | **Toplanıyor**     | **Toplanıyor**             | `lib/analytics.ts` → `analytics_events`                                  |
-| Usage Data → Advertising Data     | Toplanmıyor        | **Toplanıyor**             | AdMob gösterim ve tıklama ölçümü                                         |
-| Diagnostics                       | Toplanmıyor        | Toplanmıyor                | Çökme raporu servisi bağlı değil                                         |
-| Other Data → Other                | **Toplanıyor**     | **Toplanıyor**             | Onboarding cevapları ve test sonuçları (`lib/sync/index.ts`)             |
+| Veri türü (Apple'ın adlandırması) | Anahtarsız derleme | AdMob + RevenueCat açıkken | Nereden                                                                      |
+| --------------------------------- | ------------------ | -------------------------- | ---------------------------------------------------------------------------- |
+| Contact Info                      | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| Health & Fitness                  | Toplanmıyor        | Toplanmıyor                | IQ puanı sağlık verisi değil; testler teşhis aracı değil                     |
+| Financial Info                    | Toplanmıyor        | Toplanmıyor                | Satın alma mağazada; kart bilgisi uygulamaya gelmiyor                        |
+| Location                          | Toplanmıyor        | **Coarse Location**        | AdMob reklam seçimi için yaklaşık konum kullanabiliyor                       |
+| Sensitive Info                    | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| Contacts                          | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| User Content                      | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| Browsing History                  | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| Search History                    | Toplanmıyor        | Toplanmıyor                | —                                                                            |
+| Identifiers → User ID             | **Toplanıyor**     | **Toplanıyor**             | `progress/storage.ts` `getDeviceId()` — cihazda üretilen rastgele kimlik     |
+| Identifiers → Device ID           | Toplanmıyor        | **Toplanıyor**             | AdMob reklam kimliği (IDFA/GAID)                                             |
+| Identifiers → Push Token          | Toplanmıyor        | **Toplanıyor**             | `lib/push/tokens.ts` → `push_tokens`; yalnızca kullanıcı bildirimleri açarsa |
+| Purchases                         | Toplanmıyor        | **Toplanıyor**             | RevenueCat abonelik durumu                                                   |
+| Usage Data → Product Interaction  | **Toplanıyor**     | **Toplanıyor**             | `lib/analytics.ts` → `analytics_events`                                      |
+| Usage Data → Advertising Data     | Toplanmıyor        | **Toplanıyor**             | AdMob gösterim ve tıklama ölçümü                                             |
+| Diagnostics                       | Toplanmıyor        | Toplanmıyor                | Çökme raporu servisi bağlı değil                                             |
+| Other Data → Other                | **Toplanıyor**     | **Toplanıyor**             | Onboarding cevapları ve test sonuçları (`lib/sync/index.ts`)                 |
 
 ## Her veri için anketin sorduğu üç şey
+
+**Identifiers → Push Token**
+
+- Kullanım amacı: App Functionality
+- Kimliğe bağlı mı: **Evet** (kayıt kullanıcının kimliğiyle duruyor)
+- İzleme için mi: Hayır
+- Not: Yalnızca kullanıcı Ayarlar'dan bildirimleri açarsa toplanıyor.
+  Kapatınca kayıt siliniyor değil pasife alınıyor; hesap silinince
+  gidiyor. Anahtarsız derlemede bildirim yok, jeton da yok.
 
 **Identifiers → User ID**
 

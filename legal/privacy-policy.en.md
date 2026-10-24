@@ -1,6 +1,6 @@
 # NeuroPeak Privacy Policy
 
-**Last updated:** 17 October 2026
+**Last updated:** 24 October 2026
 
 NeuroPeak: IQ Arena (the "app") offers mini games and tests for mental
 exercise and entertainment. This document explains what the app
@@ -33,6 +33,7 @@ sent together with your random identifier:
 
 | Data               | What it contains                                                                                                                                                                                                               | Why                                                      |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| Push token         | If you turned notifications on: your device's push token, platform and language                                                                                                                                                | To send reminders                                        |
 | Onboarding answers | Age **range** (not a date of birth), focus areas, daily goal, the area you struggle with, exercise habit, notification permission                                                                                              | To build your daily plan and starting difficulty         |
 | Test results       | Test id, raw score, IQ score, percentile, correct/answered counts, sub-dimension scores, duration, date                                                                                                                        | To show your history and compare with your age group     |
 | Progress           | XP, level, current streak, longest streak, last active day, streak freezes left                                                                                                                                                | So your progress survives a change of device             |
@@ -59,10 +60,20 @@ contacts, photos, or a device identifier.
 
 ### 4. Notifications
 
-We ask for notification permission during onboarding. **This release
-does not send notifications and does not store your device's push
-token.** When reminders are switched on, this document will be updated
-and the date at the top will change.
+Notifications are off by default. When you turn them on in Settings —
+and only then — your device is asked for notification permission, and
+if you grant it your device's **push token** is stored on our server.
+What is stored is a string that addresses the device; it contains
+neither your name, nor your email, nor your location.
+
+When you turn notifications off the record is not deleted but
+deactivated, so the same device is recognised if you turn them back
+on. If you want the record gone entirely, deleting your account
+removes the push token with it.
+
+**This release does not send notifications yet:** the token is stored
+but the sending infrastructure is not in place. When sending begins,
+this document will be updated and the date at the top will change.
 
 ## What we do not do
 
