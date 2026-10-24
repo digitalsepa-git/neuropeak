@@ -36,6 +36,47 @@ values
 
 update public.tests set is_active = false where id = 'draft-test';
 
+-- Ölçüm ve profil testleri kendi tablolarında; biri pasif.
+insert into public.measure_tests
+  (id, title_tr, title_en, caveat_tr, caveat_en, est_minutes_min, est_minutes_max)
+values
+  ('brain-age', 'Beyin Yaşı', 'Brain Age', 'Ölçüm değil.', 'Not a measurement.', 3, 5);
+
+insert into public.measure_steps
+  (test_id, measure, title_tr, title_en, instruction_tr, instruction_en, seconds)
+values
+  ('brain-age', 'reaction', 'Tepki', 'Reaction', 'Dokun', 'Tap', 30);
+
+insert into public.profile_tests
+  (id, title_tr, title_en, caveat_tr, caveat_en, est_minutes_min, est_minutes_max)
+values
+  ('archetype', 'Arketip', 'Archetype', 'Envanter değil.', 'Not an inventory.', 2, 3),
+  ('draft-profile', 'Taslak', 'Draft', 'Envanter değil.', 'Not an inventory.', 2, 3);
+
+update public.profile_tests set is_active = false where id = 'draft-profile';
+
+insert into public.profile_traits (test_id, id, label_tr, label_en, description_tr, description_en)
+values
+  ('archetype', 'analytic', 'Çözümleyici', 'Analytic', 'Parçalara ayırır.', 'Breaks it down.'),
+  ('draft-profile', 'analytic', 'Çözümleyici', 'Analytic', 'Taslak.', 'Draft.');
+
+insert into public.profile_questions (test_id, slug, prompt_tr, prompt_en, options)
+values
+  ('archetype', 'ar-1', 'Soru', 'Question',
+    '[{"label":{"tr":"A"},"weights":{"analytic":2}},{"label":{"tr":"B"},"weights":{}}]'::jsonb),
+  ('draft-profile', 'dp-1', 'Taslak soru', 'Draft question',
+    '[{"label":{"tr":"A"},"weights":{}},{"label":{"tr":"B"},"weights":{}}]'::jsonb);
+
+insert into public.profile_outcomes
+  (test_id, id, title_tr, title_en, description_tr, description_en, traits, is_balanced)
+values
+  ('archetype', 'architect', 'Mimar', 'Architect', 'Yapı kurar.', 'Builds structure.',
+    '["analytic"]'::jsonb, false),
+  ('archetype', 'balanced', 'Dengeli', 'Balanced', 'Eksenler yakın.', 'Axes are close.',
+    '[]'::jsonb, true),
+  ('draft-profile', 'architect', 'Mimar', 'Architect', 'Taslak.', 'Draft.',
+    '[]'::jsonb, false);
+
 -- Soru havuzu testlerden bağımsız; ilişki `test_questions`'ta.
 insert into public.questions (slug, kind, prompt_tr, prompt_en, options, correct_index)
 values
@@ -73,6 +114,25 @@ begin
     insert into public.questions (slug, kind, prompt_tr, prompt_en, options, correct_index)
     values ('q-bad', 'logic', 'S', 'Q', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 5);
     raise exception 'beklenen hata alınmadı: questions_correct_index_in_range';
+  exception
+    when check_violation then null;
+  end;
+
+  -- Bir profil testinde en fazla bir "dengeli" sonuç olabilir.
+  begin
+    insert into public.profile_outcomes
+      (test_id, id, title_tr, title_en, description_tr, description_en, is_balanced)
+    values ('archetype', 'balanced-2', 'İkinci', 'Second', 'A', 'A', true);
+    raise exception 'beklenen hata alınmadı: profile_outcomes_one_balanced';
+  exception
+    when unique_violation then null;
+  end;
+
+  -- Profil sorusunun en az iki şıkkı olmalı.
+  begin
+    insert into public.profile_questions (test_id, slug, prompt_tr, prompt_en, options)
+    values ('archetype', 'ar-bad', 'S', 'Q', '[{"label":{"tr":"A"},"weights":{}}]'::jsonb);
+    raise exception 'beklenen hata alınmadı: profile_questions_options_min_two';
   exception
     when check_violation then null;
   end;
@@ -180,6 +240,20 @@ begin
   -- Eşleşme satırları da pasif testi sızdırmamalı.
   assert (select count(*) from public.test_questions) = 2,
     'anon pasif testin soru eşleşmelerini görüyor';
+  -- Ölçüm testi ve adımları yayında.
+  assert (select count(*) from public.measure_tests) = 1,
+    'anon ölçüm testini göremiyor';
+  assert (select count(*) from public.measure_steps) = 1,
+    'anon ölçüm adımını göremiyor';
+  -- Pasif profil testi ve ona bağlı her şey gizlenmeli.
+  assert (select count(*) from public.profile_tests) = 1,
+    'anon pasif profil testini görüyor';
+  assert (select count(*) from public.profile_traits) = 1,
+    'anon pasif profil testinin eksenini görüyor';
+  assert (select count(*) from public.profile_questions) = 1,
+    'anon pasif profil testinin sorusunu görüyor';
+  assert (select count(*) from public.profile_outcomes) = 2,
+    'anon pasif profil testinin arketipini görüyor';
   assert (select count(*) from public.profiles) = 0,
     'anon profilleri görüyor';
 end;

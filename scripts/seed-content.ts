@@ -23,7 +23,11 @@ import {
   CONTENT_TESTS,
   DAILY_TASKS,
   GAME_CATALOGUE,
+  PROFILE_TESTS,
+  brainAgeTest,
   type ContentQuestion,
+  type ProfileOutcome,
+  type ProfileTest,
 } from '@neuropeak/content';
 
 /** SQL metin değişmezi; tek tırnak ikileniyor. */
@@ -236,6 +240,243 @@ where q.id = tq.question_id
   and (tq.test_id, q.slug) not in (${keep});`;
 }
 
+/**
+ * Beyin Yaşı. Soru sormuyor, dört ölçüm yaptırıyor; bu yüzden kendi
+ * tablosunda duruyor. Bugün tek örnek, ama tablo bir listeyi tutuyor.
+ */
+function measureTestsSql(): string {
+  const row = [
+    text(brainAgeTest.id),
+    text(brainAgeTest.title.tr),
+    text(brainAgeTest.title.en),
+    text(brainAgeTest.description.tr),
+    text(brainAgeTest.description.en),
+    text(brainAgeTest.caveat.tr),
+    text(brainAgeTest.caveat.en),
+    `${brainAgeTest.estMinutes[0]}`,
+    `${brainAgeTest.estMinutes[1]}`,
+    brainAgeTest.isPro ? 'true' : 'false',
+    '0',
+  ].join(', ');
+
+  const steps = brainAgeTest.steps.map((step, index) =>
+    [
+      text(brainAgeTest.id),
+      `${text(step.measure)}::public.brain_age_measure`,
+      text(step.title.tr),
+      text(step.title.en),
+      text(step.instruction.tr),
+      text(step.instruction.en),
+      `${step.seconds}`,
+      `${index}`,
+    ].join(', '),
+  );
+
+  return `insert into public.measure_tests (
+  id, title_tr, title_en, description_tr, description_en,
+  caveat_tr, caveat_en, est_minutes_min, est_minutes_max, is_pro, sort_order
+) values
+  (${row})
+on conflict (id) do update set
+  title_tr = excluded.title_tr,
+  title_en = excluded.title_en,
+  description_tr = excluded.description_tr,
+  description_en = excluded.description_en,
+  caveat_tr = excluded.caveat_tr,
+  caveat_en = excluded.caveat_en,
+  est_minutes_min = excluded.est_minutes_min,
+  est_minutes_max = excluded.est_minutes_max,
+  is_pro = excluded.is_pro,
+  sort_order = excluded.sort_order,
+  is_active = true;
+
+${deactivateMissing('measure_tests', 'id', [brainAgeTest.id])}
+
+insert into public.measure_steps (
+  test_id, measure, title_tr, title_en, instruction_tr, instruction_en, seconds, sort_order
+) values
+${values(steps)}
+on conflict (test_id, measure) do update set
+  title_tr = excluded.title_tr,
+  title_en = excluded.title_en,
+  instruction_tr = excluded.instruction_tr,
+  instruction_en = excluded.instruction_en,
+  seconds = excluded.seconds,
+  sort_order = excluded.sort_order;
+
+delete from public.measure_steps
+where (test_id, measure::text) not in (${brainAgeTest.steps
+    .map((step) => `(${text(brainAgeTest.id)}, ${text(step.measure)})`)
+    .join(', ')});`;
+}
+
+function profileTestsSql(): string {
+  const rows = PROFILE_TESTS.map((test, index) =>
+    [
+      text(test.id),
+      text(test.title.tr),
+      text(test.title.en),
+      text(test.description.tr),
+      text(test.description.en),
+      text(test.caveat.tr),
+      text(test.caveat.en),
+      `${test.estMinutes[0]}`,
+      `${test.estMinutes[1]}`,
+      test.isPro ? 'true' : 'false',
+      `${index}`,
+    ].join(', '),
+  );
+
+  return `insert into public.profile_tests (
+  id, title_tr, title_en, description_tr, description_en,
+  caveat_tr, caveat_en, est_minutes_min, est_minutes_max, is_pro, sort_order
+) values
+${values(rows)}
+on conflict (id) do update set
+  title_tr = excluded.title_tr,
+  title_en = excluded.title_en,
+  description_tr = excluded.description_tr,
+  description_en = excluded.description_en,
+  caveat_tr = excluded.caveat_tr,
+  caveat_en = excluded.caveat_en,
+  est_minutes_min = excluded.est_minutes_min,
+  est_minutes_max = excluded.est_minutes_max,
+  is_pro = excluded.is_pro,
+  sort_order = excluded.sort_order,
+  is_active = true;
+
+${deactivateMissing(
+  'profile_tests',
+  'id',
+  PROFILE_TESTS.map((test) => test.id),
+)}`;
+}
+
+/** Eksen kimliği test içinde tekil; anahtar bu yüzden (test, eksen). */
+function profileTraitsSql(): string {
+  const rows: string[] = [];
+  const keep: string[] = [];
+
+  for (const test of PROFILE_TESTS) {
+    test.traits.forEach((trait, index) => {
+      rows.push(
+        [
+          text(test.id),
+          text(trait.id),
+          text(trait.label.tr),
+          text(trait.label.en),
+          text(trait.description.tr),
+          text(trait.description.en),
+          `${index}`,
+        ].join(', '),
+      );
+      keep.push(`(${text(test.id)}, ${text(trait.id)})`);
+    });
+  }
+
+  return `insert into public.profile_traits (
+  test_id, id, label_tr, label_en, description_tr, description_en, sort_order
+) values
+${values(rows)}
+on conflict (test_id, id) do update set
+  label_tr = excluded.label_tr,
+  label_en = excluded.label_en,
+  description_tr = excluded.description_tr,
+  description_en = excluded.description_en,
+  sort_order = excluded.sort_order;
+
+delete from public.profile_traits where (test_id, id) not in (${keep.join(', ')});`;
+}
+
+function profileQuestionsSql(): string {
+  const rows: string[] = [];
+  const keep: string[] = [];
+
+  for (const test of PROFILE_TESTS) {
+    test.questions.forEach((question, index) => {
+      rows.push(
+        [
+          text(test.id),
+          text(question.id),
+          text(question.prompt.tr),
+          text(question.prompt.en),
+          json(question.options),
+          `${index}`,
+        ].join(', '),
+      );
+      keep.push(`(${text(test.id)}, ${text(question.id)})`);
+    });
+  }
+
+  return `insert into public.profile_questions (
+  test_id, slug, prompt_tr, prompt_en, options, sort_order
+) values
+${values(rows)}
+on conflict (test_id, slug) do update set
+  prompt_tr = excluded.prompt_tr,
+  prompt_en = excluded.prompt_en,
+  options = excluded.options,
+  sort_order = excluded.sort_order,
+  is_active = true;
+
+update public.profile_questions set is_active = false
+where (test_id, slug) not in (${keep.join(', ')}) and is_active;`;
+}
+
+/**
+ * Arketipler.
+ *
+ * `balanced` içerikte `outcomes` dizisinin dışında duruyor çünkü
+ * sıralamaya girmiyor: hiçbir eksen öne çıkmadığında gösteriliyor.
+ * Tabloda aynı listede, `is_balanced` bayrağıyla.
+ */
+function profileOutcomesSql(): string {
+  const rows: string[] = [];
+  const keep: string[] = [];
+
+  const add = (test: ProfileTest, outcome: ProfileOutcome, index: number, balanced: boolean) => {
+    rows.push(
+      [
+        text(test.id),
+        text(outcome.id),
+        text(outcome.title.tr),
+        text(outcome.title.en),
+        text(outcome.description.tr),
+        text(outcome.description.en),
+        json(outcome.traits),
+        balanced ? 'true' : 'false',
+        `${index}`,
+      ].join(', '),
+    );
+    keep.push(`(${text(test.id)}, ${text(outcome.id)})`);
+  };
+
+  for (const test of PROFILE_TESTS) {
+    (test.outcomes ?? []).forEach((outcome, index) => add(test, outcome, index, false));
+    if (test.balanced !== undefined) {
+      add(test, test.balanced, (test.outcomes ?? []).length, true);
+    }
+  }
+
+  if (rows.length === 0) return 'delete from public.profile_outcomes;';
+
+  return `insert into public.profile_outcomes (
+  test_id, id, title_tr, title_en, description_tr, description_en,
+  traits, is_balanced, sort_order
+) values
+${values(rows)}
+on conflict (test_id, id) do update set
+  title_tr = excluded.title_tr,
+  title_en = excluded.title_en,
+  description_tr = excluded.description_tr,
+  description_en = excluded.description_en,
+  traits = excluded.traits,
+  is_balanced = excluded.is_balanced,
+  sort_order = excluded.sort_order;
+
+delete from public.profile_outcomes where (test_id, id) not in (${keep.join(', ')});`;
+}
+
 function badgesSql(): string {
   const rows = BADGES.map((badge, index) =>
     [
@@ -315,6 +556,11 @@ export function buildSeedSql(): string {
     testsSql(),
     questionsSql(),
     testQuestionsSql(),
+    measureTestsSql(),
+    profileTestsSql(),
+    profileTraitsSql(),
+    profileQuestionsSql(),
+    profileOutcomesSql(),
     badgesSql(),
     tasksSql(),
   ];
@@ -356,6 +602,8 @@ function main(): void {
     `${GAME_CATALOGUE.length} oyun`,
     `${CONTENT_TESTS.length} test`,
     `${new Set(CONTENT_TESTS.flatMap((test) => test.questions.map((q) => q.id))).size} soru`,
+    `1 ölçüm testi`,
+    `${PROFILE_TESTS.length} profil testi`,
     `${BADGES.length} rozet`,
     `${DAILY_TASKS.length} görev`,
   ];

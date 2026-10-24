@@ -391,6 +391,90 @@ export type Database = {
         };
         Relationships: [];
       };
+      measure_steps: {
+        Row: {
+          test_id: string;
+          measure: Database['public']['Enums']['brain_age_measure'];
+          title_tr: string;
+          title_en: string;
+          instruction_tr: string;
+          instruction_en: string;
+          seconds: number;
+          sort_order: number;
+        };
+        Insert: {
+          test_id: string;
+          measure: Database['public']['Enums']['brain_age_measure'];
+          title_tr: string;
+          title_en: string;
+          instruction_tr: string;
+          instruction_en: string;
+          seconds: number;
+          sort_order?: number;
+        };
+        Update: {
+          test_id?: string;
+          measure?: Database['public']['Enums']['brain_age_measure'];
+          title_tr?: string;
+          title_en?: string;
+          instruction_tr?: string;
+          instruction_en?: string;
+          seconds?: number;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      measure_tests: {
+        Row: {
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr: string | null;
+          description_en: string | null;
+          caveat_tr: string;
+          caveat_en: string;
+          est_minutes_min: number;
+          est_minutes_max: number;
+          is_pro: boolean;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr?: string | null;
+          description_en?: string | null;
+          caveat_tr: string;
+          caveat_en: string;
+          est_minutes_min: number;
+          est_minutes_max: number;
+          is_pro?: boolean;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title_tr?: string;
+          title_en?: string;
+          description_tr?: string | null;
+          description_en?: string | null;
+          caveat_tr?: string;
+          caveat_en?: string;
+          est_minutes_min?: number;
+          est_minutes_max?: number;
+          is_pro?: boolean;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       onboarding_answers: {
         Row: {
           user_id: string;
@@ -424,6 +508,162 @@ export type Database = {
           notifications_granted?: boolean;
           completed_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      profile_outcomes: {
+        Row: {
+          test_id: string;
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr: string;
+          description_en: string;
+          traits: Json;
+          is_balanced: boolean;
+          sort_order: number;
+        };
+        Insert: {
+          test_id: string;
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr: string;
+          description_en: string;
+          traits?: Json;
+          is_balanced?: boolean;
+          sort_order?: number;
+        };
+        Update: {
+          test_id?: string;
+          id?: string;
+          title_tr?: string;
+          title_en?: string;
+          description_tr?: string;
+          description_en?: string;
+          traits?: Json;
+          is_balanced?: boolean;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      profile_questions: {
+        Row: {
+          id: string;
+          test_id: string;
+          slug: string;
+          prompt_tr: string;
+          prompt_en: string;
+          options: Json;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          test_id: string;
+          slug: string;
+          prompt_tr: string;
+          prompt_en: string;
+          options: Json;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          test_id?: string;
+          slug?: string;
+          prompt_tr?: string;
+          prompt_en?: string;
+          options?: Json;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      profile_tests: {
+        Row: {
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr: string | null;
+          description_en: string | null;
+          caveat_tr: string;
+          caveat_en: string;
+          est_minutes_min: number;
+          est_minutes_max: number;
+          is_pro: boolean;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          title_tr: string;
+          title_en: string;
+          description_tr?: string | null;
+          description_en?: string | null;
+          caveat_tr: string;
+          caveat_en: string;
+          est_minutes_min: number;
+          est_minutes_max: number;
+          is_pro?: boolean;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title_tr?: string;
+          title_en?: string;
+          description_tr?: string | null;
+          description_en?: string | null;
+          caveat_tr?: string;
+          caveat_en?: string;
+          est_minutes_min?: number;
+          est_minutes_max?: number;
+          is_pro?: boolean;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      profile_traits: {
+        Row: {
+          test_id: string;
+          id: string;
+          label_tr: string;
+          label_en: string;
+          description_tr: string;
+          description_en: string;
+          sort_order: number;
+        };
+        Insert: {
+          test_id: string;
+          id: string;
+          label_tr: string;
+          label_en: string;
+          description_tr: string;
+          description_en: string;
+          sort_order?: number;
+        };
+        Update: {
+          test_id?: string;
+          id?: string;
+          label_tr?: string;
+          label_en?: string;
+          description_tr?: string;
+          description_en?: string;
+          sort_order?: number;
         };
         Relationships: [];
       };
@@ -907,6 +1147,7 @@ export type Database = {
       [key: string]: never;
     };
     Enums: {
+      brain_age_measure: 'reaction' | 'memory' | 'speed' | 'focus';
       brain_axis: 'memory' | 'focus' | 'logic' | 'speed' | 'problem_solving';
       difficulty: 'easy' | 'medium' | 'hard';
       game_category: 'memory' | 'attention' | 'logic' | 'math' | 'spatial' | 'speed' | 'verbal';
