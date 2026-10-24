@@ -1,5 +1,7 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
+import { apsEnvironmentFor } from './src/lib/push/aps.ts';
+
 /**
  * AdMob uygulama kimlikleri yerel derlemeye gömülür; env'den okunuyor.
  * Sahte bir kimlik gömmek yanıltıcı olurdu: ikisi de tanımlı değilse
@@ -14,6 +16,14 @@ const hasAdMobAppIds =
   iosAppId.length > 0 &&
   typeof androidAppId === 'string' &&
   androidAppId.length > 0;
+
+/**
+ * Bildirim ortamını burada veriyoruz çünkü `expo-notifications`
+ * eklentisi entitlement zaten yazılıysa dokunmuyor ve varsayılanı
+ * "development". Kuralın kendisi ve gerekçesi `src/lib/push/aps.ts`
+ * içinde; orada testleniyor.
+ */
+const apsEnvironment = apsEnvironmentFor(process.env.EAS_BUILD_PROFILE);
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   const plugins = [...(config.plugins ?? [])];
@@ -36,5 +46,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: config.name ?? 'NeuroPeak',
     slug: config.slug ?? 'neuropeak',
     plugins,
+    ios: {
+      ...config.ios,
+      entitlements: {
+        ...config.ios?.entitlements,
+        'aps-environment': apsEnvironment,
+      },
+    },
   };
 };

@@ -4,6 +4,11 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    // `app.config.ts` Expo'nun kendi yükleyicisiyle okunuyor; o
+    // yükleyici yalnızca giriş dosyasını derliyor ve komşu bir TS
+    // dosyasını ancak uzantısıyla bulabiliyor. Yayma kapalı
+    // (`noEmit`) olduğu için bayrağın başka bir etkisi yok.
+    "allowImportingTsExtensions": true,
     "paths": {
       "@/*": ["./src/*"],
       "@/assets/*": ["./assets/*"]
