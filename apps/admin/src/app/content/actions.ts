@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/auth';
 import { canEditContent } from '@/lib/content-mode';
-import { parseBadge, parseDailyTask, type FormValues } from '@/lib/content-edit';
+import { parseBadge, parseDailyTask, parseQuestion, type FormValues } from '@/lib/content-edit';
 
 /**
  * İçerik düzenleme eylemleri.
@@ -85,4 +85,52 @@ export async function updateBadge(
 
   const { id, ...patch } = parsed.value;
   return save('badges', id, patch, '/content/badges');
+}
+
+/**
+ * Soru güncellemesi.
+ *
+ * Diğerlerinden farkı anahtar: soruların birincil anahtarı uuid,
+ * içerikteki kalıcı kimlik `slug` sütununda. Panel slug'ı
+ * gösteriyor, güncelleme de onunla eşleşiyor.
+ *
+ * Soru havuzu paylaşımlı: bir soruyu değiştirmek onu kullanan
+ * bütün testleri etkiliyor. Bu yüzden yalnızca soruyu gösteren
+ * sayfa değil, test listesi de tazeleniyor.
+ */
+export async function updateQuestion(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  if (!canEditContent) return { status: 'error', message: 'Bağlantı yokken düzenleme kapalı.' };
+
+  const parsed = parseQuestion(toValues(formData));
+  if (!parsed.ok) return { status: 'error', message: parsed.message };
+
+  const { slug, ...patch } = parsed.value;
+
+  const supabase = await createClient();
+  if (supabase === null) {
+    return { status: 'error', message: 'Veritabanı bağlı değil.' };
+  }
+
+  const { data, error } = await supabase
+    .from('questions')
+    .update(patch)
+    .eq('slug', slug)
+    .select('slug');
+
+  if (error !== null) {
+    return { status: 'error', message: `Kaydedilemedi: ${error.message}` };
+  }
+
+  if (data === null || data.length === 0) {
+    return {
+      status: 'error',
+      message: 'Kaydedilemedi: bu hesabın yazma yetkisi yok ya da soru bulunamadı.',
+    };
+  }
+
+  revalidatePath('/content/tests', 'layout');
+  return { status: 'saved' };
 }

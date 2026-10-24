@@ -11,7 +11,13 @@ import { notFound } from 'next/navigation';
 import { QuestionTable } from '@/components/question-table';
 import { Shell } from '@/components/shell';
 import { canEditContent, contentMode } from '@/lib/content-mode';
-import { getMeasureTest, getProfileTest, getTest, kindBreakdown } from '@/lib/content-source';
+import {
+  getMeasureTest,
+  getProfileTest,
+  getTest,
+  kindBreakdown,
+  questionUsage,
+} from '@/lib/content-source';
 
 const KIND_LABELS: Record<string, string> = {
   matrix: 'Matris',
@@ -60,8 +66,9 @@ export default async function TestDetailPage({ params }: PageProps<'/content/tes
   notFound();
 }
 
-function QuestionTestView({ test }: { test: ContentTest }) {
+async function QuestionTestView({ test }: { test: ContentTest }) {
   const breakdown = kindBreakdown(test.questions);
+  const usage = await questionUsage();
 
   return (
     <Shell title={test.title.tr} description={test.description.tr}>
@@ -99,7 +106,7 @@ function QuestionTestView({ test }: { test: ContentTest }) {
           )}
         </div>
 
-        <QuestionTable questions={test.questions} kindLabels={KIND_LABELS} />
+        <QuestionTable questions={test.questions} kindLabels={KIND_LABELS} usage={usage} />
       </section>
     </Shell>
   );

@@ -137,3 +137,102 @@ export function parseBadge(values: FormValues): Parsed<BadgeEdit> {
     },
   };
 }
+
+// ---------------------------------------------------------------- sorular
+
+/** Ondalık sayı; zorluk ağırlığı 0,7–2 aralığında dolaşıyor. */
+function decimal(values: FormValues, key: string, label: string): Parsed<number> {
+  const raw = text(values, key).replace(',', '.');
+  if (raw.length === 0) return { ok: false, message: `${label} boş olamaz.` };
+
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return { ok: false, message: `${label} sayı olmalı.` };
+
+  return { ok: true, value: parsed };
+}
+
+export type QuestionOptionEdit = {
+  readonly tr: string;
+  readonly en: string;
+};
+
+export type QuestionEdit = {
+  readonly slug: string;
+  readonly prompt_tr: string;
+  readonly prompt_en: string;
+  readonly options: readonly QuestionOptionEdit[];
+  readonly correct_index: number;
+  readonly difficulty_weight: number;
+  readonly explanation_tr: string | null;
+  readonly explanation_en: string | null;
+  readonly is_active: boolean;
+};
+
+/**
+ * Soru formu.
+ *
+ * Şıklar `options_count` kadar okunuyor: form şık ekleyip
+ * çıkarabiliyor ve indeksler her gönderimde sıfırdan sıkışık
+ * geliyor, böylece silinen bir şık arada boşluk bırakmıyor.
+ *
+ * Doğru şık radyo düğmesiyle seçiliyor, elle indeks yazılmıyor —
+ * yoksa bir şık silindiğinde indeks sessizce başka bir şıkkı
+ * gösterirdi. Yine de aralık burada da kontrol ediliyor: form
+ * doğru çalışmasa bile yanlış veri yazılmasın.
+ */
+export function parseQuestion(values: FormValues): Parsed<QuestionEdit> {
+  const slug = required(values, 'slug', 'Kimlik');
+  if (!slug.ok) return slug;
+
+  const promptTr = required(values, 'prompt_tr', 'Türkçe soru metni');
+  if (!promptTr.ok) return promptTr;
+
+  const promptEn = required(values, 'prompt_en', 'İngilizce soru metni');
+  if (!promptEn.ok) return promptEn;
+
+  const count = integer(values, 'options_count', 'Şık sayısı');
+  if (!count.ok) return count;
+  if (count.value < 2) return { ok: false, message: 'Soruda en az iki şık olmalı.' };
+
+  const options: QuestionOptionEdit[] = [];
+  for (let index = 0; index < count.value; index += 1) {
+    const tr = text(values, `option_tr_${index}`);
+    const en = text(values, `option_en_${index}`);
+
+    if (tr.length === 0 || en.length === 0) {
+      return { ok: false, message: `${index + 1}. şık iki dilde de dolu olmalı.` };
+    }
+
+    options.push({ tr, en });
+  }
+
+  const correct = integer(values, 'correct_index', 'Doğru şık');
+  if (!correct.ok) return correct;
+  if (correct.value < 0 || correct.value >= options.length) {
+    return { ok: false, message: 'Doğru şık, şıklardan biri olmalı.' };
+  }
+
+  const weight = decimal(values, 'difficulty_weight', 'Zorluk ağırlığı');
+  if (!weight.ok) return weight;
+  if (weight.value <= 0) return { ok: false, message: 'Zorluk ağırlığı sıfırdan büyük olmalı.' };
+
+  // Açıklama isteğe bağlı; boş bırakılırsa sütun null oluyor, boş
+  // dizgi değil — "açıklama yok" ile "açıklama boş" aynı şey değil.
+  const explanationTr = text(values, 'explanation_tr');
+  const explanationEn = text(values, 'explanation_en');
+
+  return {
+    ok: true,
+    value: {
+      slug: slug.value,
+      prompt_tr: promptTr.value,
+      prompt_en: promptEn.value,
+      options,
+      correct_index: correct.value,
+      difficulty_weight: weight.value,
+      explanation_tr: explanationTr.length === 0 ? null : explanationTr,
+      explanation_en: explanationEn.length === 0 ? null : explanationEn,
+      is_active: text(values, 'is_active') === 'on',
+    },
+  };
+}

@@ -5,6 +5,8 @@ import { useMemo, useState } from 'react';
 
 import { canEditContent } from '@/lib/content-mode';
 
+import { QuestionEditor } from './question-editor';
+
 /**
  * Soru listesi. Düzenleme açılana kadar işin çoğu gözden geçirmek:
  * doğru şık işaretli, zorluk ağırlığı ve iki dildeki metin bir arada
@@ -14,13 +16,17 @@ import { canEditContent } from '@/lib/content-mode';
 export function QuestionTable({
   questions,
   kindLabels,
+  usage,
 }: {
   questions: readonly ContentQuestion[];
   kindLabels: Record<string, string>;
+  /** Hangi soru hangi testlerde geçiyor; havuz paylaşımlı. */
+  usage: Readonly<Record<string, readonly string[]>>;
 }) {
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<string>('all');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const kinds = useMemo(
     () => [...new Set(questions.map((question) => question.kind))].sort(),
@@ -147,13 +153,22 @@ export function QuestionTable({
                     <p className="mt-sm text-bodysmall text-fg-muted">{question.explanation.tr}</p>
                   )}
 
-                  <button
-                    type="button"
-                    disabled={!canEditContent}
-                    className="mt-md rounded-md border border-border px-sm py-1 text-bodysmall disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Düzenle
-                  </button>
+                  {editingId === question.id ? (
+                    <QuestionEditor
+                      question={question}
+                      usedIn={usage[question.id] ?? []}
+                      onClose={() => setEditingId(null)}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={!canEditContent}
+                      onClick={() => setEditingId(question.id)}
+                      className="mt-md rounded-md border border-border px-sm py-1 text-bodysmall disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Düzenle
+                    </button>
+                  )}
                 </div>
               )}
             </li>
