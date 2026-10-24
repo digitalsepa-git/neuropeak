@@ -3,12 +3,16 @@ import { describe, expect, it } from 'vitest';
 import { EMPTY_BRAIN_MAP } from './brain-map';
 import {
   badgeProgress,
+  badgeTierLabel,
+  describeBadgeRequirement,
   isBadgeEarned,
   newlyEarnedBadges,
   showcaseOrder,
   starsForBadges,
   type BadgeContext,
   type BadgeDefinition,
+  type BadgeRequirement,
+  type BadgeTier,
 } from './badges';
 
 const CONTEXT: BadgeContext = {
@@ -176,5 +180,47 @@ describe('vitrin sırası', () => {
     expect(showcaseOrder(definitions, CONTEXT, ['secret']).map((item) => item.id)).toContain(
       'secret',
     );
+  });
+});
+
+describe('describeBadgeRequirement', () => {
+  const KINDS: readonly BadgeRequirement[] = [
+    { kind: 'level', value: 5 },
+    { kind: 'xp', value: 1000 },
+    { kind: 'streak', value: 7 },
+    { kind: 'rounds', value: 50 },
+    { kind: 'tests', value: 3 },
+    { kind: 'category_rounds', category: 'memory', value: 20 },
+    { kind: 'all_categories' },
+    { kind: 'axis_score', axis: 'logic', value: 80 },
+    { kind: 'neuropeak', value: 75 },
+    { kind: 'league_tier', tier: 'gold' },
+    { kind: 'weekly_xp', value: 500 },
+    { kind: 'best_iq', value: 130 },
+  ];
+
+  it('her koşul türü için bir cümle üretir', () => {
+    for (const requirement of KINDS) {
+      const text = describeBadgeRequirement(requirement);
+      expect(text.length, requirement.kind).toBeGreaterThan(0);
+      // Etiket tablosundan düşen bir anahtar "undefined" yazardı.
+      expect(text, requirement.kind).not.toContain('undefined');
+    }
+  });
+
+  it('sayıya gelen ek okunuşa uyuyor', () => {
+    expect(describeBadgeRequirement({ kind: 'level', value: 5 })).toBe("Seviye 5'e ulaş");
+    expect(describeBadgeRequirement({ kind: 'level', value: 30 })).toBe("Seviye 30'a ulaş");
+  });
+});
+
+describe('badgeTierLabel', () => {
+  it('dört kademeyi de adlandırır', () => {
+    expect([1, 2, 3, 4].map((tier) => badgeTierLabel(tier as BadgeTier))).toEqual([
+      'Bronz',
+      'Gümüş',
+      'Altın',
+      'Platin',
+    ]);
   });
 });

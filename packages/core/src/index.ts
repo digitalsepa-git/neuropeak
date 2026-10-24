@@ -321,6 +321,8 @@ export {
 
 export {
   badgeProgress,
+  badgeTierLabel,
+  describeBadgeRequirement,
   isBadgeEarned,
   newlyEarnedBadges,
   showcaseOrder,
