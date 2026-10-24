@@ -1,3 +1,4 @@
+import { hasPlayed, pickSuggestedGame, recentlyPlayed, resumeLevel } from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
@@ -7,8 +8,9 @@ import { Icon } from '@/components/icons';
 import { RewardedAdCard } from '@/components/rewarded-ad-card';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
-import { GAME_CATALOGUE } from '@neuropeak/content';
+import { findGameContent } from '@neuropeak/content';
 
+import { GAME_DEFINITIONS } from '@/games/registry';
 import { useAds } from '@/lib/ads/context';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
@@ -16,7 +18,11 @@ import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
 import { TASK_LABEL_KEYS } from '@/lib/progress/templates';
 
-const SUGGESTED = GAME_CATALOGUE[3];
+/** Öneri yalnızca oynanabilir oyunlar arasından seçiliyor. */
+const PLAYABLE_IDS = GAME_DEFINITIONS.map((game) => game.id);
+
+/** "Kaldığın yerden" bölümünde gösterilecek oyun sayısı. */
+const CONTINUE_COUNT = 3;
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -27,7 +33,7 @@ export default function HomeScreen() {
   const { getString } = useRemoteConfig();
   const announcement = getString('announcement.text');
   const { isPro } = usePro();
-  const { state, level, neuropeak } = useProgress();
+  const { state, level, neuropeak, userId } = useProgress();
   const { canWatchRewarded } = useAds();
 
   // Görev kimliği katalogda yoksa kimliğin kendisi görünür; sessizce
@@ -39,6 +45,21 @@ export default function HomeScreen() {
 
   const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;
   const streakDays = state.streak.currentDays;
+
+  // Öneri günde bir kez değişiyor; görevlerle aynı tohumlama. Günü
+  // `tasksDate` veriyor — açılışta bugüne ayarlanıyor ve render
+  // sırasında saate bakmamızı gerektirmiyor.
+  const suggestedId = pickSuggestedGame(PLAYABLE_IDS, state.games, {
+    userId,
+    dateKey: state.tasksDate ?? '',
+  });
+  const suggested = suggestedId === undefined ? undefined : findGameContent(suggestedId);
+  const suggestionIsNew = suggestedId !== undefined && !hasPlayed(state.games, suggestedId);
+
+  const continueGames = recentlyPlayed(state.games, CONTINUE_COUNT).flatMap((id) => {
+    const game = findGameContent(id);
+    return game === undefined ? [] : [{ game, record: state.games[id] }];
+  });
 
   return (
     <Screen scroll>
@@ -142,18 +163,52 @@ export default function HomeScreen() {
         </Card>
       </Section>
 
-      {SUGGESTED !== undefined && (
+      {continueGames.length > 0 && (
+        <Section title={t('home.continueSection')}>
+          <View style={styles.stack}>
+            {continueGames.map(({ game, record }) => (
+              <Card
+                key={game.id}
+                accentColor={categoryAccent[game.category]}
+                onPress={() => router.push({ pathname: '/game/[id]', params: { id: game.id } })}
+              >
+                <View style={styles.taskHead}>
+                  <Text variant="subheading">{localized(game.title)}</Text>
+                  <Badge label={labels.category(game.category)} />
+                </View>
+                <Text variant="bodySmall" color="textSecondary">
+                  {record === undefined
+                    ? localized(game.instruction)
+                    : game.mode === 'levels'
+                      ? t('games.levelOf', {
+                          level: resumeLevel(record, game),
+                          total: game.totalLevels,
+                        })
+                      : t('games.bestScore', { score: record.bestScore })}
+                </Text>
+              </Card>
+            ))}
+          </View>
+        </Section>
+      )}
+
+      {suggested !== undefined && (
         <Section title={t('home.suggestionSection')}>
           <Card
-            accentColor={categoryAccent[SUGGESTED.category]}
-            onPress={() => router.push({ pathname: '/game/[id]', params: { id: SUGGESTED.id } })}
+            accentColor={categoryAccent[suggested.category]}
+            onPress={() => router.push({ pathname: '/game/[id]', params: { id: suggested.id } })}
           >
             <View style={styles.taskHead}>
-              <Text variant="subheading">{localized(SUGGESTED.title)}</Text>
-              <Badge label={labels.category(SUGGESTED.category)} />
+              <Text variant="subheading">{localized(suggested.title)}</Text>
+              <Badge
+                label={
+                  suggestionIsNew ? t('home.suggestionNew') : labels.category(suggested.category)
+                }
+                tone={suggestionIsNew ? 'brand' : 'neutral'}
+              />
             </View>
             <Text variant="bodySmall" color="textSecondary">
-              {localized(SUGGESTED.instruction)}
+              {localized(suggested.instruction)}
             </Text>
           </Card>
         </Section>

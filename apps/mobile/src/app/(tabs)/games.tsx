@@ -1,4 +1,10 @@
-import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
+import {
+  GAME_CATEGORIES,
+  playedGameCount,
+  resumeLevel,
+  type GameCategory,
+  type GameRecord,
+} from '@neuropeak/core';
 import { categoryAccent, radius, spacing } from '@neuropeak/ui';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -9,9 +15,9 @@ import { Section } from '@/components/section';
 import { Badge, Card, Chip, Screen, Text } from '@/components/ui';
 import { GAME_CATALOGUE, type ContentGame } from '@neuropeak/content';
 
-import { isGamePlayable } from '@/games/registry';
-import { GAME_PROGRESS } from '@/data/placeholder';
+import { GAME_DEFINITIONS, isGamePlayable } from '@/games/registry';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
+import { useProgress } from '@/lib/progress/context';
 
 type Filter = GameCategory | 'all';
 
@@ -19,6 +25,9 @@ export default function GamesScreen() {
   const [filter, setFilter] = useState<Filter>('all');
   const t = useT();
   const labels = useLabels();
+  const { games } = useProgress();
+
+  const played = playedGameCount(games);
 
   const visibleCategories = GAME_CATEGORIES.filter(
     (category) => filter === 'all' || filter === category,
@@ -27,7 +36,10 @@ export default function GamesScreen() {
   return (
     <Screen scroll padded={false}>
       <View style={styles.padded}>
-        <AppHeader title={t('games.title')} />
+        <AppHeader
+          title={t('games.title')}
+          subtitle={t('games.playedCount', { played, total: GAME_DEFINITIONS.length })}
+        />
       </View>
 
       <ScrollView
@@ -55,7 +67,7 @@ export default function GamesScreen() {
           <Section key={category} title={labels.category(category)}>
             <View style={styles.grid}>
               {GAME_CATALOGUE.filter((game) => game.category === category).map((game) => (
-                <GameCard key={game.id} game={game} />
+                <GameCard key={game.id} game={game} record={games[game.id]} />
               ))}
             </View>
           </Section>
@@ -65,16 +77,12 @@ export default function GamesScreen() {
   );
 }
 
-function GameCard({ game }: { game: ContentGame }) {
+function GameCard({ game, record }: { game: ContentGame; record: GameRecord | undefined }) {
   const router = useRouter();
   const t = useT();
   const { localized } = useI18n();
   const accent = categoryAccent[game.category];
-  const isEndless = game.totalLevels === 0;
   const playable = isGamePlayable(game.id);
-  // Oyun başına ilerleme henüz kaydedilmiyor; kart dolu görünsün diye
-  // yer tutucu değer kullanılıyor.
-  const level = GAME_PROGRESS[game.id] ?? 1;
 
   return (
     <Card
@@ -93,14 +101,20 @@ function GameCard({ game }: { game: ContentGame }) {
       <Text variant="subheading" numberOfLines={1}>
         {localized(game.title)}
       </Text>
-      {playable ? (
+      {!playable ? (
+        <Badge label={t('common.soon')} />
+      ) : record === undefined || record.plays === 0 ? (
         <Text variant="caption" color="textMuted">
-          {isEndless
-            ? t('games.bestLevel', { level })
-            : t('games.levelOf', { level, total: game.totalLevels })}
+          {t('games.notPlayed')}
         </Text>
       ) : (
-        <Badge label={t('common.soon')} />
+        <Text variant="caption" color="textMuted">
+          {/* Seviyeli oyunda kalınan yer, süreli oyunda en iyi skor:
+              süreli oyunun seviyesi yok. */}
+          {game.mode === 'levels'
+            ? t('games.levelOf', { level: resumeLevel(record, game), total: game.totalLevels })
+            : t('games.bestScore', { score: record.bestScore })}
+        </Text>
       )}
     </Card>
   );

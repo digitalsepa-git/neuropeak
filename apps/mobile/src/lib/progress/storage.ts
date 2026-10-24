@@ -6,6 +6,7 @@ import {
   type CategoryCounts,
   type DailyTask,
   type DayActivity,
+  type GameProgress,
   type LeagueOutcome,
   type LeagueTier,
   type StreakState,
@@ -29,6 +30,8 @@ export type ProgressState = {
   history: DayActivity[];
   /** Kategori başına oynanan tur sayısı. */
   categoryRounds: CategoryCounts;
+  /** Oyun başına ulaşılan seviye, en iyi skor ve oynama sayısı. */
+  games: GameProgress;
   league: LeagueState;
   /** Kazanılmış rozet kimlikleri. */
   badges: string[];
@@ -70,6 +73,7 @@ export const EMPTY_PROGRESS: ProgressState = {
   brainMap: EMPTY_BRAIN_MAP,
   history: [],
   categoryRounds: {},
+  games: {},
   league: EMPTY_LEAGUE,
   badges: [],
   testsFinished: 0,
@@ -90,6 +94,7 @@ export async function loadProgress(): Promise<ProgressState> {
       brainMap: { ...EMPTY_BRAIN_MAP, ...parsed.brainMap },
       history: parsed.history ?? [],
       categoryRounds: parsed.categoryRounds ?? {},
+      games: parsed.games ?? {},
       league: { ...EMPTY_LEAGUE, ...parsed.league },
       badges: parsed.badges ?? [],
     };

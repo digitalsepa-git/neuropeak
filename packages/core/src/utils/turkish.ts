@@ -77,3 +77,50 @@ export function turkishDativeSuffix(value: number): string {
   // düz ünsüzle biten bir kelimeyle okunur; hepsi "e" eki alır.
   return "'e";
 }
+
+/** Birler basamağının okunuşuna göre ayrılma eki: bir'den, üç'ten, altı'dan. */
+const ONES_ABLATIVE: Readonly<Record<number, string>> = {
+  1: 'den',
+  2: 'den',
+  3: 'ten',
+  4: 'ten',
+  5: 'ten',
+  6: 'dan',
+  7: 'den',
+  8: 'den',
+  9: 'dan',
+};
+
+/** Onlar basamağı: on'dan, yirmi'den, kırk'tan, yetmiş'ten… */
+const TENS_ABLATIVE: Readonly<Record<number, string>> = {
+  1: 'dan',
+  2: 'den',
+  3: 'dan',
+  4: 'tan',
+  5: 'den',
+  6: 'tan',
+  7: 'ten',
+  8: 'den',
+  9: 'dan',
+};
+
+/**
+ * Rakamla yazılmış bir sayıya gelecek ayrılma eki — kesme işaretiyle
+ * birlikte. Yönelme ekinde olduğu gibi okunuşa bağlı, üstüne bir de
+ * sertleşme var: "3'ten" ama "2'den", "40'tan" ama "50'den".
+ *
+ * @example turkishAblativeSuffix(37) // "'den"
+ */
+export function turkishAblativeSuffix(value: number): string {
+  const whole = Math.abs(Math.trunc(value));
+
+  const ones = whole % 10;
+  if (ones !== 0) return `'${ONES_ABLATIVE[ones] as string}`;
+
+  const tens = Math.floor(whole / 10) % 10;
+  if (tens !== 0) return `'${TENS_ABLATIVE[tens] as string}`;
+
+  // Sıfırla biten geri kalanlar "yüz" ve "bin" ile okunur; ikisi de
+  // "den" alır. "Milyon'dan" bu uygulamada geçmiyor.
+  return "'den";
+}
