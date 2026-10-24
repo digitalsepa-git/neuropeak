@@ -1,8 +1,12 @@
 import {
   CONTENT_TESTS,
+  PROFILE_TESTS,
+  brainAgeTest,
+  findProfileTest,
   findTest,
   type ContentQuestion,
   type ContentTest,
+  type ProfileTest,
 } from '@neuropeak/content';
 
 import { isSupabaseConfigured } from './supabase';
@@ -23,17 +27,37 @@ export const contentMode: ContentMode = isSupabaseConfigured ? 'live' : 'embedde
 
 export const canEditContent = contentMode === 'live';
 
+/**
+ * Testin hangi türden olduğu.
+ *
+ * Uygulamada üç tür test var ve panelin üçünü de göstermesi gerekiyor:
+ * soru havuzlu IQ testleri, ölçüm yaptıran Beyin Yaşı ve eksen puanı
+ * veren profil testleri. Önceden yalnızca ilki listeleniyordu, yani
+ * panel on bir testin yedisini gösteriyordu.
+ *
+ * Her tür farklı sayılar taşıyor; ortak bir satıra sıkıştırmak yerine
+ * tür ayrımı burada duruyor ve tablo her türe kendi sütununu veriyor.
+ */
+export type TestFamily = 'questions' | 'measures' | 'profile';
+
 export type TestSummary = {
   readonly id: string;
   readonly title: string;
-  readonly kind: ContentTest['kind'];
-  readonly questionCount: number;
-  readonly poolSize: number;
+  readonly family: TestFamily;
   readonly isPro: boolean;
-  readonly focus: ContentTest['focus'];
   readonly estMinutes: readonly [number, number];
-  /** Havuzdaki soruların ortalama zorluk ağırlığı. */
-  readonly averageWeight: number;
+  /** Panel yolunu kurar; tür başına farklı ekran var. */
+  readonly href: string;
+  /** Türe göre değişen tek satırlık özet: havuz, ölçüm ya da eksen. */
+  readonly scale: string;
+  /** Soru havuzlu testler için; diğerlerinde undefined. */
+  readonly questions?: {
+    readonly kind: ContentTest['kind'];
+    readonly focus: ContentTest['focus'];
+    readonly asked: number;
+    readonly poolSize: number;
+    readonly averageWeight: number;
+  };
 };
 
 function averageWeight(questions: readonly ContentQuestion[]): number {
@@ -42,22 +66,66 @@ function averageWeight(questions: readonly ContentQuestion[]): number {
   return Math.round((total / questions.length) * 100) / 100;
 }
 
-export function listTests(): TestSummary[] {
+/** Soru havuzlu testler: Temel IQ, Görsel IQ, Sözel IQ… */
+export function listQuestionTests(): TestSummary[] {
   return CONTENT_TESTS.map((test) => ({
     id: test.id,
     title: test.title.tr,
-    kind: test.kind,
-    questionCount: test.questionCount,
-    poolSize: test.questions.length,
+    family: 'questions' as const,
     isPro: test.isPro,
-    focus: test.focus,
     estMinutes: test.estMinutes,
-    averageWeight: averageWeight(test.questions),
+    href: `/content/tests/${test.id}`,
+    scale: `${test.questions.length} soruluk havuz`,
+    questions: {
+      kind: test.kind,
+      focus: test.focus,
+      asked: test.questionCount,
+      poolSize: test.questions.length,
+      averageWeight: averageWeight(test.questions),
+    },
   }));
+}
+
+/** Soru sormayan testler: Beyin Yaşı ve üç profil testi. */
+export function listOtherTests(): TestSummary[] {
+  return [
+    {
+      id: brainAgeTest.id,
+      title: brainAgeTest.title.tr,
+      family: 'measures' as const,
+      isPro: brainAgeTest.isPro,
+      estMinutes: brainAgeTest.estMinutes,
+      href: `/content/tests/${brainAgeTest.id}`,
+      scale: `${brainAgeTest.steps.length} ölçüm`,
+    },
+    ...PROFILE_TESTS.map((test) => ({
+      id: test.id,
+      title: test.title.tr,
+      family: 'profile' as const,
+      isPro: test.isPro,
+      estMinutes: test.estMinutes,
+      href: `/content/tests/${test.id}`,
+      scale: `${test.questions.length} soru · ${test.traits.length} eksen`,
+    })),
+  ];
+}
+
+/** Uygulamanın gerçekten sunduğu bütün testler. */
+export function listTests(): TestSummary[] {
+  return [...listQuestionTests(), ...listOtherTests()];
 }
 
 export function getTest(id: string): ContentTest | undefined {
   return findTest(id);
+}
+
+export function getProfileTest(id: string): ProfileTest | undefined {
+  return findProfileTest(id);
+}
+
+/** Beyin Yaşı tek örnek; kimlik eşleşiyorsa o. */
+export function getMeasureTest(id: string): typeof brainAgeTest | undefined {
+  return id === brainAgeTest.id ? brainAgeTest : undefined;
 }
 
 /** Bütün testlerdeki toplam soru sayısı; aynı soru iki testte sayılmaz. */

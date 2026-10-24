@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   COMPARISON_KINDS,
+  describeBadgeRequirement,
   FIGURE_ATTRIBUTES,
   attributeOf,
   generateLogicChain,
@@ -15,6 +16,7 @@ import {
   type ContentFigure,
 } from '@neuropeak/core';
 
+import { BADGES } from './badges/catalogue';
 import { GAME_CATALOGUE } from './games/catalogue';
 import { logicChainBankFor } from './logic/chain';
 import { PROFILE_TESTS } from './tests/profiles';
@@ -638,6 +640,32 @@ describe('mantık zinciri bankası', () => {
         }
         expect(puzzle.question, `${language}/${seed}`).not.toMatch(/[{}]/);
       }
+    }
+  });
+});
+
+describe('rozet kataloğu', () => {
+  it('her rozetin koşulu panelde anlatılabiliyor', () => {
+    // Çekirdekteki switch yeni bir koşul türünü karşılamazsa derlenmez;
+    // bu test de katalogdaki her rozetin etiket tablolarında karşılığı
+    // olduğunu gösteriyor. Eksik bir etiket "undefined" yazardı.
+    for (const badge of BADGES) {
+      const text = describeBadgeRequirement(badge.requirement);
+      expect(text.length, badge.id).toBeGreaterThan(0);
+      expect(text, badge.id).not.toContain('undefined');
+    }
+  });
+
+  it('kimlikler tekil', () => {
+    expect(new Set(BADGES.map((badge) => badge.id)).size).toBe(BADGES.length);
+  });
+
+  it('her rozetin iki dilde adı ve açıklaması var', () => {
+    for (const badge of BADGES) {
+      expect(badge.title.tr.length, badge.id).toBeGreaterThan(0);
+      expect(badge.title.en.length, badge.id).toBeGreaterThan(0);
+      expect(badge.description.tr.length, badge.id).toBeGreaterThan(0);
+      expect(badge.description.en.length, badge.id).toBeGreaterThan(0);
     }
   });
 });

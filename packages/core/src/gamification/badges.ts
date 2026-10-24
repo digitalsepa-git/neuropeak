@@ -1,3 +1,4 @@
+import { turkishDativeSuffix } from '../utils/turkish';
 import type { BrainAxis, BrainMap } from '../domain/brain-axes';
 import { GAME_CATEGORIES, type GameCategory } from '../domain/categories';
 import { LEAGUE_TIERS, type LeagueTier } from './league';
@@ -159,4 +160,85 @@ export function showcaseOrder(
       return b.ratio - a.ratio || a.definition.tier - b.definition.tier;
     })
     .map((item) => item.definition);
+}
+
+/** Panelde okunacak etiketler. Mobil arayüz kendi kataloğunu kullanıyor. */
+const CATEGORY_LABELS: Readonly<Record<GameCategory, string>> = {
+  memory: 'hafıza',
+  attention: 'dikkat',
+  logic: 'mantık',
+  math: 'matematik',
+  spatial: 'görsel',
+  speed: 'hız',
+  verbal: 'sözel',
+};
+
+const AXIS_LABELS: Readonly<Record<BrainAxis, string>> = {
+  memory: 'Hafıza',
+  focus: 'Odak',
+  logic: 'Mantık',
+  speed: 'Hız',
+  problemSolving: 'Problem çözme',
+};
+
+const BADGE_LEAGUE_LABELS: Readonly<Record<LeagueTier, string>> = {
+  bronze: 'Bronz',
+  silver: 'Gümüş',
+  gold: 'Altın',
+  platinum: 'Platin',
+  diamond: 'Elmas',
+  legend: 'Efsane',
+};
+
+const BADGE_TIER_LABELS: Readonly<Record<BadgeTier, string>> = {
+  1: 'Bronz',
+  2: 'Gümüş',
+  3: 'Altın',
+  4: 'Platin',
+};
+
+export function badgeTierLabel(tier: BadgeTier): string {
+  return BADGE_TIER_LABELS[tier];
+}
+
+/**
+ * Koşulu Türkçe bir cümleye çevirir — yönetim panelinin rozet
+ * listesi için.
+ *
+ * Katalogdaki açıklama metni pazarlama dili ("Yol alıyor"); burada
+ * gereken, rozetin gerçekte neye baktığı. İkisini ayrı tutmak,
+ * koşulu değiştirip açıklamayı güncellemeyi unutmanın panelde
+ * görünmesini sağlıyor.
+ *
+ * `describeRule` ile aynı işi yapıyor ve aynı yerde duruyor:
+ * kuralı veri olarak tutmanın bedeli, onu bir kez de insan diline
+ * çevirmek.
+ */
+export function describeBadgeRequirement(requirement: BadgeRequirement): string {
+  switch (requirement.kind) {
+    case 'level':
+      return `Seviye ${requirement.value}${turkishDativeSuffix(requirement.value)} ulaş`;
+    case 'xp':
+      return `Toplam ${requirement.value} XP topla`;
+    case 'streak':
+      return `${requirement.value} günlük seri yap`;
+    case 'rounds':
+      return `${requirement.value} oyun turu oyna`;
+    case 'tests':
+      return `${requirement.value} test tamamla`;
+    case 'category_rounds':
+      return `${CATEGORY_LABELS[requirement.category]} kategorisinde ${requirement.value} tur oyna`;
+    case 'all_categories':
+      return `${GAME_CATEGORIES.length} kategorinin hepsinde en az bir tur oyna`;
+    case 'axis_score':
+      return `${AXIS_LABELS[requirement.axis]} ekseninde ${requirement.value} puana çık`;
+    case 'neuropeak':
+      return `NeuroPeak skorunu ${requirement.value} yap`;
+    case 'league_tier':
+      return `${BADGE_LEAGUE_LABELS[requirement.tier]} Lig'e çık`;
+    case 'weekly_xp':
+      return `Bir haftada ${requirement.value} XP topla`;
+    case 'best_iq':
+      return `Bir testte ${requirement.value} puan al`;
+  }
 }
