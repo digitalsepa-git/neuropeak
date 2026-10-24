@@ -191,3 +191,22 @@ export function kindBreakdown(questions: readonly ContentQuestion[]): KindBreakd
     .map(([kind, count]) => ({ kind, count }))
     .sort((a, b) => b.count - a.count || (a.kind < b.kind ? -1 : 1));
 }
+
+/**
+ * Hangi soru hangi testlerde geçiyor.
+ *
+ * Havuz paylaşımlı: 182 sorunun 87'si birden fazla testte. Bir
+ * soruyu düzenleyen kişi, değişikliğin hangi testlere dokunduğunu
+ * görmeden karar veremez.
+ */
+export async function questionUsage(): Promise<Readonly<Record<string, readonly string[]>>> {
+  const tests = isLive ? await fetchQuestionTests() : CONTENT_TESTS;
+
+  const usage: Record<string, string[]> = {};
+  for (const test of tests) {
+    for (const question of test.questions) {
+      usage[question.id] = [...(usage[question.id] ?? []), test.title.tr];
+    }
+  }
+  return usage;
+}
