@@ -1,4 +1,4 @@
-import { BADGES, GAME_CATALOGUE } from '@neuropeak/content';
+import { BADGES, DAILY_TASKS, GAME_CATALOGUE } from '@neuropeak/content';
 import Link from 'next/link';
 
 import { Shell } from '@/components/shell';
@@ -19,6 +19,7 @@ export default function DashboardPage() {
     { label: 'PRO test', value: `${proTests}` },
     { label: 'Oyun', value: `${GAME_CATALOGUE.length}` },
     { label: 'Rozet', value: `${BADGES.length}` },
+    { label: 'Günlük görev', value: `${DAILY_TASKS.length}` },
   ];
 
   return (

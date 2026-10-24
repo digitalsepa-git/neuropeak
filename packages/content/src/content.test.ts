@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   COMPARISON_KINDS,
   describeBadgeRequirement,
+  describeTaskTarget,
+  pickDailyTasks,
   FIGURE_ATTRIBUTES,
   attributeOf,
   generateLogicChain,
@@ -17,6 +19,7 @@ import {
 } from '@neuropeak/core';
 
 import { BADGES } from './badges/catalogue';
+import { DAILY_TASKS } from './tasks/catalogue';
 import { GAME_CATALOGUE } from './games/catalogue';
 import { logicChainBankFor } from './logic/chain';
 import { PROFILE_TESTS } from './tests/profiles';
@@ -667,5 +670,42 @@ describe('rozet kataloğu', () => {
       expect(badge.description.tr.length, badge.id).toBeGreaterThan(0);
       expect(badge.description.en.length, badge.id).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('günlük görev havuzu', () => {
+  it('kimlikler tekil', () => {
+    expect(new Set(DAILY_TASKS.map((task) => task.id)).size).toBe(DAILY_TASKS.length);
+  });
+
+  it('her görevin iki dilde başlığı var', () => {
+    for (const task of DAILY_TASKS) {
+      expect(task.title.tr.length, task.id).toBeGreaterThan(0);
+      expect(task.title.en.length, task.id).toBeGreaterThan(0);
+    }
+  });
+
+  it('her görevin hedefi panelde anlatılabiliyor', () => {
+    for (const task of DAILY_TASKS) {
+      const text = describeTaskTarget(task);
+      expect(text.length, task.id).toBeGreaterThan(0);
+      expect(text, task.id).not.toContain('undefined');
+    }
+  });
+
+  it('kategori görevlerinin kategorisi yazılı', () => {
+    // `category` tipte isteğe bağlı; eksik kalan bir kategori görevi
+    // oyuncuya genel bir görev gibi görünür ve ilerlemesi hiç dolmaz.
+    for (const task of DAILY_TASKS) {
+      if (task.metric === 'play_category') {
+        expect(task.category, task.id).toBeDefined();
+      }
+    }
+  });
+
+  it('havuz bir günlük seçime yetiyor', () => {
+    const picked = pickDailyTasks(DAILY_TASKS, 'device-1', '2026-03-05');
+    expect(new Set(picked.map((task) => task.id)).size).toBe(picked.length);
+    expect(picked.length).toBeGreaterThan(0);
   });
 });

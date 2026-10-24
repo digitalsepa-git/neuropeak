@@ -372,17 +372,6 @@ export const STRINGS = {
     en: (p: { task: string }) => `${p.task} progress`,
   },
 
-  // ------------------------------------------------------------- günlük görev
-  'task.play-2-games': { tr: '2 oyun oyna', en: 'Play 2 games' },
-  'task.play-4-games': { tr: '4 oyun oyna', en: 'Play 4 games' },
-  'task.earn-300-xp': { tr: '300 XP kazan', en: 'Earn 300 XP' },
-  'task.earn-600-xp': { tr: '600 XP kazan', en: 'Earn 600 XP' },
-  'task.finish-test': { tr: 'Bir testi tamamla', en: 'Finish a test' },
-  'task.memory-2': { tr: '2 hafıza oyunu oyna', en: 'Play 2 memory games' },
-  'task.attention-2': { tr: '2 odaklanma oyunu oyna', en: 'Play 2 attention games' },
-  'task.logic-2': { tr: '2 mantık oyunu oyna', en: 'Play 2 logic games' },
-  'task.math-2': { tr: '2 matematik oyunu oyna', en: 'Play 2 math games' },
-
   // -------------------------------------------------------------------- oyunlar
   'games.title': { tr: 'Oyunlar', en: 'Games' },
   'games.levelOf': {

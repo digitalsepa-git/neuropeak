@@ -66,4 +66,6 @@ export {
 
 export { logicChainBankFor } from './logic/chain';
 
+export { DAILY_TASKS, findDailyTask, type ContentDailyTask } from './tasks/catalogue';
+
 export { DEFAULT_SEGMENTS } from './crm/segments';

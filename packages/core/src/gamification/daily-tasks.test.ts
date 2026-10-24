@@ -4,6 +4,7 @@ import {
   DAILY_TASK_COUNT,
   applyTaskEvent,
   completedTaskCount,
+  describeTaskTarget,
   pickDailyTasks,
   type DailyTask,
   type DailyTaskTemplate,
@@ -151,5 +152,43 @@ describe('completedTaskCount', () => {
     ];
 
     expect(completedTaskCount(tasks)).toBe(2);
+  });
+});
+
+describe('describeTaskTarget', () => {
+  const TEMPLATES: readonly DailyTaskTemplate[] = [
+    { id: 'a', metric: 'play_games', target: 2, starReward: 15 },
+    { id: 'b', metric: 'earn_xp', target: 300, starReward: 15 },
+    { id: 'c', metric: 'finish_test', target: 1, starReward: 30 },
+    { id: 'd', metric: 'finish_test', target: 3, starReward: 30 },
+    { id: 'e', metric: 'play_category', target: 2, category: 'memory', starReward: 20 },
+  ];
+
+  it('her metrik türü için bir cümle üretir', () => {
+    for (const template of TEMPLATES) {
+      const text = describeTaskTarget(template);
+      expect(text.length, template.id).toBeGreaterThan(0);
+      // Etiket tablosundan düşen bir anahtar "undefined" yazardı.
+      expect(text, template.id).not.toContain('undefined');
+    }
+  });
+
+  it('tek testi sayıyla değil kelimeyle söylüyor', () => {
+    expect(describeTaskTarget(TEMPLATES[2] as DailyTaskTemplate)).toBe('Bir test tamamla');
+    expect(describeTaskTarget(TEMPLATES[3] as DailyTaskTemplate)).toBe('3 test tamamla');
+  });
+
+  it('kategori görevinde kategoriyi adlandırıyor', () => {
+    expect(describeTaskTarget(TEMPLATES[4] as DailyTaskTemplate)).toBe(
+      'hafıza kategorisinde 2 tur oyna',
+    );
+  });
+
+  it('kategorisiz bir kategori görevi sessizce bozulmuyor', () => {
+    // Katalogda olmaması gereken bir durum ama tip buna izin veriyor;
+    // "undefined kategorisinde" yazmaktansa genel cümleye düşüyor.
+    expect(describeTaskTarget({ id: 'x', metric: 'play_category', target: 2, starReward: 5 })).toBe(
+      '2 oyun turu oyna',
+    );
   });
 });
