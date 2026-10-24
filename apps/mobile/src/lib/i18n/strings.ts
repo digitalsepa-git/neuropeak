@@ -208,7 +208,10 @@ export const STRINGS = {
     tr: 'Güçlü ve zayıf alanların, yaş grubuna göre karşılaştırma ve sana özel gelişim planı.',
     en: 'Your strong and weak areas, a comparison with your age group and a plan made for you.',
   },
-  'paywall.generic.title': { tr: 'NeuroPeak PRO', en: 'NeuroPeak PRO' },
+  // Üstte zaten "NEUROPEAK PRO" etiketi var; başlık da aynı olunca
+  // ekran kendini tekrar ediyordu. Bunu uzaktan ayarın Türkçe
+  // varsayılanı örtüyormuş.
+  'paywall.generic.title': { tr: 'Hepsini aç', en: 'Unlock everything' },
   'paywall.generic.subtitle': {
     tr: 'Zihnini geliştirmek için ihtiyacın olan her şey tek abonelikte.',
     en: 'Everything you need to train your mind, in one subscription.',
