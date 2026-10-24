@@ -236,3 +236,170 @@ export function parseQuestion(values: FormValues): Parsed<QuestionEdit> {
     },
   };
 }
+
+// ---------------------------------------------------------------- oyunlar
+
+export type GameEdit = {
+  readonly id: string;
+  readonly title_tr: string;
+  readonly title_en: string;
+  readonly description_tr: string;
+  readonly description_en: string;
+  readonly instruction_tr: string;
+  readonly instruction_en: string;
+  readonly skills: readonly QuestionOptionEdit[];
+  readonly xp_per_round: number;
+  readonly total_levels: number;
+  readonly is_active: boolean;
+};
+
+/**
+ * Oyun üst bilgisi.
+ *
+ * Kategori ve kip düzenlenmiyor. Kip oyunun kendi ekranına bağlı
+ * (seviyeli oyun seviye alır, süreli almaz; veritabanı kısıtı da
+ * bunu tutuyor) ve kategori oyunun beyin haritasında hangi ekseni
+ * beslediğini belirliyor — ikisi de metin değil, yapı.
+ *
+ * `total_levels` kipe göre doğrulanıyor: süreli oyunda sıfır olmak
+ * zorunda, seviyeli oyunda sıfırdan büyük. Kısıt veritabanında da
+ * var ama hatayı anlatan cümle burada.
+ */
+export function parseGame(values: FormValues, mode: 'levels' | 'timed'): Parsed<GameEdit> {
+  const id = required(values, 'id', 'Kimlik');
+  if (!id.ok) return id;
+
+  const fields: [key: string, label: string][] = [
+    ['title_tr', 'Türkçe ad'],
+    ['title_en', 'İngilizce ad'],
+    ['instruction_tr', 'Türkçe yönerge'],
+    ['instruction_en', 'İngilizce yönerge'],
+  ];
+
+  const texts: Record<string, string> = {};
+  for (const [key, label] of fields) {
+    const parsed = required(values, key, label);
+    if (!parsed.ok) return parsed;
+    texts[key] = parsed.value;
+  }
+
+  const xp = integer(values, 'xp_per_round', 'Tur başına XP');
+  if (!xp.ok) return xp;
+  if (xp.value < 1) return { ok: false, message: 'Tur başına XP en az 1 olmalı.' };
+
+  const levels = integer(values, 'total_levels', 'Seviye sayısı');
+  if (!levels.ok) return levels;
+
+  if (mode === 'timed' && levels.value !== 0) {
+    return { ok: false, message: 'Süreli oyunun seviye sayısı 0 olmalı.' };
+  }
+  if (mode === 'levels' && levels.value < 1) {
+    return { ok: false, message: 'Seviyeli oyunun en az bir seviyesi olmalı.' };
+  }
+
+  const count = integer(values, 'skills_count', 'Yetenek sayısı');
+  if (!count.ok) return count;
+
+  const skills: QuestionOptionEdit[] = [];
+  for (let index = 0; index < count.value; index += 1) {
+    const tr = text(values, `skill_tr_${index}`);
+    const en = text(values, `skill_en_${index}`);
+
+    if (tr.length === 0 || en.length === 0) {
+      return { ok: false, message: `${index + 1}. yetenek iki dilde de dolu olmalı.` };
+    }
+
+    skills.push({ tr, en });
+  }
+
+  return {
+    ok: true,
+    value: {
+      id: id.value,
+      title_tr: texts.title_tr as string,
+      title_en: texts.title_en as string,
+      description_tr: text(values, 'description_tr'),
+      description_en: text(values, 'description_en'),
+      instruction_tr: texts.instruction_tr as string,
+      instruction_en: texts.instruction_en as string,
+      skills,
+      xp_per_round: xp.value,
+      total_levels: levels.value,
+      is_active: text(values, 'is_active') === 'on',
+    },
+  };
+}
+
+// ---------------------------------------------------------------- test üst bilgisi
+
+export type TestEdit = {
+  readonly id: string;
+  readonly title_tr: string;
+  readonly title_en: string;
+  readonly description_tr: string;
+  readonly description_en: string;
+  readonly question_count: number;
+  readonly est_minutes_min: number;
+  readonly est_minutes_max: number;
+  readonly is_pro: boolean;
+  readonly is_active: boolean;
+};
+
+/**
+ * Test üst bilgisi.
+ *
+ * `question_count` havuzdan büyük olamaz: test oturumda havuzdan o
+ * kadar soru çekiyor, havuz yetmezse çalışma anında bozulur. Bu
+ * kontrol veritabanında yok — havuz başka bir tabloda ve kısıtla
+ * ifade edilemiyor — bu yüzden tek yeri burası.
+ *
+ * Norm (ortalama ve sapma) düzenlenmiyor: ham puanı IQ'ya çeviren
+ * ölçek, metin değil. Değiştirmek geçmiş sonuçları da yeniden
+ * anlamlandırırdı ve geçmişi taşıyacak bir yol yok.
+ */
+export function parseTest(values: FormValues, poolSize: number): Parsed<TestEdit> {
+  const id = required(values, 'id', 'Kimlik');
+  if (!id.ok) return id;
+
+  const titleTr = required(values, 'title_tr', 'Türkçe ad');
+  if (!titleTr.ok) return titleTr;
+
+  const titleEn = required(values, 'title_en', 'İngilizce ad');
+  if (!titleEn.ok) return titleEn;
+
+  const count = integer(values, 'question_count', 'Sorulan soru sayısı');
+  if (!count.ok) return count;
+  if (count.value < 1) return { ok: false, message: 'Oturumda en az bir soru sorulmalı.' };
+  if (count.value > poolSize) {
+    return {
+      ok: false,
+      message: `Havuzda ${poolSize} soru var; oturumda bundan fazlası sorulamaz.`,
+    };
+  }
+
+  const min = integer(values, 'est_minutes_min', 'En az süre');
+  if (!min.ok) return min;
+  if (min.value < 1) return { ok: false, message: 'En az süre 1 dakikadan küçük olamaz.' };
+
+  const max = integer(values, 'est_minutes_max', 'En çok süre');
+  if (!max.ok) return max;
+  if (max.value < min.value) {
+    return { ok: false, message: 'En çok süre, en az süreden küçük olamaz.' };
+  }
+
+  return {
+    ok: true,
+    value: {
+      id: id.value,
+      title_tr: titleTr.value,
+      title_en: titleEn.value,
+      description_tr: text(values, 'description_tr'),
+      description_en: text(values, 'description_en'),
+      question_count: count.value,
+      est_minutes_min: min.value,
+      est_minutes_max: max.value,
+      is_pro: text(values, 'is_pro') === 'on',
+      is_active: text(values, 'is_active') === 'on',
+    },
+  };
+}

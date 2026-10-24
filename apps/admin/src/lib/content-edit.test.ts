@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseBadge, parseDailyTask, parseQuestion } from './content-edit';
+import { parseBadge, parseDailyTask, parseGame, parseQuestion, parseTest } from './content-edit';
 
 /**
  * Doğrulama saf olduğu için testlenebilen tek yazma parçası bu.
@@ -244,5 +244,135 @@ describe('parseQuestion', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     expect('visual' in parsed.value).toBe(false);
+  });
+});
+
+const GAME = {
+  id: 'card-match',
+  title_tr: 'Kart Eşleme',
+  title_en: 'Card Match',
+  description_tr: 'Eşleri bul.',
+  description_en: 'Find the pairs.',
+  instruction_tr: 'Aynı simgeyi bul',
+  instruction_en: 'Find the same symbol',
+  skills_count: '2',
+  skill_tr_0: 'Görsel hafıza',
+  skill_en_0: 'Visual memory',
+  skill_tr_1: 'Dikkat',
+  skill_en_1: 'Attention',
+  xp_per_round: '14',
+  total_levels: '240',
+};
+
+describe('parseGame', () => {
+  it('seviyeli oyunu okur', () => {
+    const parsed = parseGame(GAME, 'levels');
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    expect(parsed.value.skills).toHaveLength(2);
+    expect(parsed.value.total_levels).toBe(240);
+    expect(parsed.value.xp_per_round).toBe(14);
+  });
+
+  it('süreli oyunda seviye sayısı sıfır olmalı', () => {
+    // Veritabanı kısıtı da tutuyor (`games_mode_levels_agree`).
+    const parsed = parseGame(GAME, 'timed');
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain('0 olmalı');
+  });
+
+  it('seviyeli oyun sıfır seviyeyle kalamaz', () => {
+    const parsed = parseGame({ ...GAME, total_levels: '0' }, 'levels');
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain('en az bir seviye');
+  });
+
+  it('süreli oyunu sıfır seviyeyle kabul eder', () => {
+    expect(parseGame({ ...GAME, total_levels: '0' }, 'timed').ok).toBe(true);
+  });
+
+  it('yarım kalan yeteneği reddeder', () => {
+    const parsed = parseGame({ ...GAME, skill_en_1: '' }, 'levels');
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain('2. yetenek');
+  });
+
+  it('yeteneksiz oyunu kabul eder', () => {
+    const parsed = parseGame({ ...GAME, skills_count: '0' }, 'levels');
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.skills).toEqual([]);
+  });
+
+  it('sıfır XP reddediliyor', () => {
+    expect(parseGame({ ...GAME, xp_per_round: '0' }, 'levels').ok).toBe(false);
+  });
+
+  it('boş yönergeyi reddeder', () => {
+    expect(parseGame({ ...GAME, instruction_tr: '' }, 'levels').ok).toBe(false);
+  });
+});
+
+const TEST_HEADER = {
+  id: 'basic-iq',
+  title_tr: 'Temel IQ Testi',
+  title_en: 'Basic IQ Test',
+  description_tr: 'Genel değerlendirme.',
+  description_en: 'A general assessment.',
+  question_count: '20',
+  est_minutes_min: '8',
+  est_minutes_max: '12',
+};
+
+describe('parseTest', () => {
+  it('geçerli üst bilgiyi okur', () => {
+    const parsed = parseTest(TEST_HEADER, 30);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.question_count).toBe(20);
+    expect(parsed.value.is_pro).toBe(false);
+  });
+
+  it('havuzdan fazla soru sorulamaz', () => {
+    // Bu kontrolün veritabanında karşılığı yok: havuz başka bir
+    // tabloda ve kısıtla ifade edilemiyor.
+    const parsed = parseTest({ ...TEST_HEADER, question_count: '40' }, 30);
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain('30 soru var');
+  });
+
+  it('havuza eşit sayıyı kabul eder', () => {
+    expect(parseTest({ ...TEST_HEADER, question_count: '30' }, 30).ok).toBe(true);
+  });
+
+  it('sıfır soruyu reddeder', () => {
+    expect(parseTest({ ...TEST_HEADER, question_count: '0' }, 30).ok).toBe(false);
+  });
+
+  it('ters süre aralığını reddeder', () => {
+    const parsed = parseTest({ ...TEST_HEADER, est_minutes_min: '12', est_minutes_max: '8' }, 30);
+    expect(parsed.ok).toBe(false);
+    if (parsed.ok) return;
+    expect(parsed.message).toContain('en az süreden küçük');
+  });
+
+  it('eşit süre aralığını kabul eder', () => {
+    expect(parseTest({ ...TEST_HEADER, est_minutes_min: '10', est_minutes_max: '10' }, 30).ok).toBe(
+      true,
+    );
+  });
+
+  it('normu hiç okumuyor', () => {
+    // Ham puanı IQ'ya çeviren ölçek metin değil; panelden
+    // değiştirilmiyor.
+    const parsed = parseTest({ ...TEST_HEADER, norm_mean: '120' }, 30);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect('norm_mean' in parsed.value).toBe(false);
   });
 });

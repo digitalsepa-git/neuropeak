@@ -4,7 +4,14 @@ import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/auth';
 import { canEditContent } from '@/lib/content-mode';
-import { parseBadge, parseDailyTask, parseQuestion, type FormValues } from '@/lib/content-edit';
+import {
+  parseBadge,
+  parseDailyTask,
+  parseGame,
+  parseQuestion,
+  parseTest,
+  type FormValues,
+} from '@/lib/content-edit';
 
 /**
  * İçerik düzenleme eylemleri.
@@ -32,7 +39,7 @@ function toValues(formData: FormData): FormValues {
 }
 
 async function save(
-  table: 'daily_task_templates' | 'badges',
+  table: 'daily_task_templates' | 'badges' | 'games' | 'tests',
   id: string,
   patch: Record<string, unknown>,
   path: string,
@@ -133,4 +140,48 @@ export async function updateQuestion(
 
   revalidatePath('/content/tests', 'layout');
   return { status: 'saved' };
+}
+
+/**
+ * Oyun üst bilgisi.
+ *
+ * Kip formda değil çünkü düzenlenmiyor; ama `total_levels`
+ * doğrulaması kipe bağlı, bu yüzden gizli alan olarak geliyor.
+ * İstemciden gelen bir değere bakmak hoş değil ama kipin kendisi
+ * yazılmıyor: yanlış gelse bile en fazla yanlış hata mesajı
+ * çıkar, veritabanı kısıtı son sözü söylüyor.
+ */
+export async function updateGame(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  if (!canEditContent) return { status: 'error', message: 'Bağlantı yokken düzenleme kapalı.' };
+
+  const values = toValues(formData);
+  const mode = values.mode === 'timed' ? 'timed' : 'levels';
+
+  const parsed = parseGame(values, mode);
+  if (!parsed.ok) return { status: 'error', message: parsed.message };
+
+  const { id, ...patch } = parsed.value;
+  return save('games', id, patch, '/content/games');
+}
+
+/**
+ * Test üst bilgisi.
+ *
+ * Havuz boyutu doğrulamaya gerekiyor ve istemciden geliyor; yanlış
+ * gelse bile yazılan bir alan değil, yalnızca "havuzdan fazla soru
+ * sorulamaz" kontrolünü etkiliyor. Havuzu sunucuda yeniden saymak
+ * daha güvenli olurdu ama soruları ayrıca çekmek gerekirdi; bu
+ * kontrol kullanıcıyı uyarmak için, bir güvenlik sınırı değil.
+ */
+export async function updateTest(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  if (!canEditContent) return { status: 'error', message: 'Bağlantı yokken düzenleme kapalı.' };
+
+  const values = toValues(formData);
+  const poolSize = Number(values.pool_size ?? '0');
+
+  const parsed = parseTest(values, Number.isFinite(poolSize) ? poolSize : 0);
+  if (!parsed.ok) return { status: 'error', message: parsed.message };
+
+  const { id, ...patch } = parsed.value;
+  return save('tests', id, patch, '/content/tests');
 }

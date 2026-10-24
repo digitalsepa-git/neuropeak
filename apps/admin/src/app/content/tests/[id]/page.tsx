@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { QuestionTable } from '@/components/question-table';
+import { TestEditor } from '@/components/test-editor';
 import { Shell } from '@/components/shell';
 import { canEditContent, contentMode } from '@/lib/content-mode';
 import {
@@ -107,6 +108,11 @@ async function QuestionTestView({ test }: { test: ContentTest }) {
         </div>
 
         <QuestionTable questions={test.questions} kindLabels={KIND_LABELS} usage={usage} />
+      </section>
+
+      <section className="mt-xl">
+        <h2 className="text-subheading font-semibold">Üst bilgi</h2>
+        <TestEditor test={test} poolSize={test.questions.length} />
       </section>
     </Shell>
   );
