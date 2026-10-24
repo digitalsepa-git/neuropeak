@@ -7,6 +7,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /** Izgara boyutu zorluğa göre; büyük ızgarada göz daha çok geziyor. */
 const GRID_SIZE: Record<GameProps['difficulty'], number> = {
@@ -34,6 +35,7 @@ function buildBoard(size: number, round: number): number[] {
  * bitince yenisi gelir; amaç sürede kaç tablo bitirdiğin.
  */
 export function SymbolHuntGame({ difficulty, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
   const size = GRID_SIZE[difficulty];
 
@@ -87,7 +89,7 @@ export function SymbolHuntGame({ difficulty, onFinish, onProgress }: GameProps) 
     <View style={styles.root}>
       <View style={[styles.targetPill, { backgroundColor: theme.colors.brand }]}>
         <Text variant="bodyStrong" color="onBrand">
-          Sıradaki: {target}
+          {t('play.nextSymbol', { symbol: String(target) })}
         </Text>
       </View>
 
@@ -126,7 +128,7 @@ export function SymbolHuntGame({ difficulty, onFinish, onProgress }: GameProps) 
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        {round} tablo tamamlandı
+        {t('play.tablesFinished', { count: round })}
       </Text>
     </View>
   );

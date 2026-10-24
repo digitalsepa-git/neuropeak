@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
+import { useT } from '@/lib/i18n';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
 
@@ -29,6 +30,7 @@ function Dots({ count, color }: { count: number; color: string }) {
  */
 export function QuickDecisionGame({ difficulty, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  const t = useT();
 
   const [trial, setTrial] = useState(() => generateQuickDecision(difficulty, 1));
   const [score, setScore] = useState(0);
@@ -37,6 +39,12 @@ export function QuickDecisionGame({ difficulty, onFinish, onProgress }: GameProp
 
   const trialSeed = useRef(1);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Şıkların sırası çekirdekteki `correctIndex` ile aynı: 0 "aynı"/"sol".
+  const options =
+    trial.kind === 'same-or-different'
+      ? [t('play.same'), t('play.different')]
+      : [t('play.sideLeft'), t('play.sideRight')];
 
   const { report, finishNow } = useRoundFinish(onFinish, onProgress);
   const remaining = useGameTimer(TIMED_ROUND_SECONDS, finishNow);
@@ -88,11 +96,11 @@ export function QuickDecisionGame({ difficulty, onFinish, onProgress }: GameProp
       </View>
 
       <Text variant="body" color="textMuted" style={styles.prompt}>
-        {trial.prompt}
+        {trial.kind === 'same-or-different' ? t('play.sameOrDifferent') : t('play.whichSide')}
       </Text>
 
       <View style={styles.actions}>
-        {trial.options.map((option, index) => (
+        {options.map((option, index) => (
           <Pressable
             key={option}
             accessibilityRole="button"

@@ -148,7 +148,7 @@ export function MatrixPuzzleGame({ startLevel, onFinish, onProgress }: GameProps
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={`${index + 1}. seçenek`}
+              accessibilityLabel={t('play.optionN', { index: index + 1 })}
               onPress={() => answer(index)}
               style={[
                 styles.cell,

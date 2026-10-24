@@ -155,7 +155,7 @@ export function CardMatchGame({ difficulty, startLevel, onFinish, onProgress }: 
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.moves}>
-        {moves} hamle
+        {t('play.moves', { count: moves })}
       </Text>
     </View>
   );

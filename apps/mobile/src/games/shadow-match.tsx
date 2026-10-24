@@ -137,7 +137,7 @@ export function ShadowMatchGame({ difficulty, onFinish, onProgress }: GameProps)
           <Pressable
             key={index}
             accessibilityRole="button"
-            accessibilityLabel={`${index + 1}. gölge`}
+            accessibilityLabel={t('play.shadowN', { index: index + 1 })}
             onPress={() => answer(index)}
             style={[styles.option, { backgroundColor: theme.colors.surfaceElevated }]}
           >

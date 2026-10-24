@@ -133,16 +133,16 @@ export function ReactionGame({ onFinish, onProgress }: GameProps) {
           ? t('play.tapNow')
           : phase === 'early'
             ? t('play.tooEarly')
-            : `Tepki süren ${median} ms`;
+            : t('play.reactionMedian', { ms: median });
 
   const caption =
     phase === 'early'
       ? t('play.tapToRetry')
       : phase === 'done'
-        ? `En iyi ${Math.min(...times)} ms`
+        ? t('play.bestMs', { ms: Math.min(...times) })
         : last !== null
           ? `${last} ms`
-          : `${times.length} / ${TRIALS} ölçüm`;
+          : t('play.trialsOf', { done: times.length, total: TRIALS });
 
   return (
     <View style={styles.root}>

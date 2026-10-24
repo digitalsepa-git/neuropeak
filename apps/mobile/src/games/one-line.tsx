@@ -161,7 +161,7 @@ export function OneLineGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={node}
               accessibilityRole="button"
-              accessibilityLabel={`${node + 1}. nokta`}
+              accessibilityLabel={t('play.dotN', { index: node + 1 })}
               onPress={() => tapNode(node)}
               style={[
                 styles.hit,
@@ -174,7 +174,7 @@ export function OneLineGame({ startLevel, onFinish, onProgress }: GameProps) {
 
       <View style={styles.footer}>
         <Text variant="caption" color="textMuted">
-          {drawn.size} / {puzzle.edges.length} kenar
+          {t('play.edgesOf', { done: drawn.size, total: puzzle.edges.length })}
         </Text>
         <Pressable
           accessibilityRole="button"

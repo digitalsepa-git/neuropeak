@@ -139,7 +139,7 @@ export function PaperFoldGame({ startLevel, onFinish, onProgress }: GameProps) {
   return (
     <View style={styles.root}>
       <Text variant="caption" color="textMuted">
-        Kağıt {foldText} katlandı ve delindi
+        {t('play.foldedAndPunched', { folds: foldText })}
       </Text>
 
       <View style={styles.foldedRow}>
@@ -172,7 +172,7 @@ export function PaperFoldGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={`${index + 1}. seçenek`}
+              accessibilityLabel={t('play.optionN', { index: index + 1 })}
               onPress={() => answer(index)}
               style={[styles.option, { borderColor }]}
             >

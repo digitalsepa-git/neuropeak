@@ -7,6 +7,7 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const BOARD_SIZE = 300;
 const BOARD_PADDING = 2;
@@ -49,6 +50,7 @@ function buildPuzzle(level: number, fadeRate: number): Puzzle {
  * doğruda ızgara büyür ve fark incelir.
  */
 export function OddOneOutGame({ difficulty, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
   const fadeRate = FADE_RATE[difficulty];
 
@@ -101,7 +103,7 @@ export function OddOneOutGame({ difficulty, onFinish, onProgress }: GameProps) {
           <Pressable
             key={index}
             accessibilityRole="button"
-            accessibilityLabel={`${index + 1}. kare`}
+            accessibilityLabel={t('play.squareN', { index: index + 1 })}
             onPress={() => onTilePress(index)}
             style={{
               backgroundColor: index === puzzle.oddIndex ? oddColor : baseColor,
@@ -114,7 +116,7 @@ export function OddOneOutGame({ difficulty, onFinish, onProgress }: GameProps) {
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        {level} tur · {puzzle.columns}×{puzzle.columns}
+        {t('play.roundsAndGrid', { rounds: level, size: puzzle.columns })}
       </Text>
     </View>
   );

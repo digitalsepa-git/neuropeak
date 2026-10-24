@@ -102,7 +102,7 @@ export function WordAnalogyGame({ startLevel, onFinish, onProgress }: GameProps)
             color={picked === puzzle.correctIndex ? 'success' : 'danger'}
             style={styles.explanationText}
           >
-            İlişki: {puzzle.relation}
+            {t('play.relationLabel', { relation: puzzle.relation })}
           </Text>
         )}
       </View>

@@ -103,10 +103,10 @@ describe('Sayı Dizisi üreteci', () => {
 
   it('seviye yükseldikçe daha fazla kural devreye girer', () => {
     const lowLevelRules = new Set(
-      Array.from({ length: 60 }, (_, index) => generateNumberSeries(1, index * 97).ruleName),
+      Array.from({ length: 60 }, (_, index) => generateNumberSeries(1, index * 97).rule),
     );
     const highLevelRules = new Set(
-      Array.from({ length: 60 }, (_, index) => generateNumberSeries(10, index * 97).ruleName),
+      Array.from({ length: 60 }, (_, index) => generateNumberSeries(10, index * 97).rule),
     );
 
     expect(highLevelRules.size).toBeGreaterThan(lowLevelRules.size);

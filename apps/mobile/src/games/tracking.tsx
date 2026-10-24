@@ -123,11 +123,11 @@ export function TrackingGame({ startLevel, onFinish, onProgress }: GameProps) {
 
   const hint =
     phase === 'preview'
-      ? `${round.targetCount} hedefi aklında tut`
+      ? t('play.holdTargets', { count: round.targetCount })
       : phase === 'moving'
         ? t('play.followWithEyes')
         : phase === 'picking'
-          ? `${picked.length} / ${round.targetCount} işaretlendi`
+          ? t('play.markedOf', { done: picked.length, total: round.targetCount })
           : t('play.nextRoundComing');
 
   return (
@@ -157,7 +157,7 @@ export function TrackingGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={ball.id}
               accessibilityRole="button"
-              accessibilityLabel={`${ball.id + 1}. top`}
+              accessibilityLabel={t('play.ballN', { index: ball.id + 1 })}
               onPress={() => tapBall(ball.id)}
               style={[
                 styles.ball,

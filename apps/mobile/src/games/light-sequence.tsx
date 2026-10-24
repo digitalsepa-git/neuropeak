@@ -122,7 +122,7 @@ export function LightSequenceGame({ difficulty, onFinish, onProgress }: GameProp
             <Pressable
               key={pad.id}
               accessibilityRole="button"
-              accessibilityLabel={`${pad.id + 1}. ışık`}
+              accessibilityLabel={t('play.lightN', { index: pad.id + 1 })}
               disabled={phase !== 'repeat'}
               onPress={() => onPadPress(pad.id)}
               style={[
@@ -139,7 +139,7 @@ export function LightSequenceGame({ difficulty, onFinish, onProgress }: GameProp
       </View>
 
       <Text variant="caption" color="textMuted">
-        {sequence.length} ışık
+        {t('play.lightCount', { count: sequence.length })}
       </Text>
     </View>
   );

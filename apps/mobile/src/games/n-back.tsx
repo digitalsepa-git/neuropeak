@@ -104,7 +104,7 @@ export function NBackGame({ onFinish, onProgress }: GameProps) {
   return (
     <View style={styles.root}>
       <Text variant="caption" color="textMuted">
-        {n} adım geriye bak
+        {t('play.nBackHint', { steps: n })}
       </Text>
 
       <View
@@ -126,7 +126,7 @@ export function NBackGame({ onFinish, onProgress }: GameProps) {
       </Pressable>
 
       <Text variant="caption" color="textMuted" style={styles.streak}>
-        Seri {streak}
+        {t('play.streakLabel', { count: streak })}
       </Text>
     </View>
   );

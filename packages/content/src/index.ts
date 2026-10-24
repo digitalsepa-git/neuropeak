@@ -64,4 +64,6 @@ export {
   type ProfileTrait,
 } from './tests/profiles';
 
+export { logicChainBankFor } from './logic/chain';
+
 export { DEFAULT_SEGMENTS } from './crm/segments';

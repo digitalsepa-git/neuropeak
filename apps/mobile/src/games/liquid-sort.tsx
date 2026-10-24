@@ -13,6 +13,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const LIQUID_COLORS = [
   palette.accentMemory,
@@ -31,6 +32,7 @@ const LIQUID_COLORS = [
  * seviye çözülebilir.
  */
 export function LiquidSortGame({ difficulty, startLevel, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
 
   const [level, setLevel] = useState(startLevel);
@@ -95,7 +97,7 @@ export function LiquidSortGame({ difficulty, startLevel, onFinish, onProgress }:
           <Pressable
             key={index}
             accessibilityRole="button"
-            accessibilityLabel={`${index + 1}. şişe`}
+            accessibilityLabel={t('play.tubeN', { index: index + 1 })}
             onPress={() => onTubePress(index)}
             style={[
               styles.tube,
@@ -129,7 +131,7 @@ export function LiquidSortGame({ difficulty, startLevel, onFinish, onProgress }:
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.hint}>
-        {moves} hamle · her şişede tek renk kalsın
+        {t('play.movesOneColour', { count: moves })}
       </Text>
     </View>
   );

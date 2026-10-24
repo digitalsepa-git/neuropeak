@@ -103,7 +103,7 @@ export function GridRecallGame({ startLevel, onFinish, onProgress }: GameProps) 
         {phase === 'showing'
           ? t('play.rememberCells')
           : phase === 'guessing'
-            ? `${picked.length} / ${puzzle.cells.length} işaretlendi`
+            ? t('play.markedOf', { done: picked.length, total: puzzle.cells.length })
             : t('play.nextLevelComing')}
       </Text>
 
@@ -132,9 +132,10 @@ export function GridRecallGame({ startLevel, onFinish, onProgress }: GameProps) 
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={`${Math.floor(index / puzzle.size) + 1}. satır ${
-                (index % puzzle.size) + 1
-              }. sütun`}
+              accessibilityLabel={t('play.rowColumn', {
+                row: Math.floor(index / puzzle.size) + 1,
+                column: (index % puzzle.size) + 1,
+              })}
               onPress={() => tapCell(index)}
               style={[
                 styles.cell,
