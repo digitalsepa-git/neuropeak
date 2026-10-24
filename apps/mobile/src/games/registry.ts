@@ -74,6 +74,20 @@ export type GameDefinition = ContentGame & {
   readonly Component: ComponentType<GameProps>;
 };
 
+/**
+ * Ekranı yazılmış oyunların kimlikleri.
+ *
+ * Katalogdan bağımsız: içerik veritabanından gelebiliyor ve orada
+ * bu sürümde ekranı olmayan bir oyun bulunabilir. Katalog süzülürken
+ * buna bakılıyor.
+ */
+export const PLAYABLE_GAME_IDS: ReadonlySet<string> = new Set(Object.keys(COMPONENTS));
+
+/** Kimlikten bileşene; içerik ayrı geliyor. */
+export function componentFor(id: string): ComponentType<GameProps> | undefined {
+  return COMPONENTS[id];
+}
+
 /** Oynanabilir oyunlar: katalogda tanımlı ve ekranı yazılmış olanlar. */
 export const GAME_DEFINITIONS: readonly GameDefinition[] = GAME_CATALOGUE.flatMap((game) => {
   const Component = COMPONENTS[game.id];

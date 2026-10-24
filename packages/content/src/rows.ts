@@ -1,18 +1,17 @@
+import type { BadgeRequirement } from '@neuropeak/core';
+
+import type { ContentBadge } from './badges/catalogue';
+import type { ContentGame } from './games/catalogue';
+import type { ContentDailyTask } from './tasks/catalogue';
+import type { BrainAgeStep } from './tests/brain-age';
 import type {
-  ContentBadge,
-  ContentDailyTask,
-  ContentGame,
-  ContentQuestion,
-  ContentTest,
-  BrainAgeStep,
-  Localized,
   ProfileAnswer,
   ProfileOutcome,
   ProfileQuestion,
   ProfileTest,
   ProfileTrait,
-} from '@neuropeak/content';
-import type { BadgeRequirement } from '@neuropeak/core';
+} from './tests/profiles';
+import type { ContentQuestion, ContentTest, Localized } from './types';
 
 /**
  * Veritabanı satırlarını içerik tiplerine çevirir.
@@ -26,12 +25,53 @@ import type { BadgeRequirement } from '@neuropeak/core';
  * canlı yolunda doğrulanabilir olan kısım bu — sorgunun kendisi
  * çalışan bir Supabase ister.
  *
+ * Çeviriler içerik paketinde çünkü iki taraf da aynısını istiyor:
+ * yönetim paneli okuduğunu göstermek için, mobil uygulama da
+ * içeriği veritabanından çekmek için. Aynı mantığı iki yerde
+ * tutmak, birini düzeltip diğerini unutmak demekti.
+ *
  * Satır şekilleri burada dar biçimde yazılı. Üretilen tam tip
  * `apps/mobile/src/lib/database.types.ts`'te duruyor ama o mobil
- * uygulamanın içinde; panelin oraya uzanması yerine okuduğu
- * sütunlar burada tekrar ediliyor. Şema ile içerik arasındaki
- * denklik `npm run db:verify` ile her CI koşusunda sınanıyor.
+ * uygulamanın içinde. Şema ile içerik arasındaki denklik
+ * `npm run db:verify` ile her CI koşusunda sınanıyor.
  */
+
+/**
+ * Sorgularda okunan sütunlar.
+ *
+ * Burada duruyorlar çünkü çevirinin beklediği alanlarla birebir
+ * eşleşmeleri gerekiyor; bir sütun eklenip listeye yazılmazsa
+ * çeviri sessizce `undefined` okur.
+ */
+export const GAME_COLUMNS =
+  'id, category, mode, title_tr, title_en, description_tr, description_en, ' +
+  'instruction_tr, instruction_en, skills, total_levels, xp_per_round';
+
+export const BADGE_COLUMNS =
+  'id, title_tr, title_en, description_tr, description_en, tier, star_reward, ' +
+  'is_secret, requirement';
+
+export const TASK_COLUMNS = 'id, title_tr, title_en, metric, target, category, star_reward';
+
+export const TEST_COLUMNS =
+  'id, kind, title_tr, title_en, description_tr, description_en, question_count, ' +
+  'est_minutes_min, est_minutes_max, is_pro, focus, norm_mean, norm_sd';
+
+export const QUESTION_COLUMNS =
+  'slug, kind, prompt_tr, prompt_en, options, correct_index, difficulty_weight, ' +
+  'explanation_tr, explanation_en, visual';
+
+export const MEASURE_TEST_COLUMNS =
+  'id, title_tr, title_en, description_tr, description_en, caveat_tr, caveat_en, ' +
+  'est_minutes_min, est_minutes_max, is_pro, ' +
+  'measure_steps(measure, title_tr, title_en, instruction_tr, instruction_en, seconds, sort_order)';
+
+export const PROFILE_TEST_COLUMNS =
+  'id, title_tr, title_en, description_tr, description_en, caveat_tr, caveat_en, ' +
+  'est_minutes_min, est_minutes_max, is_pro, ' +
+  'profile_traits(id, label_tr, label_en, description_tr, description_en, sort_order), ' +
+  'profile_questions(slug, prompt_tr, prompt_en, options, sort_order), ' +
+  'profile_outcomes(id, title_tr, title_en, description_tr, description_en, traits, is_balanced, sort_order)';
 
 type Json = unknown;
 

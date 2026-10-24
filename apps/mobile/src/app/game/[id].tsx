@@ -26,7 +26,8 @@ import {
   tapFeedback,
   useTheme,
 } from '@/components/ui';
-import { findGame } from '@/games/registry';
+import { componentFor } from '@/games/registry';
+import { useContent } from '@/lib/content/context';
 import type { RoundOutcome } from '@/games/types';
 import { useAds } from '@/lib/ads/context';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
@@ -56,7 +57,12 @@ export default function GameScreen() {
       : t('game.roundsFinished', { count: result.level });
   };
 
-  const game = findGame(id ?? '');
+  // İçerik katalogdan (gerekirse veritabanından), oyunu çizen
+  // bileşen kayıt defterinden: metin veri, ekran kod.
+  const catalogue = useContent();
+  const content = catalogue.games.find((item) => item.id === (id ?? ''));
+  const Component = content === undefined ? undefined : componentFor(content.id);
+  const game = content === undefined || Component === undefined ? undefined : content;
 
   const [phase, setPhase] = useState<Phase>('briefing');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
@@ -266,7 +272,7 @@ export default function GameScreen() {
   }
 
   if (phase === 'playing') {
-    const Game = game.Component;
+    const Game = Component as NonNullable<typeof Component>;
     // Süreli oyunlar kendi etiketini (geri sayım) bildirir.
     const progressLabel =
       status.label ??

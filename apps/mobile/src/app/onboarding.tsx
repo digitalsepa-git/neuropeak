@@ -1,5 +1,4 @@
 import { GAME_CATEGORIES, type GameCategory } from '@neuropeak/core';
-import { CONTENT_TESTS, GAME_CATALOGUE } from '@neuropeak/content';
 import { spacing } from '@neuropeak/ui';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState } from 'react';
@@ -17,6 +16,7 @@ import { useLabels, useT } from '@/lib/i18n';
 import type { StringKey } from '@/lib/i18n';
 import { useOnboardingGate } from '@/lib/onboarding-context';
 import { enqueueMutation } from '@/lib/sync';
+import { useContent } from '@/lib/content/context';
 import {
   AGE_RANGES,
   DAILY_GOALS,
@@ -77,10 +77,9 @@ const GOAL_HINTS: Record<number, StringKey> = {
 };
 
 /** Karşılama metnindeki sayılar katalogdan; elle yazılınca eskiyordu. */
-const GAME_COUNT = GAME_CATALOGUE.length;
-const TEST_COUNT = CONTENT_TESTS.length;
 
 export default function OnboardingScreen() {
+  const catalogue = useContent();
   const theme = useTheme();
   const t = useT();
   const labels = useLabels();
@@ -208,7 +207,13 @@ export default function OnboardingScreen() {
                 {t('onboarding.welcome.title')}
               </Text>
               <Text variant="body" color="textSecondary" align="center">
-                {t('onboarding.welcome.body', { games: GAME_COUNT, tests: TEST_COUNT })}
+                {t('onboarding.welcome.body', {
+                  games: catalogue.games.length,
+                  tests:
+                    catalogue.tests.length +
+                    catalogue.profileTests.length +
+                    catalogue.measureTests.length,
+                })}
               </Text>
             </View>
           )}

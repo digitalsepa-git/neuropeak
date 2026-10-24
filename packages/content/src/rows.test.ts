@@ -19,7 +19,7 @@ import {
   type ProfileTestRow,
   type QuestionRow,
   type TestRow,
-} from './content-rows';
+} from './rows';
 
 /**
  * Panelin canlı yolunda doğrulanabilir olan kısım bu: satırdan

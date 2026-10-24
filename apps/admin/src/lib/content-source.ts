@@ -10,6 +10,7 @@ import {
   type ContentGame,
   type ContentQuestion,
   type ContentTest,
+  type MeasureTest,
   type ProfileTest,
 } from '@neuropeak/content';
 
@@ -22,7 +23,6 @@ import {
   fetchQuestionTests,
 } from './content-live';
 import { contentMode } from './content-mode';
-import type { MeasureTest } from './content-rows';
 
 /**
  * Panelin içerik kaynağı.

@@ -12,16 +12,24 @@ import { clamp, standardNormalCdf } from '../utils/math';
  * sayısı veya zorluk dağılımı değişse de aynı normlar geçerli kalır.
  */
 
-export type QuestionKind =
-  | 'matrix'
-  | 'number_series'
-  | 'shape_analogy'
-  | 'verbal_analogy'
-  | 'logic'
-  | 'spatial'
-  | 'coding'
-  | 'odd_one_out'
-  | 'arithmetic';
+/**
+ * Soru türleri. Dizi olarak duruyor çünkü yalnızca tip denetimi
+ * değil, çalışma anında da gerekiyor: veritabanından gelen içerikte
+ * bu sürümün tanımadığı bir tür olabilir ve o soru elenmeli.
+ */
+export const QUESTION_KINDS = [
+  'matrix',
+  'number_series',
+  'shape_analogy',
+  'verbal_analogy',
+  'logic',
+  'spatial',
+  'coding',
+  'odd_one_out',
+  'arithmetic',
+] as const;
+
+export type QuestionKind = (typeof QUESTION_KINDS)[number];
 
 /** Sonuç raporundaki alt boyutlar. */
 export const REPORT_DIMENSIONS = ['verbal', 'numeric', 'visual', 'logical'] as const;

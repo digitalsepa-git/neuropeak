@@ -43,7 +43,10 @@ import {
 import { useI18n } from '@/lib/i18n';
 import { enqueueMutation } from '@/lib/sync';
 
-import { BADGES, DAILY_TASKS, type ContentBadge } from '@neuropeak/content';
+import type { ContentBadge } from '@neuropeak/content';
+
+import { EMBEDDED_CATALOGUE } from '@/lib/content/catalogue';
+import { useContent } from '@/lib/content/context';
 
 import { rolloverLeague } from './league';
 import {
@@ -107,7 +110,9 @@ const ProgressContext = createContext<ProgressContextValue>({
   level: levelProgress(0),
   neuropeak: neuropeakScore(EMPTY_PROGRESS.brainMap),
   userId: 'anonymous',
-  badges: BADGES,
+  // Varsayılan bağlam sağlayıcı olmadan okunursa diye; gerçek liste
+  // içerik sağlayıcısından geliyor.
+  badges: EMBEDDED_CATALOGUE.badges,
   ready: false,
   celebration: null,
   clearCelebration: () => undefined,
@@ -122,6 +127,10 @@ const ProgressContext = createContext<ProgressContextValue>({
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { language, t } = useI18n();
   const userName = t('league.you');
+
+  // Rozetler ve görev havuzu artık içerikten: panelden düzenlenince
+  // uygulamada da değişsinler.
+  const { badges, dailyTasks } = useContent();
 
   const [state, setState] = useState<ProgressState>(EMPTY_PROGRESS);
   const [ready, setReady] = useState(false);
@@ -164,7 +173,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           : {
               ...withLeague,
               tasksDate: today,
-              tasks: pickDailyTasks(DAILY_TASKS, deviceId.current, today),
+              tasks: pickDailyTasks(dailyTasks, deviceId.current, today),
               rewardedAdsToday: 0,
             };
 
@@ -279,7 +288,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         bestIq,
       };
 
-      const earned = newlyEarnedBadges(BADGES, badgeContext, current.badges) as ContentBadge[];
+      const earned = newlyEarnedBadges(badges, badgeContext, current.badges) as ContentBadge[];
       const badgeStars = starsForBadges(earned);
 
       const stars =
@@ -326,7 +335,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         }),
       });
     },
-    [commit],
+    [badges, commit],
   );
 
   const recordGameRound = useCallback<ProgressContextValue['recordGameRound']>(
@@ -399,7 +408,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       level: levelProgress(state.xp),
       neuropeak: neuropeakScore(state.brainMap),
       userId,
-      badges: BADGES,
+      badges,
       ready,
       celebration,
       clearCelebration: () => setCelebration(null),
@@ -411,6 +420,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       grantRewardedAdStars,
     }),
     [
+      badges,
       celebration,
       gameProgress,
       grantRewardedAdStars,

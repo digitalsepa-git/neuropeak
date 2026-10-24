@@ -8,17 +8,13 @@ import { Icon } from '@/components/icons';
 import { RewardedAdCard } from '@/components/rewarded-ad-card';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
-import { findDailyTask, findGameContent } from '@neuropeak/content';
 
-import { GAME_DEFINITIONS } from '@/games/registry';
+import { useContent } from '@/lib/content/context';
 import { useAds } from '@/lib/ads/context';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
-
-/** Öneri yalnızca oynanabilir oyunlar arasından seçiliyor. */
-const PLAYABLE_IDS = GAME_DEFINITIONS.map((game) => game.id);
 
 /** "Kaldığın yerden" bölümünde gösterilecek oyun sayısı. */
 const CONTINUE_COUNT = 3;
@@ -33,12 +29,16 @@ export default function HomeScreen() {
   const announcement = getString('announcement.text');
   const { isPro } = usePro();
   const { state, level, neuropeak, userId } = useProgress();
+  const catalogue = useContent();
+
+  // Öneri yalnızca kataloğa giren oyunlar arasından seçiliyor.
+  const playableIds = catalogue.games.map((game) => game.id);
   const { canWatchRewarded } = useAds();
 
   // Görev kimliği katalogda yoksa kimliğin kendisi görünür; sessizce
   // boş bir satır göstermekten iyi.
   const taskLabel = (id: string) => {
-    const task = findDailyTask(id);
+    const task = catalogue.dailyTasks.find((item) => item.id === id);
     return task === undefined ? id : localized(task.title);
   };
 
@@ -48,15 +48,16 @@ export default function HomeScreen() {
   // Öneri günde bir kez değişiyor; görevlerle aynı tohumlama. Günü
   // `tasksDate` veriyor — açılışta bugüne ayarlanıyor ve render
   // sırasında saate bakmamızı gerektirmiyor.
-  const suggestedId = pickSuggestedGame(PLAYABLE_IDS, state.games, {
+  const suggestedId = pickSuggestedGame(playableIds, state.games, {
     userId,
     dateKey: state.tasksDate ?? '',
   });
-  const suggested = suggestedId === undefined ? undefined : findGameContent(suggestedId);
+  const suggested =
+    suggestedId === undefined ? undefined : catalogue.games.find((game) => game.id === suggestedId);
   const suggestionIsNew = suggestedId !== undefined && !hasPlayed(state.games, suggestedId);
 
   const continueGames = recentlyPlayed(state.games, CONTINUE_COUNT).flatMap((id) => {
-    const game = findGameContent(id);
+    const game = catalogue.games.find((item) => item.id === id);
     return game === undefined ? [] : [{ game, record: state.games[id] }];
   });
 

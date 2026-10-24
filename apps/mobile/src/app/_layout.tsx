@@ -19,6 +19,7 @@ import { AdsProvider } from '@/lib/ads/context';
 import { startAnalytics, track } from '@/lib/analytics';
 import { ProProvider } from '@/lib/billing/context';
 import { I18nProvider, loadLanguage, useT } from '@/lib/i18n';
+import { ContentProvider } from '@/lib/content/context';
 import { ProgressProvider } from '@/lib/progress/context';
 import { loadOnboardingState } from '@/lib/onboarding';
 import { OnboardingGateProvider, useOnboardingGate } from '@/lib/onboarding-context';
@@ -71,16 +72,18 @@ export default function RootLayout() {
         <ThemeProvider>
           <I18nProvider initialLanguage={language}>
             <RemoteConfigProvider>
-              <ProProvider>
-                <ProgressProvider>
-                  <AdsProvider>
-                    <OnboardingGateProvider initialCompleted={onboardingCompleted}>
-                      <RootStack />
-                      <CelebrationOverlay />
-                    </OnboardingGateProvider>
-                  </AdsProvider>
-                </ProgressProvider>
-              </ProProvider>
+              <ContentProvider>
+                <ProProvider>
+                  <ProgressProvider>
+                    <AdsProvider>
+                      <OnboardingGateProvider initialCompleted={onboardingCompleted}>
+                        <RootStack />
+                        <CelebrationOverlay />
+                      </OnboardingGateProvider>
+                    </AdsProvider>
+                  </ProgressProvider>
+                </ProProvider>
+              </ContentProvider>
             </RemoteConfigProvider>
           </I18nProvider>
         </ThemeProvider>
