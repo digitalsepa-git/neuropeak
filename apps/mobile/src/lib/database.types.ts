@@ -10,6 +10,27 @@ export type Database = {
   };
   public: {
     Tables: {
+      admins: {
+        Row: {
+          user_id: string;
+          email: string;
+          created_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          user_id: string;
+          email: string;
+          created_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          user_id?: string;
+          email?: string;
+          created_at?: string;
+          created_by?: string | null;
+        };
+        Relationships: [];
+      };
       analytics_events: {
         Row: {
           id: number;
