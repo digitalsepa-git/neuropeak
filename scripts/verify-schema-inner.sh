@@ -13,7 +13,10 @@ psql -v ON_ERROR_STOP=1 -q -f "$ROOT/supabase/tests/01_rls_assertions.sql"
 # yazsın diye içerik tabloları boşaltılıyor.
 psql -v ON_ERROR_STOP=1 -q -c "truncate table
   public.test_questions, public.questions, public.tests,
-  public.games, public.badges, public.daily_task_templates cascade;"
+  public.games, public.badges, public.daily_task_templates,
+  public.measure_steps, public.measure_tests,
+  public.profile_traits, public.profile_questions,
+  public.profile_outcomes, public.profile_tests cascade;"
 
 echo "→ İçerik seed'i" >&2
 "$ROOT/node_modules/.bin/tsx" "$ROOT/scripts/seed-content.ts"

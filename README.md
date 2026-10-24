@@ -45,8 +45,6 @@ Barındırılan bir Supabase'de bağlantı dizesi proje ayarlarındadır. Seed y
 
 `db:verify` seed'i de çalıştırır, yani içerik şemaya sığmayı bıraktığında CI bunu söyler.
 
-Beyin Yaşı ve profil testlerinin henüz tablosu yok; onlar yalnızca pakette duruyor.
-
 ### Bağlantı
 
 `apps/mobile/.env.example` dosyasını `.env` olarak kopyalayıp Supabase projesinin URL ve anon anahtarını doldurun. Boş bırakılırsa uygulama tamamen çevrimdışı çalışır: veriler cihazda durur, senkronizasyon ilk fırsatta yapılır.
