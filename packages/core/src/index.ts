@@ -84,6 +84,7 @@ export {
   DAILY_TASK_COUNT,
   applyTaskEvent,
   completedTaskCount,
+  describeTaskTarget,
   pickDailyTasks,
   type DailyTask,
   type DailyTaskTemplate,

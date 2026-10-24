@@ -43,7 +43,7 @@ import {
 import { useI18n } from '@/lib/i18n';
 import { enqueueMutation } from '@/lib/sync';
 
-import { BADGES, type ContentBadge } from '@neuropeak/content';
+import { BADGES, DAILY_TASKS, type ContentBadge } from '@neuropeak/content';
 
 import { rolloverLeague } from './league';
 import {
@@ -53,7 +53,6 @@ import {
   saveProgress,
   type ProgressState,
 } from './storage';
-import { DAILY_TASK_TEMPLATES } from './templates';
 
 /** Kutlanacak olay; arayüz gösterdikten sonra temizler. */
 export type Celebration =
@@ -165,7 +164,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           : {
               ...withLeague,
               tasksDate: today,
-              tasks: pickDailyTasks(DAILY_TASK_TEMPLATES, deviceId.current, today),
+              tasks: pickDailyTasks(DAILY_TASKS, deviceId.current, today),
               rewardedAdsToday: 0,
             };
 

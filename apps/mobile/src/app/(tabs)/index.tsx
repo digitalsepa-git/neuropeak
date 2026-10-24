@@ -8,7 +8,7 @@ import { Icon } from '@/components/icons';
 import { RewardedAdCard } from '@/components/rewarded-ad-card';
 import { Section } from '@/components/section';
 import { Badge, Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
-import { findGameContent } from '@neuropeak/content';
+import { findDailyTask, findGameContent } from '@neuropeak/content';
 
 import { GAME_DEFINITIONS } from '@/games/registry';
 import { useAds } from '@/lib/ads/context';
@@ -16,7 +16,6 @@ import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useRemoteConfig } from '@/lib/remote/context';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
-import { TASK_LABEL_KEYS } from '@/lib/progress/templates';
 
 /** Öneri yalnızca oynanabilir oyunlar arasından seçiliyor. */
 const PLAYABLE_IDS = GAME_DEFINITIONS.map((game) => game.id);
@@ -39,8 +38,8 @@ export default function HomeScreen() {
   // Görev kimliği katalogda yoksa kimliğin kendisi görünür; sessizce
   // boş bir satır göstermekten iyi.
   const taskLabel = (id: string) => {
-    const key = TASK_LABEL_KEYS[id];
-    return key === undefined ? id : t(key);
+    const task = findDailyTask(id);
+    return task === undefined ? id : localized(task.title);
   };
 
   const completedTasks = state.tasks.filter((task) => task.progress >= task.target).length;

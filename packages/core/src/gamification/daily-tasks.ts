@@ -89,3 +89,39 @@ export function applyTaskEvent(tasks: readonly DailyTask[], event: TaskEvent): T
 export function completedTaskCount(tasks: readonly DailyTask[]): number {
   return tasks.filter((task) => task.progress >= task.target).length;
 }
+
+/** Panelde okunacak kategori adları. */
+const TASK_CATEGORY_LABELS: Readonly<Record<GameCategory, string>> = {
+  memory: 'hafıza',
+  attention: 'dikkat',
+  logic: 'mantık',
+  math: 'matematik',
+  spatial: 'görsel',
+  speed: 'hız',
+  verbal: 'sözel',
+};
+
+/**
+ * Görevin hedefini Türkçe bir cümleye çevirir — yönetim panelinin
+ * görev listesi için.
+ *
+ * `describeBadgeRequirement` ve `describeRule` ile aynı iş: kuralı
+ * veri olarak tutmanın bedeli, onu bir kez de insan diline çevirmek.
+ * Katalogdaki başlık oyuncuya gösterilen metin; buradaki cümle
+ * görevin gerçekte neyi saydığı. İkisi ayrıştığında panelde yan yana
+ * görünüyor.
+ */
+export function describeTaskTarget(template: DailyTaskTemplate): string {
+  switch (template.metric) {
+    case 'play_games':
+      return `${template.target} oyun turu oyna`;
+    case 'earn_xp':
+      return `${template.target} XP kazan`;
+    case 'finish_test':
+      return template.target === 1 ? 'Bir test tamamla' : `${template.target} test tamamla`;
+    case 'play_category':
+      return template.category === undefined
+        ? `${template.target} oyun turu oyna`
+        : `${TASK_CATEGORY_LABELS[template.category]} kategorisinde ${template.target} tur oyna`;
+  }
+}

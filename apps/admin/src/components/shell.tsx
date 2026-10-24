@@ -19,6 +19,7 @@ const NAV: readonly NavItem[] = [
   { href: '/content/tests', label: 'Testler', ready: true },
   { href: '/content/games', label: 'Oyunlar', ready: true },
   { href: '/content/badges', label: 'Rozetler', ready: true },
+  { href: '/content/tasks', label: 'Günlük görevler', ready: true },
   { href: '/users', label: 'Kullanıcılar', ready: true },
   { href: '/users/push', label: 'Push', ready: true },
   { href: '/analytics', label: 'Analitik', ready: true },
