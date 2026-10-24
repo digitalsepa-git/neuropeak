@@ -41,9 +41,16 @@ export const REMOTE_KEYS: readonly RemoteKeyDefinition[] = [
   {
     key: 'paywall.title',
     label: 'Paywall başlığı',
-    description: 'Paywall ekranının üst başlığı.',
+    description:
+      'Paywall ekranının üst başlığını değiştirir. Boşken uygulamanın ' +
+      'kendi başlığı kullanılır ve kullanıcının diline göre çevrilir; ' +
+      'buraya yazılan metin tek dilde olduğu için her dilde aynı ' +
+      'görünür.',
     type: 'string',
-    defaultValue: 'Potansiyelini aç',
+    // Boş: varsayılanın bir metin olması, çevrilmiş başlığı her
+    // zaman eziyordu. Panelden hiçbir şey yazılmamışken bile İngilizce
+    // kullanan herkes Türkçe başlık görüyordu — hem de paywall'da.
+    defaultValue: '',
   },
   {
     key: 'paywall.trial_days',

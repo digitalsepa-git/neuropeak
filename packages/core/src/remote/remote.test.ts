@@ -86,6 +86,16 @@ describe('uzaktan yapılandırma', () => {
     expect(remoteBoolean(config, 'leagues.enabled')).toBe(true);
   });
 
+  it('metin ezen anahtarların varsayılanı boş', () => {
+    // Bu anahtarlar uygulamanın çevrilmiş metnini eziyor. Varsayılanı
+    // bir cümle olsaydı, panelden hiçbir şey yazılmamışken bile her
+    // dilde o tek dildeki cümle görünürdü — paywall başlığında tam
+    // olarak bu olmuştu.
+    for (const key of ['paywall.title']) {
+      expect(DEFAULT_REMOTE_CONFIG[key]).toBe('');
+    }
+  });
+
   it('tanımsız anahtarda okuyucu güvenli değer döner', () => {
     expect(remoteString({}, 'yok.anahtar')).toBe('');
     expect(remoteNumber({}, 'yok.anahtar')).toBe(0);
