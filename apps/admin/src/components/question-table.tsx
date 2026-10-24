@@ -3,7 +3,7 @@
 import type { ContentQuestion } from '@neuropeak/content';
 import { useMemo, useState } from 'react';
 
-import { canEditContent } from '@/lib/content-source';
+import { canEditContent } from '@/lib/content-mode';
 
 /**
  * Soru listesi. Düzenleme açılana kadar işin çoğu gözden geçirmek:

@@ -1,14 +1,26 @@
-import { BADGES, DAILY_TASKS, GAME_CATALOGUE } from '@neuropeak/content';
 import Link from 'next/link';
 
 import { Shell } from '@/components/shell';
-import { listOtherTests, listQuestionTests, totalQuestionCount } from '@/lib/content-source';
+import {
+  listBadges,
+  listDailyTasks,
+  listGames,
+  listOtherTests,
+  listQuestionTests,
+  totalQuestionCount,
+} from '@/lib/content-source';
 
-export default function DashboardPage() {
-  const questionTests = listQuestionTests();
-  const otherTests = listOtherTests();
+export default async function DashboardPage() {
+  const [questionTests, otherTests, questions, games, badges, tasks] = await Promise.all([
+    listQuestionTests(),
+    listOtherTests(),
+    totalQuestionCount(),
+    listGames(),
+    listBadges(),
+    listDailyTasks(),
+  ]);
+
   const tests = [...questionTests, ...otherTests];
-  const questions = totalQuestionCount();
   const proTests = tests.filter((test) => test.isPro).length;
 
   // "Soru (tekil)" yalnızca havuzlu testleri sayıyor; ölçüm ve profil
@@ -17,9 +29,9 @@ export default function DashboardPage() {
     { label: 'Test', value: `${tests.length}` },
     { label: 'Soru havuzu (tekil)', value: `${questions}` },
     { label: 'PRO test', value: `${proTests}` },
-    { label: 'Oyun', value: `${GAME_CATALOGUE.length}` },
-    { label: 'Rozet', value: `${BADGES.length}` },
-    { label: 'Günlük görev', value: `${DAILY_TASKS.length}` },
+    { label: 'Oyun', value: `${games.length}` },
+    { label: 'Rozet', value: `${badges.length}` },
+    { label: 'Günlük görev', value: `${tasks.length}` },
   ];
 
   return (

@@ -5,7 +5,7 @@ import type { GameCategory } from '@neuropeak/core';
 import { categoryAccent } from '@neuropeak/ui';
 import { useMemo, useState } from 'react';
 
-import { canEditContent } from '@/lib/content-source';
+import { canEditContent } from '@/lib/content-mode';
 
 const MODE_LABELS = { levels: 'Seviyeli', timed: 'Süreli' } as const;
 

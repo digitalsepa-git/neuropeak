@@ -1,7 +1,9 @@
-import { BADGES, type ContentBadge } from '@neuropeak/content';
+import type { ContentBadge } from '@neuropeak/content';
 import { badgeTierLabel, describeBadgeRequirement, type BadgeTier } from '@neuropeak/core';
 
+import { EmptyContent } from '@/components/empty-content';
 import { Shell } from '@/components/shell';
+import { listBadges } from '@/lib/content-source';
 
 /**
  * Rozet kataloğu.
@@ -17,14 +19,16 @@ import { Shell } from '@/components/shell';
 
 const TIERS: readonly BadgeTier[] = [1, 2, 3, 4];
 
-export default function BadgesPage() {
+export default async function BadgesPage() {
+  const badges = await listBadges();
+
   const byTier = TIERS.map((tier) => ({
     tier,
-    badges: BADGES.filter((badge) => badge.tier === tier),
+    badges: badges.filter((badge) => badge.tier === tier),
   })).filter((group) => group.badges.length > 0);
 
-  const secretCount = BADGES.filter((badge) => badge.isSecret).length;
-  const totalStars = BADGES.reduce((sum, badge) => sum + badge.starReward, 0);
+  const secretCount = badges.filter((badge) => badge.isSecret).length;
+  const totalStars = badges.reduce((sum, badge) => sum + badge.starReward, 0);
 
   return (
     <Shell
@@ -32,10 +36,12 @@ export default function BadgesPage() {
       description="Kazanma koşulları ve yıldız ödülleri. Koşullar veri olarak tutuluyor; buradaki cümleler o veriden üretiliyor."
     >
       <section className="mb-xl grid gap-md sm:grid-cols-3">
-        <Stat label="Rozet" value={`${BADGES.length}`} />
+        <Stat label="Rozet" value={`${badges.length}`} />
         <Stat label="Gizli" value={`${secretCount}`} />
         <Stat label="Toplanabilir yıldız" value={`${totalStars}`} />
       </section>
+
+      {byTier.length === 0 && <EmptyContent what="Rozet" />}
 
       {byTier.map((group) => (
         <section key={group.tier} className="mb-xl last:mb-0">
