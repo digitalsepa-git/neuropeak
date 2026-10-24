@@ -12,6 +12,7 @@ import {
 import { useActionState, useMemo, useState } from 'react';
 
 import { IDLE, saveCampaign } from '@/app/content/actions';
+import type { SegmentSize, SegmentSizes } from '@/lib/segments';
 
 /**
  * Push besteci.
@@ -27,9 +28,11 @@ import { IDLE, saveCampaign } from '@/app/content/actions';
  */
 export function PushComposer({
   segments,
+  sizes,
   canSend,
 }: {
   segments: readonly Segment[];
+  sizes: SegmentSizes;
   canSend: boolean;
 }) {
   const [segmentId, setSegmentId] = useState(segments[0]?.id ?? '');
@@ -76,6 +79,7 @@ export function PushComposer({
           {segment !== undefined && (
             <p className="mt-xs text-caption text-fg-muted">{describeSegment(segment)}</p>
           )}
+          <AudienceCount size={sizes[segmentId]} />
         </section>
 
         <LocaleFields
@@ -163,6 +167,29 @@ export function PushComposer({
         <Preview locale="İngilizce" title={enTitle} body={enBody} />
       </aside>
     </div>
+  );
+}
+
+/**
+ * Kitlenin kaç kişi olduğu ve kaçına ulaşılabildiği.
+ *
+ * İki sayı ayrı duruyor: kurala uyan herkes ile bildirime izin
+ * vermiş olanlar. Tek sayı gösterseydik kampanya kitlesinden küçük
+ * gittiğinde sebebi görünmezdi.
+ *
+ * Sayı okunamadığında "—": sıfır bir ölçüm, "—" ölçüm olmadığı.
+ */
+function AudienceCount({ size }: { size: SegmentSize | undefined }) {
+  if (size === undefined) {
+    return (
+      <p className="mt-xs text-caption text-fg-subtle">Kitle sayısı — · bildirim gidebilecek —</p>
+    );
+  }
+
+  return (
+    <p className="mt-xs text-caption text-fg-subtle tabular-nums">
+      Kitle {size.audience} kişi · {size.reachable} kişiye bildirim gidebilir
+    </p>
   );
 }
 
