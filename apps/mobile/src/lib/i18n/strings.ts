@@ -519,6 +519,161 @@ export const STRINGS = {
   'play.colorGreen': { tr: 'YEŞİL', en: 'GREEN' },
   'play.colorYellow': { tr: 'SARI', en: 'YELLOW' },
 
+  // ----------------------------------------- oyun tahtasındaki sayaçlar
+  'play.moves': {
+    tr: (p: { count: number }) => `${p.count} hamle`,
+    en: (p: { count: number }) => `${p.count} move${p.count === 1 ? '' : 's'}`,
+  },
+  'play.movesOneColour': {
+    tr: (p: { count: number }) => `${p.count} hamle · her şişede tek renk kalsın`,
+    en: (p: { count: number }) =>
+      `${p.count} move${p.count === 1 ? '' : 's'} · one colour per tube`,
+  },
+  'play.connectedOf': {
+    tr: (p: { done: number; total: number }) => `${p.done} / ${p.total} bağlandı`,
+    en: (p: { done: number; total: number }) => `${p.done} / ${p.total} connected`,
+  },
+  'play.edgesOf': {
+    tr: (p: { done: number; total: number }) => `${p.done} / ${p.total} kenar`,
+    en: (p: { done: number; total: number }) => `${p.done} / ${p.total} edges`,
+  },
+  'play.markedOf': {
+    tr: (p: { done: number; total: number }) => `${p.done} / ${p.total} işaretlendi`,
+    en: (p: { done: number; total: number }) => `${p.done} / ${p.total} marked`,
+  },
+  'play.trialsOf': {
+    tr: (p: { done: number; total: number }) => `${p.done} / ${p.total} ölçüm`,
+    en: (p: { done: number; total: number }) => `${p.done} / ${p.total} trials`,
+  },
+  'play.digitCount': {
+    tr: (p: { count: number }) => `${p.count} haneli`,
+    en: (p: { count: number }) => `${p.count} digits`,
+  },
+  'play.lightCount': {
+    tr: (p: { count: number }) => `${p.count} ışık`,
+    en: (p: { count: number }) => `${p.count} light${p.count === 1 ? '' : 's'}`,
+  },
+  'play.solvedCount': {
+    tr: (p: { count: number }) => `${p.count} işlem`,
+    en: (p: { count: number }) => `${p.count} solved`,
+  },
+  'play.tablesFinished': {
+    tr: (p: { count: number }) => `${p.count} tablo tamamlandı`,
+    en: (p: { count: number }) => `${p.count} grid${p.count === 1 ? '' : 's'} finished`,
+  },
+  'play.roundsAndGrid': {
+    tr: (p: { rounds: number; size: number }) => `${p.rounds} tur · ${p.size}×${p.size}`,
+    en: (p: { rounds: number; size: number }) =>
+      `${p.rounds} round${p.rounds === 1 ? '' : 's'} · ${p.size}×${p.size}`,
+  },
+  'play.streakLabel': {
+    tr: (p: { count: number }) => `Seri ${p.count}`,
+    en: (p: { count: number }) => `Streak ${p.count}`,
+  },
+
+  // --------------------------------------------- oyun tahtasındaki ipuçları
+  'play.nBackHint': {
+    tr: (p: { steps: number }) => `${p.steps} adım geriye bak`,
+    en: (p: { steps: number }) => `Look ${p.steps} step${p.steps === 1 ? '' : 's'} back`,
+  },
+  'play.holdTargets': {
+    tr: (p: { count: number }) => `${p.count} hedefi aklında tut`,
+    en: (p: { count: number }) => `Remember ${p.count} target${p.count === 1 ? '' : 's'}`,
+  },
+  'play.nextSymbol': {
+    tr: (p: { symbol: string }) => `Sıradaki: ${p.symbol}`,
+    en: (p: { symbol: string }) => `Next: ${p.symbol}`,
+  },
+  'play.foldedAndPunched': {
+    tr: (p: { folds: string }) => `Kağıt ${p.folds} katlandı ve delindi`,
+    en: (p: { folds: string }) => `Folded ${p.folds} and punched`,
+  },
+  'play.relationLabel': {
+    tr: (p: { relation: string }) => `İlişki: ${p.relation}`,
+    en: (p: { relation: string }) => `Relation: ${p.relation}`,
+  },
+  'play.ruleLabel': {
+    tr: (p: { rule: string }) => `Kural: ${p.rule}`,
+    en: (p: { rule: string }) => `Rule: ${p.rule}`,
+  },
+  'play.answerWas': {
+    tr: (p: { answer: string }) => `Doğrusu ${p.answer}`,
+    en: (p: { answer: string }) => `The answer was ${p.answer}`,
+  },
+  'play.answerWasWithRule': {
+    tr: (p: { answer: number; rule: string }) => `Doğrusu ${p.answer} · ${p.rule}`,
+    en: (p: { answer: number; rule: string }) => `The answer was ${p.answer} · ${p.rule}`,
+  },
+  'play.reactionMedian': {
+    tr: (p: { ms: number }) => `Tepki süren ${p.ms} ms`,
+    en: (p: { ms: number }) => `Your reaction: ${p.ms} ms`,
+  },
+  'play.bestMs': {
+    tr: (p: { ms: number }) => `En iyi ${p.ms} ms`,
+    en: (p: { ms: number }) => `Best ${p.ms} ms`,
+  },
+
+  // --------------------------------------------------------- Hızlı Karar
+  'play.sameOrDifferent': {
+    tr: 'Nokta sayıları aynı mı?',
+    en: 'Are the dot counts the same?',
+  },
+  'play.whichSide': { tr: 'Hangi tarafta daha çok nokta var?', en: 'Which side has more dots?' },
+  'play.different': { tr: 'Farklı', en: 'Different' },
+  // `play.left` / `play.right` yön ("Sola", "Sağa"); burada taraf adı gerekiyor.
+  'play.sideLeft': { tr: 'Sol', en: 'Left' },
+  'play.sideRight': { tr: 'Sağ', en: 'Right' },
+
+  // ------------------------------------------- Sayı Dizisi kural adları
+  'rule.constant-step': { tr: 'sabit ekleme', en: 'constant step' },
+  'rule.constant-factor': { tr: 'sabit çarpan', en: 'constant factor' },
+  'rule.squares': { tr: 'tam kareler', en: 'perfect squares' },
+  'rule.growing-gap': { tr: 'artan fark', en: 'growing gap' },
+  'rule.sum-of-previous': { tr: 'önceki ikisinin toplamı', en: 'sum of the previous two' },
+  'rule.multiply-and-add': { tr: 'çarp ve ekle', en: 'multiply and add' },
+
+  // ------------------------------------------- erişilebilirlik etiketleri
+  'play.rowColumn': {
+    tr: (p: { row: number; column: number }) => `${p.row}. satır ${p.column}. sütun`,
+    en: (p: { row: number; column: number }) => `Row ${p.row}, column ${p.column}`,
+  },
+  'play.optionN': {
+    tr: (p: { index: number }) => `${p.index}. seçenek`,
+    en: (p: { index: number }) => `Option ${p.index}`,
+  },
+  'play.lightN': {
+    tr: (p: { index: number }) => `${p.index}. ışık`,
+    en: (p: { index: number }) => `Light ${p.index}`,
+  },
+  'play.tubeN': {
+    tr: (p: { index: number }) => `${p.index}. şişe`,
+    en: (p: { index: number }) => `Tube ${p.index}`,
+  },
+  'play.squareN': {
+    tr: (p: { index: number }) => `${p.index}. kare`,
+    en: (p: { index: number }) => `Square ${p.index}`,
+  },
+  'play.dotN': {
+    tr: (p: { index: number }) => `${p.index}. nokta`,
+    en: (p: { index: number }) => `Dot ${p.index}`,
+  },
+  'play.shadowN': {
+    tr: (p: { index: number }) => `${p.index}. gölge`,
+    en: (p: { index: number }) => `Shadow ${p.index}`,
+  },
+  'play.pieceN': {
+    tr: (p: { index: number }) => `${p.index}. parça`,
+    en: (p: { index: number }) => `Piece ${p.index}`,
+  },
+  'play.ballN': {
+    tr: (p: { index: number }) => `${p.index}. top`,
+    en: (p: { index: number }) => `Ball ${p.index}`,
+  },
+  'play.circlesCount': {
+    tr: (p: { count: number }) => `${p.count} daire`,
+    en: (p: { count: number }) => `${p.count} circle${p.count === 1 ? '' : 's'}`,
+  },
+
   // ---------------------------------------------------------------- testler
   'tests.title': { tr: 'Testler', en: 'Tests' },
   'tests.filterIq': { tr: 'IQ Testleri', en: 'IQ Tests' },

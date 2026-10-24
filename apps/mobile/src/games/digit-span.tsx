@@ -178,14 +178,14 @@ export function DigitSpanGame({ difficulty, onFinish, onProgress }: GameProps) {
               {t('play.wrongShort')}
             </Text>
             <Text variant="bodySmall" color="textSecondary">
-              Doğrusu {digits.join('')}
+              {t('play.answerWas', { answer: digits.join('') })}
             </Text>
           </View>
         )}
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.lengthLabel}>
-        {length} haneli
+        {t('play.digitCount', { count: length })}
       </Text>
 
       <View style={styles.keypad}>

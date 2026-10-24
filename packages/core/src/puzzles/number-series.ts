@@ -13,12 +13,28 @@ export type NumberSeriesPuzzle = {
   readonly answer: number;
   readonly options: readonly number[];
   readonly correctIndex: number;
-  /** Kuralın adı; doğru cevaptan sonra açıklama olarak gösterilir. */
-  readonly ruleName: string;
+  /**
+   * Kuralın kimliği; doğru cevaptan sonra açıklama olarak gösteriliyor.
+   * Adı değil kimliği döndürüyoruz — cümleyi arayüz kuruyor, böylece
+   * açıklama iki dilde de doğru çıkıyor.
+   */
+  readonly rule: NumberSeriesRule;
 };
 
+/** Dizinin kurulduğu kural. Arayüz bunları kendi kataloğunda adlandırıyor. */
+export const NUMBER_SERIES_RULES = [
+  'constant-step',
+  'constant-factor',
+  'squares',
+  'growing-gap',
+  'sum-of-previous',
+  'multiply-and-add',
+] as const;
+
+export type NumberSeriesRule = (typeof NUMBER_SERIES_RULES)[number];
+
 type SeriesRule = {
-  readonly name: string;
+  readonly id: NumberSeriesRule;
   /** Diziyi üretir; son eleman cevaptır. */
   readonly build: (rng: Rng) => number[];
   /** Kuralın hangi seviyeden sonra devreye gireceği. */
@@ -31,7 +47,7 @@ function randomInt(rng: Rng, min: number, max: number): number {
 
 const RULES: SeriesRule[] = [
   {
-    name: 'sabit ekleme',
+    id: 'constant-step',
     minLevel: 1,
     build: (rng) => {
       const start = randomInt(rng, 1, 12);
@@ -40,7 +56,7 @@ const RULES: SeriesRule[] = [
     },
   },
   {
-    name: 'sabit çarpan',
+    id: 'constant-factor',
     minLevel: 1,
     build: (rng) => {
       const start = randomInt(rng, 1, 5);
@@ -49,7 +65,7 @@ const RULES: SeriesRule[] = [
     },
   },
   {
-    name: 'tam kareler',
+    id: 'squares',
     minLevel: 3,
     build: (rng) => {
       const start = randomInt(rng, 1, 5);
@@ -57,7 +73,7 @@ const RULES: SeriesRule[] = [
     },
   },
   {
-    name: 'artan fark',
+    id: 'growing-gap',
     minLevel: 4,
     build: (rng) => {
       const start = randomInt(rng, 1, 8);
@@ -70,7 +86,7 @@ const RULES: SeriesRule[] = [
     },
   },
   {
-    name: 'önceki ikisinin toplamı',
+    id: 'sum-of-previous',
     minLevel: 6,
     build: (rng) => {
       const first = randomInt(rng, 1, 5);
@@ -83,7 +99,7 @@ const RULES: SeriesRule[] = [
     },
   },
   {
-    name: 'çarp ve ekle',
+    id: 'multiply-and-add',
     minLevel: 8,
     build: (rng) => {
       const start = randomInt(rng, 1, 4);
@@ -145,6 +161,6 @@ export function generateNumberSeries(level: number, seed: number): NumberSeriesP
     answer,
     options,
     correctIndex: options.indexOf(answer),
-    ruleName: rule.name,
+    rule: rule.id,
   };
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateLogicChain } from './logic-chain';
+import { generateLogicChain, type LogicChainBank } from './logic-chain';
 import {
   TUBE_CAPACITY,
   canPour,
@@ -107,23 +107,48 @@ describe('Matris üreteci', () => {
   });
 });
 
+/**
+ * Testlerin kendi bankası. Çekirdek içerik paketine bağlı değil ve
+ * olmamalı; üreteç bankayı dışarıdan aldığı için test de kendi
+ * bankasını veriyor. Türkçe banka seçildi: ek alan biçimi kalıbın
+ * doğru yere koyduğunu da sınıyor.
+ */
+const CHAIN_BANK: LogicChainBank = {
+  names: [
+    { subject: 'Deniz', object: "Deniz'den" },
+    { subject: 'Mert', object: "Mert'ten" },
+    { subject: 'Elif', object: "Elif'ten" },
+    { subject: 'Burak', object: "Burak'tan" },
+    { subject: 'Ayşe', object: "Ayşe'den" },
+    { subject: 'Can', object: "Can'dan" },
+  ],
+  kinds: {
+    taller: { comparative: 'daha uzun', superlative: 'en uzun', least: 'en kısa' },
+    faster: { comparative: 'daha hızlı', superlative: 'en hızlı', least: 'en yavaş' },
+    older: { comparative: 'daha yaşlı', superlative: 'en yaşlı', least: 'en genç' },
+    heavier: { comparative: 'daha ağır', superlative: 'en ağır', least: 'en hafif' },
+  },
+  premise: '{a}, {b} {comparative}.',
+  question: 'Kim {superlative}?',
+};
+
 describe('Mantık Zinciri üreteci', () => {
   it('zincir uzunluğu kadar kişi ve bir eksik öncül üretir', () => {
-    const puzzle = generateLogicChain(1, 5);
+    const puzzle = generateLogicChain(1, 5, CHAIN_BANK);
 
     expect(puzzle.options).toHaveLength(3);
     expect(puzzle.premises).toHaveLength(2);
   });
 
   it('seviye yükseldikçe zincir uzar', () => {
-    expect(generateLogicChain(1, 1).options.length).toBeLessThan(
-      generateLogicChain(9, 1).options.length,
+    expect(generateLogicChain(1, 1, CHAIN_BANK).options.length).toBeLessThan(
+      generateLogicChain(9, 1, CHAIN_BANK).options.length,
     );
   });
 
   it('doğru cevap şıklar arasında ve tek', () => {
     for (let seed = 1; seed <= 200; seed += 1) {
-      const puzzle = generateLogicChain((seed % 10) + 1, seed * 13);
+      const puzzle = generateLogicChain((seed % 10) + 1, seed * 13, CHAIN_BANK);
 
       expect(puzzle.correctIndex).toBeGreaterThanOrEqual(0);
       expect(new Set(puzzle.options).size).toBe(puzzle.options.length);
@@ -133,7 +158,7 @@ describe('Mantık Zinciri üreteci', () => {
   it('öncüller zinciri tam olarak belirler', () => {
     // Her kişi en fazla bir kez "daha" tarafında, bir kez karşı tarafta
     // geçer; bu da tam bir sıralama demektir.
-    const puzzle = generateLogicChain(7, 99);
+    const puzzle = generateLogicChain(7, 99, CHAIN_BANK);
     const mentioned = new Set<string>();
 
     for (const premise of puzzle.premises) {
@@ -146,6 +171,6 @@ describe('Mantık Zinciri üreteci', () => {
   });
 
   it('aynı tohum aynı bulmacayı verir', () => {
-    expect(generateLogicChain(4, 777)).toEqual(generateLogicChain(4, 777));
+    expect(generateLogicChain(4, 777, CHAIN_BANK)).toEqual(generateLogicChain(4, 777, CHAIN_BANK));
   });
 });

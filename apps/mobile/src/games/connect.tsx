@@ -171,7 +171,7 @@ export function ConnectGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={`${row + 1}. satır ${column + 1}. sütun`}
+              accessibilityLabel={t('play.rowColumn', { row: row + 1, column: column + 1 })}
               onPress={() => tapCell(index)}
               style={[
                 styles.cell,
@@ -212,7 +212,7 @@ export function ConnectGame({ startLevel, onFinish, onProgress }: GameProps) {
 
       <View style={styles.footer}>
         <Text variant="caption" color="textMuted">
-          {connected} / {puzzle.pairs.length} bağlandı
+          {t('play.connectedOf', { done: connected, total: puzzle.pairs.length })}
         </Text>
         <Pressable
           accessibilityRole="button"

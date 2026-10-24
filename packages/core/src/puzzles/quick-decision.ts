@@ -12,11 +12,16 @@ import { createRng, type Rng } from '../random';
 
 export type QuickDecisionDifficulty = 'easy' | 'medium' | 'hard';
 
+/**
+ * Sorunun türü. Metni değil türü döndürüyoruz: cümleyi arayüz kuruyor,
+ * böylece iki dilde de doğru cümle çıkıyor ve çekirdek dil bilmiyor.
+ */
+export type QuickDecisionKind = 'same-or-different' | 'which-side';
+
 export type QuickDecisionTrial = {
   readonly left: number;
   readonly right: number;
-  readonly prompt: string;
-  readonly options: readonly [string, string];
+  readonly kind: QuickDecisionKind;
   readonly correctIndex: number;
 };
 
@@ -49,8 +54,7 @@ export function generateQuickDecision(
     return {
       left: onLeft ? base + difference : base,
       right: onLeft ? base : base + difference,
-      prompt: 'Nokta sayıları aynı mı?',
-      options: ['Aynı', 'Farklı'],
+      kind: 'same-or-different',
       correctIndex: equal ? 0 : 1,
     };
   }
@@ -61,8 +65,7 @@ export function generateQuickDecision(
   return {
     left: leftWins ? base + difference : base,
     right: leftWins ? base : base + difference,
-    prompt: 'Hangi tarafta daha çok nokta var?',
-    options: ['Sol', 'Sağ'],
+    kind: 'which-side',
     correctIndex: leftWins ? 0 : 1,
   };
 }

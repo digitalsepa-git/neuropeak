@@ -8,12 +8,14 @@ import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { TIMED_ROUND_SECONDS, formatSeconds, useGameTimer } from '@/games/use-game-timer';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /**
  * Hızlı İşlem — süreli. Sürede kaç doğru işlem yaptığını ölçer; doğru
  * seri uzadıkça puan artar, yanlış seriyi sıfırlar.
  */
 export function QuickMathGame({ difficulty, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
 
   const [problem, setProblem] = useState<QuickMathProblem>(() => generateQuickMath(difficulty, 1));
@@ -81,7 +83,9 @@ export function QuickMathGame({ difficulty, onFinish, onProgress }: GameProps) {
       </View>
 
       <Text variant="caption" color="textMuted" style={styles.streak}>
-        {streak > 2 ? `${streak} doğru üst üste` : `${solved} işlem`}
+        {streak > 2
+          ? t('play.streakCorrect', { count: streak })
+          : t('play.solvedCount', { count: solved })}
       </Text>
 
       <View style={styles.options}>

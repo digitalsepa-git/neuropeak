@@ -6,12 +6,14 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 /**
  * Sayı Dizisi — seviyeli. Diziyi üreten kuralı bulup devamını seçersin.
  * Doğru cevaptan sonra kural kısaca gösterilir; oyun öğretmeli.
  */
 export function NumberSeriesGame({ startLevel, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
 
   const [level, setLevel] = useState(startLevel);
@@ -71,12 +73,15 @@ export function NumberSeriesGame({ startLevel, onFinish, onProgress }: GameProps
       <View style={styles.explanationSlot}>
         {picked !== null && picked === puzzle.correctIndex && (
           <Text variant="caption" color="success">
-            Kural: {puzzle.ruleName}
+            {t('play.ruleLabel', { rule: t(`rule.${puzzle.rule}`) })}
           </Text>
         )}
         {picked !== null && picked !== puzzle.correctIndex && (
           <Text variant="caption" color="danger">
-            Doğrusu {puzzle.answer} · {puzzle.ruleName}
+            {t('play.answerWasWithRule', {
+              answer: puzzle.answer,
+              rule: t(`rule.${puzzle.rule}`),
+            })}
           </Text>
         )}
       </View>

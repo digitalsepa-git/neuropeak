@@ -1,4 +1,5 @@
 import { generateLogicChain } from '@neuropeak/core';
+import { logicChainBankFor } from '@neuropeak/content';
 import { radius, spacing } from '@neuropeak/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -8,6 +9,7 @@ import { Icon } from '@/components/icons';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useI18n } from '@/lib/i18n';
 
 /**
  * Mantık Zinciri — seviyeli. Verilen karşılaştırmalardan sıralamayı
@@ -16,9 +18,15 @@ import { useRoundFinish } from '@/games/use-round-finish';
  */
 export function LogicChainGame({ startLevel, onFinish, onProgress }: GameProps) {
   const theme = useTheme();
+  // Öncüller ve soru arayüz dilinde kuruluyor; adlar ve karşılaştırma
+  // sözcükleri içerik paketindeki bankadan geliyor.
+  const { language } = useI18n();
+  const bank = logicChainBankFor(language);
 
   const [level, setLevel] = useState(startLevel);
-  const [puzzle, setPuzzle] = useState(() => generateLogicChain(startLevel, startLevel * 31_337));
+  const [puzzle, setPuzzle] = useState(() =>
+    generateLogicChain(startLevel, startLevel * 31_337, bank),
+  );
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
@@ -48,10 +56,10 @@ export function LogicChainGame({ startLevel, onFinish, onProgress }: GameProps) 
         const nextLevel = correct ? level + 1 : level;
         setPicked(null);
         setLevel(nextLevel);
-        setPuzzle(generateLogicChain(nextLevel, nextLevel * 31_337 + score));
+        setPuzzle(generateLogicChain(nextLevel, nextLevel * 31_337 + score, bank));
       }, 700);
     },
-    [level, picked, puzzle.correctIndex, score, streak],
+    [bank, level, picked, puzzle.correctIndex, score, streak],
   );
 
   return (

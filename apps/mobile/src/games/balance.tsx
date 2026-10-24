@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, tapFeedback, useTheme } from '@/components/ui';
 import type { GameProps } from '@/games/types';
 import { useRoundFinish } from '@/games/use-round-finish';
+import { useT } from '@/lib/i18n';
 
 const GLYPH: Record<BalanceShape, string> = {
   circle: '●',
@@ -40,6 +41,7 @@ function Shapes({ shapes }: { shapes: readonly BalanceShape[] }) {
  * için her sorunun tek ve tam sayı cevabı var.
  */
 export function BalanceGame({ startLevel, onFinish, onProgress }: GameProps) {
+  const t = useT();
   const theme = useTheme();
 
   const [level, setLevel] = useState(startLevel);
@@ -127,7 +129,7 @@ export function BalanceGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={option}
               accessibilityRole="button"
-              accessibilityLabel={`${option} daire`}
+              accessibilityLabel={t('play.circlesCount', { count: option })}
               onPress={() => answer(index)}
               style={[
                 styles.option,

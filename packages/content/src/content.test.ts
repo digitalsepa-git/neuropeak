@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  COMPARISON_KINDS,
   FIGURE_ATTRIBUTES,
   attributeOf,
+  generateLogicChain,
   figureKey,
   hasDiscoverableRule,
   isAmbiguousGlyph,
@@ -14,6 +16,7 @@ import {
 } from '@neuropeak/core';
 
 import { GAME_CATALOGUE } from './games/catalogue';
+import { logicChainBankFor } from './logic/chain';
 import { PROFILE_TESTS } from './tests/profiles';
 import { displayNamesFor, wordBankFor } from './words/bank';
 
@@ -570,4 +573,71 @@ describe('profil testleri', () => {
       }
     });
   }
+});
+
+describe('mantık zinciri bankası', () => {
+  const languages = ['tr', 'en'] as const;
+
+  it('iki dilde de aynı sayıda ad var', () => {
+    // Aynı tohum iki dilde de aynı uzunlukta zincir kursun.
+    expect(logicChainBankFor('tr').names).toHaveLength(logicChainBankFor('en').names.length);
+  });
+
+  it('kalıplar gereken yer tutucuları taşıyor', () => {
+    for (const language of languages) {
+      const bank = logicChainBankFor(language);
+
+      expect(bank.premise, language).toContain('{a}');
+      expect(bank.premise, language).toContain('{b}');
+      expect(bank.premise, language).toContain('{comparative}');
+      expect(bank.question, language).toContain('{superlative}');
+    }
+  });
+
+  it('her karşılaştırma türünün üç sözcüğü dolu', () => {
+    for (const language of languages) {
+      const bank = logicChainBankFor(language);
+
+      for (const kind of COMPARISON_KINDS) {
+        const text = bank.kinds[kind];
+        expect(text.comparative.length, `${language}/${kind}`).toBeGreaterThan(0);
+        expect(text.superlative.length, `${language}/${kind}`).toBeGreaterThan(0);
+        expect(text.least.length, `${language}/${kind}`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('Türkçe adların ayrılma eki ses uyumuna uyuyor', () => {
+    // Sert ünsüzle biten ad "t" alır: Mert'ten, Burak'tan. Önceki
+    // sürüm hepsine "'den" ekliyordu ve dokuz addan dördü yanlıştı.
+    const VOICELESS = new Set(['f', 's', 't', 'k', 'ç', 'ş', 'h', 'p']);
+
+    for (const name of logicChainBankFor('tr').names) {
+      const suffix = name.object.slice(name.subject.length);
+      const lastLetter = name.subject[name.subject.length - 1]?.toLocaleLowerCase('tr') ?? '';
+      const expected = VOICELESS.has(lastLetter) ? 't' : 'd';
+
+      expect(name.object.startsWith(`${name.subject}'`), name.subject).toBe(true);
+      expect(suffix[1], name.subject).toBe(expected);
+    }
+  });
+
+  it('İngilizcede adın iki biçimi aynı', () => {
+    for (const name of logicChainBankFor('en').names) {
+      expect(name.object).toBe(name.subject);
+    }
+  });
+
+  it('kurulan cümlede doldurulmamış yer tutucu kalmıyor', () => {
+    for (const language of languages) {
+      for (let seed = 1; seed <= 40; seed += 1) {
+        const puzzle = generateLogicChain((seed % 9) + 1, seed * 31, logicChainBankFor(language));
+
+        for (const premise of puzzle.premises) {
+          expect(premise, `${language}/${seed}`).not.toMatch(/[{}]/);
+        }
+        expect(puzzle.question, `${language}/${seed}`).not.toMatch(/[{}]/);
+      }
+    }
+  });
 });

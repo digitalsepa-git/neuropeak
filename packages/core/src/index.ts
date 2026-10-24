@@ -114,12 +114,22 @@ export {
 } from './puzzles/matrix';
 
 export {
+  COMPARISON_KINDS,
   chainLengthForLevel,
   generateLogicChain,
+  type ComparisonKind,
+  type ComparisonText,
+  type LogicChainBank,
+  type LogicChainName,
   type LogicChainPuzzle,
 } from './puzzles/logic-chain';
 
-export { generateNumberSeries, type NumberSeriesPuzzle } from './puzzles/number-series';
+export {
+  NUMBER_SERIES_RULES,
+  generateNumberSeries,
+  type NumberSeriesPuzzle,
+  type NumberSeriesRule,
+} from './puzzles/number-series';
 
 export {
   generateTargetNumber,
@@ -206,6 +216,7 @@ export {
 export {
   generateQuickDecision,
   type QuickDecisionDifficulty,
+  type QuickDecisionKind,
   type QuickDecisionTrial,
 } from './puzzles/quick-decision';
 

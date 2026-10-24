@@ -155,9 +155,10 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
             <Pressable
               key={index}
               accessibilityRole="button"
-              accessibilityLabel={`${Math.floor(index / puzzle.columns) + 1}. satır ${
-                (index % puzzle.columns) + 1
-              }. sütun`}
+              accessibilityLabel={t('play.rowColumn', {
+                row: Math.floor(index / puzzle.columns) + 1,
+                column: (index % puzzle.columns) + 1,
+              })}
               onPress={() => place(index)}
               style={[
                 styles.cell,
@@ -181,7 +182,7 @@ export function TilingGame({ startLevel, onFinish, onProgress }: GameProps) {
           <Pressable
             key={piece.id}
             accessibilityRole="button"
-            accessibilityLabel={`${piece.id + 1}. parça`}
+            accessibilityLabel={t('play.pieceN', { index: piece.id + 1 })}
             onPress={() => {
               tapFeedback();
               setSelected(piece.id);

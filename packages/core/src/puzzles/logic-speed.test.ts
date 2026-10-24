@@ -197,11 +197,11 @@ describe('Hızlı Karar üreteci', () => {
     for (const difficulty of difficulties) {
       for (let seed = 1; seed <= 300; seed += 1) {
         const trial = generateQuickDecision(difficulty, seed * 7);
-        const answer = trial.options[trial.correctIndex];
 
-        if (trial.prompt.startsWith('Nokta sayıları')) {
-          expect(answer, `${difficulty}/${seed}`).toBe(
-            trial.left === trial.right ? 'Aynı' : 'Farklı',
+        if (trial.kind === 'same-or-different') {
+          // 0 "aynı", 1 "farklı"; şıkların metnini arayüz koyuyor.
+          expect(trial.correctIndex, `${difficulty}/${seed}`).toBe(
+            trial.left === trial.right ? 0 : 1,
           );
           continue;
         }
@@ -209,7 +209,8 @@ describe('Hızlı Karar üreteci', () => {
         expect(trial.left, `${difficulty}/${seed} eşit küme ile "daha çok" sordu`).not.toBe(
           trial.right,
         );
-        expect(answer).toBe(trial.left > trial.right ? 'Sol' : 'Sağ');
+        // 0 sol, 1 sağ.
+        expect(trial.correctIndex).toBe(trial.left > trial.right ? 0 : 1);
       }
     }
   });
@@ -247,12 +248,12 @@ describe('Hızlı Karar üreteci', () => {
   });
 
   it('iki soru türü de çıkar', () => {
-    const prompts = new Set<string>();
+    const kinds = new Set<string>();
     for (let seed = 1; seed <= 100; seed += 1) {
-      prompts.add(generateQuickDecision('medium', seed * 5).prompt);
+      kinds.add(generateQuickDecision('medium', seed * 5).kind);
     }
 
-    expect(prompts.size).toBe(2);
+    expect(kinds.size).toBe(2);
   });
 
   it('aynı tohum aynı soruyu verir', () => {
