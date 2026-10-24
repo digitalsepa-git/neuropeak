@@ -1,7 +1,7 @@
-import type { ContentDailyTask } from '@neuropeak/content';
 import { DAILY_TASK_COUNT, describeTaskTarget, type TaskMetric } from '@neuropeak/core';
 
 import { EmptyContent } from '@/components/empty-content';
+import { TaskEditor } from '@/components/task-editor';
 import { Shell } from '@/components/shell';
 import { listDailyTasks } from '@/lib/content-source';
 
@@ -52,30 +52,24 @@ export default async function TasksPage() {
               <th className="px-md py-sm font-semibold">Hedef</th>
               <th className="px-md py-sm font-semibold">Metrik</th>
               <th className="px-md py-sm text-right font-semibold">Yıldız</th>
+              <th className="px-md py-sm text-right font-semibold">
+                <span className="sr-only">Düzenle</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {tasks.map((task) => (
-              <TaskRow key={task.id} task={task} />
+              <TaskEditor
+                key={task.id}
+                task={task}
+                target={describeTaskTarget(task)}
+                metric={METRIC_LABELS[task.metric]}
+              />
             ))}
           </tbody>
         </table>
       </div>
     </Shell>
-  );
-}
-
-function TaskRow({ task }: { task: ContentDailyTask }) {
-  return (
-    <tr className="border-b border-border last:border-0">
-      <td className="px-md py-sm">
-        <p className="text-caption text-fg-subtle">{task.id}</p>
-      </td>
-      <td className="px-md py-sm font-medium">{task.title.tr}</td>
-      <td className="px-md py-sm text-fg-muted">{describeTaskTarget(task)}</td>
-      <td className="px-md py-sm text-fg-muted">{METRIC_LABELS[task.metric]}</td>
-      <td className="px-md py-sm text-right tabular-nums">{task.starReward}</td>
-    </tr>
   );
 }
 

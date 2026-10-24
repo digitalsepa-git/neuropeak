@@ -1,6 +1,6 @@
-import type { ContentBadge } from '@neuropeak/content';
 import { badgeTierLabel, describeBadgeRequirement, type BadgeTier } from '@neuropeak/core';
 
+import { BadgeEditor } from '@/components/badge-editor';
 import { EmptyContent } from '@/components/empty-content';
 import { Shell } from '@/components/shell';
 import { listBadges } from '@/lib/content-source';
@@ -58,11 +58,18 @@ export default async function BadgesPage() {
                   <th className="px-md py-sm font-semibold">Oyuncuya görünen</th>
                   <th className="px-md py-sm font-semibold">Koşul</th>
                   <th className="px-md py-sm text-right font-semibold">Yıldız</th>
+                  <th className="px-md py-sm text-right font-semibold">
+                    <span className="sr-only">Düzenle</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {group.badges.map((badge) => (
-                  <BadgeRow key={badge.id} badge={badge} />
+                  <BadgeEditor
+                    key={badge.id}
+                    badge={badge}
+                    requirement={describeBadgeRequirement(badge.requirement)}
+                  />
                 ))}
               </tbody>
             </table>
@@ -70,27 +77,6 @@ export default async function BadgesPage() {
         </section>
       ))}
     </Shell>
-  );
-}
-
-function BadgeRow({ badge }: { badge: ContentBadge }) {
-  return (
-    <tr className="border-b border-border last:border-0">
-      <td className="px-md py-sm">
-        <div className="flex items-center gap-xs">
-          <span className="font-medium">{badge.title.tr}</span>
-          {badge.isSecret && (
-            <span className="rounded-pill bg-surface-sunken px-1.5 text-overline font-semibold tracking-wide text-fg-muted uppercase">
-              Gizli
-            </span>
-          )}
-        </div>
-        <p className="text-caption text-fg-subtle">{badge.id}</p>
-      </td>
-      <td className="px-md py-sm text-fg-muted">{badge.description.tr}</td>
-      <td className="px-md py-sm">{describeBadgeRequirement(badge.requirement)}</td>
-      <td className="px-md py-sm text-right tabular-nums">{badge.starReward}</td>
-    </tr>
   );
 }
 
