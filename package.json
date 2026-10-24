@@ -24,7 +24,8 @@
     "format:check": "prettier --check .",
     "db:verify": "./scripts/verify-schema.sh",
     "db:types": "./scripts/generate-db-types.sh",
-    "db:types:check": "./scripts/generate-db-types.sh --check"
+    "db:types:check": "./scripts/generate-db-types.sh --check",
+    "db:seed": "./scripts/seed-content.sh"
   },
   "devDependencies": {
     "prettier": "^3.9.10",

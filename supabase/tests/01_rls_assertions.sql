@@ -36,10 +36,24 @@ values
 
 update public.tests set is_active = false where id = 'draft-test';
 
-insert into public.questions (test_id, kind, prompt_tr, prompt_en, options, correct_index)
+-- Soru havuzu testlerden bağımsız; ilişki `test_questions`'ta.
+insert into public.questions (slug, kind, prompt_tr, prompt_en, options, correct_index)
 values
-  ('basic-iq', 'logic', 'Soru', 'Question', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 1),
-  ('draft-test', 'logic', 'Taslak soru', 'Draft question', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 0);
+  ('q-live', 'logic', 'Soru', 'Question', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 1),
+  ('q-draft', 'logic', 'Taslak soru', 'Draft question', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 0),
+  -- Hem yayındaki hem taslak teste giren soru: havuz paylaşımlı
+  -- olduğu için bu normal ve soru görünür kalmalı.
+  ('q-shared', 'logic', 'Ortak soru', 'Shared question', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 0);
+
+insert into public.test_questions (test_id, question_id, sort_order)
+select t.test_id, q.id, t.sort_order
+from (values
+  ('basic-iq', 'q-live', 0),
+  ('draft-test', 'q-draft', 0),
+  ('basic-iq', 'q-shared', 1),
+  ('draft-test', 'q-shared', 1)
+) as t (test_id, slug, sort_order)
+join public.questions q on q.slug = t.slug;
 
 -- ---------------------------------------------------------------- kısıtlar
 
@@ -56,8 +70,8 @@ begin
 
   -- Doğru cevap dizini şık sayısını aşamaz.
   begin
-    insert into public.questions (test_id, kind, prompt_tr, prompt_en, options, correct_index)
-    values ('basic-iq', 'logic', 'S', 'Q', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 5);
+    insert into public.questions (slug, kind, prompt_tr, prompt_en, options, correct_index)
+    values ('q-bad', 'logic', 'S', 'Q', '[{"tr":"A"},{"tr":"B"}]'::jsonb, 5);
     raise exception 'beklenen hata alınmadı: questions_correct_index_in_range';
   exception
     when check_violation then null;
@@ -155,9 +169,17 @@ begin
     'anon pasif oyunu görüyor';
   assert (select count(*) from public.tests) = 1,
     'anon pasif testi görüyor';
-  -- Pasif testin sorusu da gizlenmeli.
-  assert (select count(*) from public.questions) = 1,
-    'anon pasif testin sorusunu görüyor';
+  -- Pasif testin yalnızca ona ait sorusu gizlenmeli; yayındaki teste
+  -- de giren ortak soru görünmeye devam etmeli.
+  assert (select count(*) from public.questions) = 2,
+    'anon soru havuzunu yanlış görüyor';
+  assert (select count(*) from public.questions where slug = 'q-draft') = 0,
+    'anon yalnızca pasif teste ait soruyu görüyor';
+  assert (select count(*) from public.questions where slug = 'q-shared') = 1,
+    'anon yayındaki teste de giren ortak soruyu göremiyor';
+  -- Eşleşme satırları da pasif testi sızdırmamalı.
+  assert (select count(*) from public.test_questions) = 2,
+    'anon pasif testin soru eşleşmelerini görüyor';
   assert (select count(*) from public.profiles) = 0,
     'anon profilleri görüyor';
 end;

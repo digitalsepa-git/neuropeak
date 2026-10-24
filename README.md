@@ -17,25 +17,41 @@ neuropeak/
 └── supabase/            # Şema, migration'lar, Edge Functions
 ```
 
-`packages/content` (soru bankası) PR#19'da eklenecek.
-
 ## Veritabanı
 
 Şema `supabase/migrations` altında, elle yazılmış SQL migration'ları olarak durur.
 
-| Komut                    | Açıklama                                                                                           |
-| ------------------------ | -------------------------------------------------------------------------------------------------- |
-| `npm run db:verify`      | Geçici bir Postgres kurup migration'ları uygular, şema kısıtlarını ve RLS politikalarını test eder |
-| `npm run db:types`       | Şemadan TypeScript tiplerini üretir (`apps/mobile/src/lib/database.types.ts`)                      |
-| `npm run db:types:check` | Üretilen tipler güncel mi diye bakar (CI)                                                          |
+| Komut                    | Açıklama                                                                                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `npm run db:verify`      | Geçici bir Postgres kurup migration'ları uygular, şema ve RLS testlerini koşturur, içeriği seed'ler |
+| `npm run db:types`       | Şemadan TypeScript tiplerini üretir (`apps/mobile/src/lib/database.types.ts`)                       |
+| `npm run db:types:check` | Üretilen tipler güncel mi diye bakar (CI)                                                           |
+| `npm run db:seed`        | `packages/content`'teki içeriği veritabanına yazar                                                  |
 
 Yerelde `brew install postgresql@17` yeterlidir; Docker gerekmez. CI aynı betikleri hizmet olarak çalışan bir Postgres üzerinde koşturur.
 
 `database.types.ts` üretilen bir dosyadır, elle düzenlenmez — şema değişince `npm run db:types` çalıştırılıp sonuç commit edilir.
 
+### İçerik seed'i
+
+Oyunlar, testler, sorular, rozetler ve günlük görevler `packages/content` içinde kodda duruyor; uygulama onları paketten okuyor. Aynı içeriği veritabanına yazmak için:
+
+```bash
+npm run db:seed -- --sql                 # SQL'i görür, uygulamaz
+DATABASE_URL="postgresql://…" npm run db:seed
+```
+
+Barındırılan bir Supabase'de bağlantı dizesi proje ayarlarındadır. Seed yeniden çalıştırılabilir: her satır kimliğine göre upsert edilir, katalogdan çıkmış kayıt silinmez `is_active = false` yapılır — kullanıcı verisi ona bağlı olabilir.
+
+`db:verify` seed'i de çalıştırır, yani içerik şemaya sığmayı bıraktığında CI bunu söyler.
+
+Beyin Yaşı ve profil testlerinin henüz tablosu yok; onlar yalnızca pakette duruyor.
+
 ### Bağlantı
 
 `apps/mobile/.env.example` dosyasını `.env` olarak kopyalayıp Supabase projesinin URL ve anon anahtarını doldurun. Boş bırakılırsa uygulama tamamen çevrimdışı çalışır: veriler cihazda durur, senkronizasyon ilk fırsatta yapılır.
+
+Panel de aynı değişkenleri (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) okur; tanımlı değilken gömülü içeriği salt okunur gösterir ve bunu ekranda söyler. Panelin canlı veriden okuması henüz bağlanmadı: anon anahtarıyla gizli rozetler görünmüyor ve panelde giriş yok, o yüzden önce yetkilendirme kararı gerekiyor.
 
 ## Tasarım sistemi
 

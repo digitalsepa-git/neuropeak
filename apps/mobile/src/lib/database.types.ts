@@ -77,6 +77,7 @@ export type Database = {
           sort_order: number;
           is_active: boolean;
           created_at: string;
+          requirement: Json;
         };
         Insert: {
           id: string;
@@ -90,6 +91,7 @@ export type Database = {
           sort_order?: number;
           is_active?: boolean;
           created_at?: string;
+          requirement: Json;
         };
         Update: {
           id?: string;
@@ -103,6 +105,7 @@ export type Database = {
           sort_order?: number;
           is_active?: boolean;
           created_at?: string;
+          requirement?: Json;
         };
         Relationships: [];
       };
@@ -297,6 +300,9 @@ export type Database = {
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          instruction_tr: string;
+          instruction_en: string;
+          skills: Json;
         };
         Insert: {
           id: string;
@@ -314,6 +320,9 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          instruction_tr?: string;
+          instruction_en?: string;
+          skills?: Json;
         };
         Update: {
           id?: string;
@@ -331,6 +340,9 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          instruction_tr?: string;
+          instruction_en?: string;
+          skills?: Json;
         };
         Relationships: [];
       };
@@ -571,7 +583,6 @@ export type Database = {
       questions: {
         Row: {
           id: string;
-          test_id: string;
           kind: Database['public']['Enums']['question_kind'];
           prompt_tr: string;
           prompt_en: string;
@@ -585,10 +596,11 @@ export type Database = {
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          slug: string | null;
+          visual: Json | null;
         };
         Insert: {
           id?: string;
-          test_id: string;
           kind: Database['public']['Enums']['question_kind'];
           prompt_tr: string;
           prompt_en: string;
@@ -602,10 +614,11 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          slug?: string | null;
+          visual?: Json | null;
         };
         Update: {
           id?: string;
-          test_id?: string;
           kind?: Database['public']['Enums']['question_kind'];
           prompt_tr?: string;
           prompt_en?: string;
@@ -619,6 +632,8 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          slug?: string | null;
+          visual?: Json | null;
         };
         Relationships: [];
       };
@@ -709,6 +724,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      test_questions: {
+        Row: {
+          test_id: string;
+          question_id: string;
+          sort_order: number;
+        };
+        Insert: {
+          test_id: string;
+          question_id: string;
+          sort_order?: number;
+        };
+        Update: {
+          test_id?: string;
+          question_id?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       test_results: {
         Row: {
           id: string;
@@ -769,6 +802,7 @@ export type Database = {
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          focus: Database['public']['Enums']['report_dimension'] | null;
         };
         Insert: {
           id: string;
@@ -787,6 +821,7 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          focus?: Database['public']['Enums']['report_dimension'] | null;
         };
         Update: {
           id?: string;
@@ -805,6 +840,7 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          focus?: Database['public']['Enums']['report_dimension'] | null;
         };
         Relationships: [];
       };
@@ -887,6 +923,7 @@ export type Database = {
         | 'coding'
         | 'odd_one_out'
         | 'arithmetic';
+      report_dimension: 'verbal' | 'numeric' | 'visual' | 'logical';
       star_reason:
         | 'game_complete'
         | 'test_complete'
