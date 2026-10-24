@@ -545,6 +545,175 @@ $$;
 reset role;
 reset request.jwt.claims;
 
+-- ---------------------------------------------------------------- segment kitlesi
+
+-- İki kullanıcıyı birbirinden ayıran bir durum kuruluyor: biri PRO,
+-- Türkçe ve bugün aktif; diğeri ücretsiz, İngilizce ve 20 gündür yok.
+-- İkisi de altın ligde (yukarıdaki lig bölümünden).
+--
+-- `is_pro`'yu yalnızca gönderen taraf değiştirebiliyor (profil
+-- tetikleyicisi); hazırlık o yüzden service_role iddiasıyla yapılıyor.
+set request.jwt.claims = '{"role":"service_role"}';
+
+update public.profiles
+set is_pro = true, locale = 'tr'
+where id = '11111111-1111-1111-1111-111111111111';
+
+update public.profiles
+set is_pro = false, locale = 'en'
+where id = '22222222-2222-2222-2222-222222222222';
+
+insert into public.streaks (user_id, current_days, longest_days, last_active_date)
+values
+  ('11111111-1111-1111-1111-111111111111', 10, 10, now()::date),
+  ('22222222-2222-2222-2222-222222222222', 0, 3, now()::date - 20)
+on conflict (user_id) do update
+set current_days = excluded.current_days,
+    longest_days = excluded.longest_days,
+    last_active_date = excluded.last_active_date;
+
+-- Birinci kullanıcının iki cihazı var, ikincisi bildirimi kapatmış.
+insert into public.push_tokens (user_id, token, platform, locale, is_active)
+values
+  ('11111111-1111-1111-1111-111111111111', 'ExponentPushToken[telefon]', 'ios', 'tr', true),
+  ('11111111-1111-1111-1111-111111111111', 'ExponentPushToken[tablet]', 'android', 'tr', true),
+  ('22222222-2222-2222-2222-222222222222', 'ExponentPushToken[kapali]', 'ios', 'en', false);
+
+reset request.jwt.claims;
+
+insert into public.segments (id, title, match_mode, rules)
+values
+  ('pro', 'PRO üyeler', 'all', '[{"kind":"is_pro","value":true}]'::jsonb),
+  ('sleeping', 'Uykuya dalanlar', 'all', '[{"kind":"inactive_days","value":7}]'::jsonb),
+  ('tr-or-gold', 'Türkçe ya da altın', 'any',
+    '[{"kind":"locale","value":"tr"},{"kind":"league_tier_at_least","tier":"gold"}]'::jsonb),
+  ('gold-pro', 'Altın ve PRO', 'all',
+    '[{"kind":"league_tier_at_least","tier":"gold"},{"kind":"is_pro","value":true}]'::jsonb),
+  -- Pasif: kuralı veritabanının tanımadığı bir tür. Etkin olsaydı
+  -- sayaçların tamamını düşürürdü; burada yalnızca değerlendiricinin
+  -- sessiz kalmadığını göstermek için duruyor.
+  ('bogus', 'Bilinmeyen kural', 'all', '[{"kind":"astrolojik_burc","value":"koc"}]'::jsonb);
+
+update public.segments set is_active = false where id = 'bogus';
+
+do $$
+declare
+  row record;
+begin
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+  -- Kuralsız segment herkesi kapsıyor; erişilebilir olan yalnızca
+  -- etkin jetonu olan kullanıcı. İki sayının ayrı durmasının sebebi
+  -- bu: kitle iki kişi, bildirim bir kişiye gidebilir.
+  select * into row from public.admin_segment_sizes() where segment_id = 'everyone';
+  assert row.audience = 2, 'kuralsız segment herkesi kapsamıyor';
+  assert row.reachable = 1, 'erişilebilir sayısı jetona bakmıyor';
+
+  select * into row from public.admin_segment_sizes() where segment_id = 'pro';
+  assert row.audience = 1 and row.reachable = 1, 'PRO segmenti yanlış';
+
+  -- 20 gündür girmeyen kullanıcı kitlede ama bildirimi kapalı.
+  select * into row from public.admin_segment_sizes() where segment_id = 'sleeping';
+  assert row.audience = 1, 'uykuya dalanlar yanlış sayıldı';
+  assert row.reachable = 0, 'bildirimi kapalı kullanıcı erişilebilir görünüyor';
+
+  -- 'any': biri Türkçe olduğu için, diğeri altın ligde olduğu için.
+  select * into row from public.admin_segment_sizes() where segment_id = 'tr-or-gold';
+  assert row.audience = 2, 'any kipinde birleşim alınmıyor';
+
+  -- 'all': ikisi de altın ligde ama yalnızca biri PRO.
+  select * into row from public.admin_segment_sizes() where segment_id = 'gold-pro';
+  assert row.audience = 1, 'all kipinde kesişim alınmıyor';
+
+  -- Pasif segment sayaçlarda hiç görünmüyor; bilinmeyen kuralı
+  -- değerlendirmeye kalksaydı zaten hata verirdi.
+  assert not exists (select 1 from public.admin_segment_sizes() where segment_id = 'bogus'),
+    'pasif segment sayaçlarda';
+
+  -- Kitle: aynı kullanıcının iki cihazı iki satır.
+  assert (select count(*) from public.segment_audience('pro')) = 2,
+    'kullanıcının ikinci cihazı kitleye girmiyor';
+  assert (select count(*) from public.segment_audience('sleeping')) = 0,
+    'pasif jeton kitleye giriyor';
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
+do $$
+begin
+  -- Normal kullanıcı ne sayıyı ne de jetonları görebilir.
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+  begin
+    perform public.admin_segment_sizes();
+    raise exception 'normal kullanıcı kitle sayılarını okuyabildi';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  begin
+    perform public.segment_audience('everyone');
+    raise exception 'normal kullanıcı jetonları okuyabildi';
+  exception
+    when insufficient_privilege then null;
+  end;
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
+do $$
+begin
+  -- Gönderen servis kendi oturumuyla okuyabilmeli: kitleyi o çözüyor.
+  set local role service_role;
+  assert (select count(*) from public.segment_audience('everyone')) = 2,
+    'gönderen servis kitleyi okuyamıyor';
+end;
+$$;
+
+reset role;
+
+do $$
+begin
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+  -- Olmayan ya da pasif segment sessizce boş kitle dönmüyor: boş
+  -- kitle ile yanlış kimlik ayırt edilemezdi.
+  begin
+    perform public.segment_audience('bogus');
+    raise exception 'pasif segment için kitle döndü';
+  exception
+    when raise_exception then
+      if sqlerrm not like '%etkin segment yok%' then raise; end if;
+  end;
+
+  -- Tanınmayan kural türü hata veriyor; sessizce false dönseydi
+  -- kitle fark edilmeden daralırdı.
+  begin
+    perform public.segment_rule_matches(
+      '{"kind":"astrolojik_burc","value":"koc"}'::jsonb,
+      '{"level":5}'::jsonb
+    );
+    raise exception 'bilinmeyen kural sessizce geçti';
+  exception
+    when raise_exception then
+      if sqlerrm not like '%bilinmeyen segment kuralı%' then raise; end if;
+  end;
+end;
+$$;
+
+reset role;
+reset request.jwt.claims;
+
+reset role;
+reset request.jwt.claims;
+
 rollback;
 
 \echo 'Tüm şema ve RLS testleri geçti.'

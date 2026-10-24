@@ -29,12 +29,18 @@ create table if not exists auth.users (
 
 -- Supabase'deki karşılıklarıyla aynı davranır: istek üzerindeki JWT
 -- iddialarından kullanıcıyı ve rolü okur.
+--
+-- `nullif` cast'ten önce: `reset request.jwt.claims` ayarı
+-- kaldırmıyor, boş dizgeye çeviriyor ve `''::jsonb` hata veriyor.
+-- Gerçek Supabase de bu sırayla yazılmış; taklidin ayrışması,
+-- iddiasız çağrılan her işlevi burada anlaşılmaz bir JSON hatasıyla
+-- düşürüyordu.
 create or replace function auth.uid()
 returns uuid
 language sql
 stable
 as $$
-  select nullif(current_setting('request.jwt.claims', true)::jsonb ->> 'sub', '')::uuid;
+  select (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')::uuid;
 $$;
 
 create or replace function auth.role()
@@ -43,7 +49,7 @@ language sql
 stable
 as $$
   select coalesce(
-    nullif(current_setting('request.jwt.claims', true)::jsonb ->> 'role', ''),
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role',
     current_user
   );
 $$;

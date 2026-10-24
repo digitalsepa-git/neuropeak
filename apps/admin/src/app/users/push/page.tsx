@@ -2,9 +2,12 @@ import { DEFAULT_SEGMENTS } from '@neuropeak/content';
 
 import { PushComposer } from '@/components/push-composer';
 import { Shell } from '@/components/shell';
-import { canEditContent } from '@/lib/content-mode';
+import { canEditContent, contentMode } from '@/lib/content-mode';
+import { NO_SIZES, fetchSegmentSizes } from '@/lib/segments';
 
-export default function PushPage() {
+export default async function PushPage() {
+  const sizes = contentMode === 'live' ? await fetchSegmentSizes() : NO_SIZES;
+
   return (
     <Shell
       title="Push kampanyası"
@@ -18,7 +21,7 @@ export default function PushPage() {
         </p>
       </div>
 
-      <PushComposer segments={DEFAULT_SEGMENTS} canSend={canEditContent} />
+      <PushComposer segments={DEFAULT_SEGMENTS} sizes={sizes} canSend={canEditContent} />
     </Shell>
   );
 }
