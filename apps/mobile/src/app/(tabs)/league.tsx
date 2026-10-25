@@ -100,6 +100,17 @@ export default function LeagueScreen() {
         </Card>
       )}
 
+      {/* Tablonun üstünde: rakiplerin cihazda üretildiğini isimleri
+          okumadan önce söylemek gerekiyor. Kart altta dururken
+          kullanıcı otuz satır boyunca onları gerçek oyuncu sanıyordu
+          ve çoğu oraya kadar kaydırmıyordu bile. */}
+      <Card padding="lg">
+        <Text variant="bodyStrong">{t('league.practiceTitle')}</Text>
+        <Text variant="bodySmall" color="textSecondary">
+          {t('league.practiceBody')}
+        </Text>
+      </Card>
+
       <Section title={t('league.tableSection')} meta={t('league.tableMeta', { count: GROUP_SIZE })}>
         <Card padding="xs">
           {table.map((row, index) => (
@@ -115,13 +126,6 @@ export default function LeagueScreen() {
           ))}
         </Card>
       </Section>
-
-      <Card padding="lg">
-        <Text variant="bodyStrong">{t('league.practiceTitle')}</Text>
-        <Text variant="bodySmall" color="textSecondary">
-          {t('league.practiceBody')}
-        </Text>
-      </Card>
     </Screen>
   );
 }
