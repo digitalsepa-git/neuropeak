@@ -2,6 +2,7 @@ export { Badge, type BadgeTone } from './badge';
 export { Button, type ButtonSize, type ButtonVariant } from './button';
 export { Card } from './card';
 export { Chip } from './chip';
+export { GlassSurface } from './glass-surface';
 export { tapFeedback, usePressScale } from './press-feedback';
 export { ProgressBar } from './progress-bar';
 export { Screen } from './screen';
