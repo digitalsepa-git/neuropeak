@@ -23,8 +23,7 @@
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "APPLE_TEAM_ID"
+        "appleTeamId": "2SH6N4AK3P"
       },
       "android": {
         "track": "internal"
