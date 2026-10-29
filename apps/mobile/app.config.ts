@@ -1,21 +1,19 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
+import { adMobAppIds } from './src/lib/ads/app-ids.ts';
 import { apsEnvironmentFor } from './src/lib/push/aps.ts';
 
 /**
- * AdMob uygulama kimlikleri yerel derlemeye gömülür; env'den okunuyor.
- * Sahte bir kimlik gömmek yanıltıcı olurdu: ikisi de tanımlı değilse
- * eklenti hiç eklenmiyor, uygulama reklamsız derleniyor ve Expo Go'da
- * çalışmaya devam ediyor.
+ * AdMob uygulama kimliği derlemeye gömülüyor ve eklenti **her zaman**
+ * ekleniyor. Önceden kimlik yokken eklenti hiç eklenmiyordu; ama SDK
+ * bağımlılıkta olduğu için derlemeye yine giriyor ve Info.plist'te
+ * kimlik bulamayınca açılışta uygulamayı düşürüyordu. Gerekçesi ve
+ * örnek kimlikler `src/lib/ads/app-ids.ts` içinde.
  */
-const iosAppId = process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID;
-const androidAppId = process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID;
-
-const hasAdMobAppIds =
-  typeof iosAppId === 'string' &&
-  iosAppId.length > 0 &&
-  typeof androidAppId === 'string' &&
-  androidAppId.length > 0;
+const appIds = adMobAppIds(
+  process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID,
+  process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID,
+);
 
 /**
  * Bildirim ortamını burada veriyoruz çünkü `expo-notifications`
@@ -34,18 +32,16 @@ const apsEnvironment = apsEnvironmentFor(process.env.EAS_BUILD_PROFILE);
 export default ({ config }: ConfigContext): ExpoConfig => {
   const plugins = [...(config.plugins ?? [])];
 
-  if (hasAdMobAppIds) {
-    plugins.push([
-      'react-native-google-mobile-ads',
-      {
-        iosAppId,
-        androidAppId,
-        // iOS'ta izleme izni istenmeden önce kullanıcıya gösterilen metin.
-        userTrackingUsageDescription:
-          'İzin verirsen reklamlar ilgi alanlarına göre seçilir. Reddetsen de uygulamanın tüm özellikleri açık kalır.',
-      },
-    ]);
-  }
+  plugins.push([
+    'react-native-google-mobile-ads',
+    {
+      iosAppId: appIds.ios,
+      androidAppId: appIds.android,
+      // iOS'ta izleme izni istenmeden önce kullanıcıya gösterilen metin.
+      userTrackingUsageDescription:
+        'İzin verirsen reklamlar ilgi alanlarına göre seçilir. Reddetsen de uygulamanın tüm özellikleri açık kalır.',
+    },
+  ]);
 
   return {
     ...config,
