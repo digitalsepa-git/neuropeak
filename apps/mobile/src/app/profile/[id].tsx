@@ -16,6 +16,7 @@ import { track } from '@/lib/analytics';
 import { useI18n, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 import { useContent } from '@/lib/content/context';
+import { useNativeHeader } from '@/lib/navigation/use-native-header';
 
 /**
  * Profil testleri: Zihin Arketipi, Odaklanma Profili, Kişilik Haritası.
@@ -61,6 +62,13 @@ export default function ProfileTestScreen() {
     },
     [answers, index, recordTestFinished, test],
   );
+
+  // Başlık yalnızca giriş ekranında: soru akışı başlayınca
+  // ekranın tamamı testin.
+  useNativeHeader({
+    shown: test !== undefined && !started,
+    title: test === undefined ? '' : localized(test.title),
+  });
 
   if (test === undefined) {
     return (

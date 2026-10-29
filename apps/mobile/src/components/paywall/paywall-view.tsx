@@ -1,4 +1,5 @@
 import { spacing } from '@neuropeak/ui';
+import { SymbolView } from 'expo-symbols';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -145,6 +146,13 @@ export function PaywallView({
 
   return (
     <Screen scroll>
+      {/* Apple abonelik sayfalarında gezinme çubuğu değil, içeriğin
+          üstünde yüzen bir kapat düğmesi kullanıyor; biz de öyle
+          yapıyoruz. Değişen şey düğmenin kendisi: metin olarak
+          yazılmış bir "✕" değil, sistemin `xmark.circle.fill`
+          sembolü. Ölçeği, kalınlığı ve dolgusu Dinamik Tip'le
+          birlikte değişiyor ve her iOS sürümünde o sürümün çizimi
+          geliyor. */}
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
@@ -152,9 +160,7 @@ export function PaywallView({
           hitSlop={12}
           onPress={close}
         >
-          <Text variant="body" color="textMuted">
-            ✕
-          </Text>
+          <SymbolView name="xmark.circle.fill" size={28} tintColor={theme.colors.textMuted} />
         </Pressable>
         <Pressable accessibilityRole="button" hitSlop={12} onPress={() => void onRestore()}>
           <Text variant="caption" color="textMuted">
@@ -234,6 +240,12 @@ export function PaywallView({
 }
 
 const styles = StyleSheet.create({
+  topBar: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
   benefit: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -262,11 +274,5 @@ const styles = StyleSheet.create({
   plans: {
     gap: spacing.sm,
     marginBottom: spacing.lg,
-  },
-  topBar: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: spacing.sm,
   },
 });

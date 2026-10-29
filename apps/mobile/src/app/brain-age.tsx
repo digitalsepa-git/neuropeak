@@ -27,6 +27,7 @@ import {
 } from '@/components/brain-age/measures';
 import { Button, Card, ProgressBar, Screen, Text, useTheme } from '@/components/ui';
 import { track } from '@/lib/analytics';
+import { useNativeHeader } from '@/lib/navigation/use-native-header';
 import { useI18n, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 
@@ -62,6 +63,10 @@ export default function BrainAgeScreen() {
   const [scores, setScores] = useState<BrainAgeScores | null>(null);
   // Hız ölçümünün tohumu; ölçüm başlarken bir kez üretiliyor.
   const [seed, setSeed] = useState(1);
+
+  // Başlık yalnızca giriş ekranında: tepki süresi ölçülürken
+  // ekranda gezinme çubuğu olmamalı.
+  useNativeHeader({ shown: phase === 'intro', title: localized(brainAgeTest.title) });
 
   const step = BRAIN_AGE_STEPS[stepIndex];
 
