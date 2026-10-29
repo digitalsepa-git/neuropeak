@@ -6,7 +6,6 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import type { AppLanguage } from '@neuropeak/core';
-import { fontFamily } from '@neuropeak/ui';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -101,13 +100,20 @@ function RootStack() {
 
   return (
     <Stack
+      // Başlık çubuğuna yalnızca vurgu rengini veriyoruz. Arka plan,
+      // yazı tipi, ölçüler ve kaydırma kenarı davranışı sistemden
+      // geliyor; iOS 26'nın cam başlığı ancak böyle devreye giriyor.
+      // Önceden kendi yazı tipimizi ve arka planımızı dayatıyor,
+      // gölgeyi kapatıyorduk — bunların hepsi camı iptal ediyordu.
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: theme.colors.background },
-        headerStyle: { backgroundColor: theme.colors.background },
-        headerTintColor: theme.colors.textPrimary,
-        headerTitleStyle: { fontFamily: fontFamily.semibold, fontSize: 17 },
-        headerShadowVisible: false,
+        headerTintColor: theme.colors.brand,
+        // Geri düğmesinde yalnızca ok: aksi hâlde iOS önceki ekranın
+        // adını yazıyor ve o ad bizde rota grubunun kendisi
+        // ("(tabs)") oluyor. iOS 26'nın cam geri düğmesi zaten
+        // metinsiz tasarlanmış.
+        headerBackButtonDisplayMode: 'minimal',
       }}
     >
       <Stack.Protected guard={!completed}>

@@ -11,6 +11,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { track } from '@/lib/analytics';
+import { useNativeHeader } from '@/lib/navigation/use-native-header';
 
 import { GameShell } from '@/components/game/game-shell';
 import { Icon } from '@/components/icons';
@@ -122,6 +123,13 @@ export default function GameScreen() {
     [difficulty, game, recordGameRound],
   );
 
+  // Başlık yalnızca brifingde: oyun oynanırken ekranın tamamı
+  // oyunun ve çıkış GameShell'in kendi düğmesinden yapılıyor.
+  useNativeHeader({
+    shown: game !== undefined && phase === 'briefing',
+    title: game === undefined ? '' : localized(game.title),
+  });
+
   if (game === undefined) {
     return (
       <Screen>
@@ -142,18 +150,6 @@ export default function GameScreen() {
 
     return (
       <Screen scroll>
-        <View style={styles.briefingTop}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-            hitSlop={12}
-            onPress={() => router.back()}
-            style={styles.backIcon}
-          >
-            <Icon name="chevronRight" color={theme.colors.textSecondary} size={22} />
-          </Pressable>
-        </View>
-
         <View style={[styles.cover, { backgroundColor: `${accent}1F` }]}>
           <View style={[styles.coverDot, { backgroundColor: accent }]} />
         </View>
@@ -369,9 +365,6 @@ const styles = StyleSheet.create({
   backIcon: {
     transform: [{ rotate: '180deg' }],
     width: 22,
-  },
-  briefingTop: {
-    paddingTop: spacing.sm,
   },
   centered: {
     alignItems: 'center',

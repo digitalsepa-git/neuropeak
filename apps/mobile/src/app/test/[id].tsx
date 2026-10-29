@@ -14,13 +14,13 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 
-import { Icon } from '@/components/icons';
 import { Figure } from '@/components/test/figure';
 import { ScoreReveal } from '@/components/test/score-reveal';
 import { VisualPrompt } from '@/components/test/visual-prompt';
 import { Button, Card, ProgressBar, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useAds } from '@/lib/ads/context';
 import { track } from '@/lib/analytics';
+import { useNativeHeader } from '@/lib/navigation/use-native-header';
 import { useI18n, useLabels, useT } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress/context';
 import { enqueueMutation } from '@/lib/sync';
@@ -144,6 +144,13 @@ export default function TestRunnerScreen() {
     [finish, questionIndex, questions],
   );
 
+  // Başlık yalnızca giriş ekranında: soru ekranında testin kendi
+  // çıkış akışı var ve sistemin geri düğmesi onu atlardı.
+  useNativeHeader({
+    shown: test !== undefined && phase === 'intro',
+    title: test === undefined ? '' : localized(test.title),
+  });
+
   if (test === undefined) {
     return (
       <Screen>
@@ -158,17 +165,6 @@ export default function TestRunnerScreen() {
   if (phase === 'intro') {
     return (
       <Screen scroll>
-        <View style={styles.introHeader}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-            hitSlop={10}
-            onPress={() => router.back()}
-          >
-            <Icon name="chevronRight" color={theme.colors.textSecondary} size={22} />
-          </Pressable>
-        </View>
-
         <View style={styles.intro}>
           <Text variant="overline" color="brand">
             {t('common.questionCount', { count: test.questionCount })} ·{' '}

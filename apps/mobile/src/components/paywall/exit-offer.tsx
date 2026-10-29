@@ -1,11 +1,23 @@
 import { palette, radius, spacing } from '@neuropeak/ui';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { SymbolView } from 'expo-symbols';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
-import { Button, Screen, Text, ThemeProvider, tapFeedback } from '@/components/ui';
+import { Button, Screen, Text, ThemeProvider, tapFeedback, useTheme } from '@/components/ui';
 import type { Plan } from '@/lib/billing';
 import { usePlanText, useT } from '@/lib/i18n';
+
+/**
+ * Kapat sembolü ayrı bir bileşen çünkü rengini koyu temadan
+ * okuması gerekiyor; `ExitOffer`'ın kendisi o temayı sağlayan taraf
+ * ve içeriden okusaydı dışarıdaki açık temanın rengini alırdı.
+ */
+function CloseSymbol() {
+  const theme = useTheme();
+
+  return <SymbolView name="xmark.circle.fill" size={28} tintColor={theme.colors.textMuted} />;
+}
 
 /** Teklifin görünür kalma süresi. */
 const COUNTDOWN_SECONDS = 10 * 60;
@@ -63,9 +75,7 @@ export function ExitOffer({ plan, busy, onAccept, onDismiss }: ExitOfferProps) {
               onDismiss();
             }}
           >
-            <Text variant="body" color="textMuted">
-              ✕
-            </Text>
+            <CloseSymbol />
           </Pressable>
         </View>
 
