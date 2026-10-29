@@ -1,9 +1,9 @@
 import { radius, spacing } from '@neuropeak/ui';
+import { SymbolView } from 'expo-symbols';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Icon } from '@/components/icons';
-import { Screen, Text, tapFeedback, useTheme } from '@/components/ui';
+import { GlassSurface, Screen, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useT } from '@/lib/i18n';
 
 type GameShellProps = {
@@ -43,12 +43,17 @@ export function GameShell({
             tapFeedback();
             onExit();
           }}
-          style={[styles.exitButton, { backgroundColor: theme.colors.surface }]}
+          style={styles.exitButton}
         >
-          <Icon name="chevronRight" color={theme.colors.textSecondary} size={18} />
+          {/* Oyun alanının üstünde yüzen iki denetim: çıkış ve
+              durum. Camın altından oyun görünüyor, denetimler yine
+              de okunuyor. */}
+          <GlassSurface style={styles.exitSurface} interactive>
+            <SymbolView name="xmark" size={15} tintColor={theme.colors.textSecondary} />
+          </GlassSurface>
         </Pressable>
 
-        <View style={[styles.statusPill, { backgroundColor: theme.colors.surface }]}>
+        <GlassSurface style={styles.statusPill}>
           <Text variant="caption" color="textSecondary">
             {progressLabel}
           </Text>
@@ -56,7 +61,7 @@ export function GameShell({
           <Text variant="caption">
             {t('game.score')} {score}
           </Text>
-        </View>
+        </GlassSurface>
       </View>
 
       <View style={[styles.instruction, { backgroundColor: theme.colors.surfaceElevated }]}>
@@ -83,11 +88,15 @@ const styles = StyleSheet.create({
     width: 1,
   },
   exitButton: {
+    height: 36,
+    width: 36,
+  },
+  exitSurface: {
     alignItems: 'center',
     borderRadius: radius.pill,
     height: 36,
     justifyContent: 'center',
-    transform: [{ rotate: '180deg' }],
+    overflow: 'hidden',
     width: 36,
   },
   instruction: {
@@ -99,6 +108,7 @@ const styles = StyleSheet.create({
   },
   statusPill: {
     alignItems: 'center',
+    overflow: 'hidden',
     borderRadius: radius.pill,
     flexDirection: 'row',
     gap: spacing.sm,

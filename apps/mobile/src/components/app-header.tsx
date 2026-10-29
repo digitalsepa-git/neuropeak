@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
-import { Text, tapFeedback, useTheme } from '@/components/ui';
+import { GlassSurface, Text, tapFeedback, useTheme } from '@/components/ui';
 import { useT } from '@/lib/i18n';
 import { usePro } from '@/lib/billing/context';
 import { useProgress } from '@/lib/progress/context';
@@ -32,10 +32,12 @@ export function AppHeader({ title, subtitle }: { title: string; subtitle?: strin
         )}
       </View>
 
-      <View style={[styles.pill, { backgroundColor: theme.colors.surface }]}>
+      {/* Yıldız sayacı içeriğin üstünde duran bir çip; iOS 26'da
+          arkasındaki listeyi kırarak geçiyor. */}
+      <GlassSurface style={styles.pill}>
         <Icon name="star" color={theme.colors.brand} size={16} filled />
         <Text variant="caption">{state.stars}</Text>
-      </View>
+      </GlassSurface>
 
       {!isPro && (
         <Pressable
@@ -72,6 +74,7 @@ const styles = StyleSheet.create({
   pill: {
     alignItems: 'center',
     borderRadius: radius.pill,
+    overflow: 'hidden',
     flexDirection: 'row',
     gap: spacing.xs2,
     paddingHorizontal: spacing.sm,
