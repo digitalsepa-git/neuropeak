@@ -22,6 +22,12 @@ const hasAdMobAppIds =
  * eklentisi entitlement zaten yazılıysa dokunmuyor ve varsayılanı
  * "development". Kuralın kendisi ve gerekçesi `src/lib/push/aps.ts`
  * içinde; orada testleniyor.
+ *
+ * Atama bilerek en sonda: `eas` komutları çözülmüş yapılandırmayı
+ * `app.json`'a geri yazabiliyor ve oraya "development" düşüyor.
+ * Buradaki satır onu her derlemede yeniden eziyor, yani app.json'da
+ * ne yazdığının önemi yok — ama orada bir `aps-environment`
+ * görürsen bu yüzdendir, silinebilir.
  */
 const apsEnvironment = apsEnvironmentFor(process.env.EAS_BUILD_PROFILE);
 
