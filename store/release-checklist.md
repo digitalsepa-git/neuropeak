@@ -9,6 +9,22 @@ TestFlight'a yükleme yapılamaz. İkisi de senin açman gereken hesap.
 
 ---
 
+## Yayından önce kapatılması şart olan üç şey
+
+İlk TestFlight derlemesi (1.0.0, build 3) bunlar **olmadan** çıktı;
+bilerek, inceleme için değişken sayısını azaltmak ve zinciri erken
+görmek için. Mağaza sürümü bunlarsız çıkmayacak.
+
+1. **Supabase bağlı olacak.** Şu an içerik uygulamaya gömülü
+   bankadan geliyor, ilerleme cihazda kalıyor, lig rakipleri cihazda
+   üretiliyor, analitik ve bildirim kapalı. → aşağıda madde 1.
+2. **Satın alma çalışacak.** RevenueCat anahtarları boş; paywall
+   görünüyor ama satın alma açılmıyor. → madde 4.
+3. **Reklamlar olacak.** AdMob kimlikleri derlemeye girmedi;
+   uygulama reklamsız derlendi. → madde 5.
+
+Üçü de senin hesabını gerektiriyor, kodla kapatılamıyor.
+
 ## Kodda hazır olanlar
 
 ### Uygulama
