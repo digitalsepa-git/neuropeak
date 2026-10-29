@@ -142,8 +142,19 @@ ve API anahtarlarını `.env`'e yaz.
 ### 5. AdMob
 
 AdMob panelinde uygulama ve reklam birimleri açıp kimlikleri
-`.env`'e yaz. Kimlikler boşken uygulama reklamsız derleniyor — ilk
-TestFlight yüklemesini reklamsız göndermek da bir seçenek, hatta
+`.env`'e **ve EAS ortam değişkenlerine** yaz. `.env` git tarafından
+yok sayılıyor, dolayısıyla EAS sunucusuna gitmiyor; yalnızca `.env`'e
+yazmak bulut derlemesini etkilemez.
+
+Kimlikler boşken uygulama reklamsız derleniyor: reklam birimi
+kimliği olmayınca `admob.ts` hiç reklam istemiyor. Uygulama
+kimliğinin kendisi yine de derlemeye giriyor — yoksa Google'ın
+SDK'sı açılışta uygulamayı düşürüyor — ve gerçek kimlik verilmemişse
+Google'ın örnek kimliği yazılıyor. Mağaza sürümünde bunun gerçek
+kimlikle değişmesi gerekiyor; `src/lib/ads/app-ids.ts` bunu
+`isReal` ile ayırt ediyor.
+
+İlk TestFlight yüklemesini reklamsız göndermek bir seçenek, hatta
 daha az değişken demek.
 
 ### 6. İlk TestFlight yüklemesi
