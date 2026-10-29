@@ -86,6 +86,14 @@ Panel, senkronizasyon, analitik ve bildirim bu olmadan açılmıyor.
 Uygulama çalışmaya devam ediyor ama her şey cihazda kalıyor.
 
 1. supabase.com'da proje aç.
+
+   **Önce yer aç.** Ücretsiz planda aynı anda yalnızca **iki aktif
+   proje** tutulabiliyor ve sınır hesap genelinde, organizasyon
+   başına değil. 29 Ekim 2026'da ikisi de doluydu: `octopuspick`
+   (digitalsepa-git's Org) ve `Borcama` (Zeroceko's Org). Birini
+   duraklatman, silmen ya da Pro'ya geçmen gerekiyor. Duraklatmak
+   veriyi silmiyor ama o projenin API'sini durduruyor.
+
 2. `supabase/migrations/` altındaki dosyaları sırayla uygula
    (Supabase CLI ya da SQL editörü).
 3. `npm run db:seed` ile içeriği yaz.
