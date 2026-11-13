@@ -19,6 +19,8 @@ const localProvider: BillingProvider = {
 
   getPlans: () => Promise.resolve(FALLBACK_PLANS),
 
+  getExitOffer: () => Promise.resolve(EXIT_OFFER_PLAN),
+
   purchase: () =>
     Promise.resolve<PurchaseOutcome>({
       status: 'unavailable',

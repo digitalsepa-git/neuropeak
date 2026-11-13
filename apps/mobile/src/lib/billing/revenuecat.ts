@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 
 import { EXIT_OFFER_PLAN, FALLBACK_PLANS, PRODUCT_IDS } from './catalog';
+import { pricedPlan, yearlyCostOfWeekly, type StorePrice } from './pricing';
 import type { BillingProvider, Entitlement, Plan, PlanId, PurchaseOutcome } from './types';
 
 const iosKey = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY;
@@ -35,27 +36,85 @@ async function loadPurchases(): Promise<PurchasesModule> {
   return module;
 }
 
+type Offerings = Awaited<ReturnType<PurchasesModule['default']['getOfferings']>>;
+type Package = Offerings['current'] extends infer T
+  ? T extends { availablePackages: infer P }
+    ? P extends readonly (infer Item)[]
+      ? Item
+      : never
+    : never
+  : never;
+
+/**
+ * Bütün offering'lerdeki paketler.
+ *
+ * RevenueCat'te `current` yalnızca panelde "current" işaretlenmiş
+ * offering; indirimli teklif gibi ürünler ayrı offering'lerde
+ * durabiliyor ve orada durduklarında `current` içinde görünmüyorlar.
+ */
+function allPackages(offerings: Offerings): Package[] {
+  return Object.values(offerings.all).flatMap(
+    (offering) => offering.availablePackages as Package[],
+  );
+}
+
+/** Ürün kimliğinden mağaza fiyatına. */
+async function storeProducts(): Promise<Map<string, StorePrice>> {
+  const { default: Purchases } = await loadPurchases();
+  const offerings = await Purchases.getOfferings();
+
+  return new Map(
+    allPackages(offerings).map((item) => [
+      item.product.identifier,
+      {
+        price: item.product.price,
+        priceString: item.product.priceString,
+        pricePerWeekString: item.product.pricePerWeekString,
+        pricePerYear: item.product.pricePerYear,
+        currencyCode: item.product.currencyCode,
+      } satisfies StorePrice,
+    ]),
+  );
+}
+
 export const revenueCatProvider: BillingProvider = {
   isConfigured: true,
 
   async getPlans(): Promise<Plan[]> {
     try {
-      const { default: Purchases } = await loadPurchases();
-      const offerings = await Purchases.getOfferings();
-      const packages = offerings.current?.availablePackages ?? [];
+      const products = await storeProducts();
+      if (products.size === 0) return FALLBACK_PLANS;
 
-      if (packages.length === 0) {
-        return FALLBACK_PLANS;
-      }
+      const weekly = products.get(PRODUCT_IDS.weekly);
+      // Yıllık planın yanındaki üstü çizili rakam "bir yıl boyunca
+      // haftalık ödemek"; haftalık ürün yoksa karşılaştıracak bir
+      // şey de yok.
+      const comparison = weekly === undefined ? undefined : yearlyCostOfWeekly(weekly);
 
-      // Mağazadan gelen fiyatlar kullanıcının para birimindedir; metinler
-      // bizim katalogdan, fiyatlar mağazadan gelir.
-      return FALLBACK_PLANS.map((plan) => {
-        const match = packages.find((item) => item.product.identifier === PRODUCT_IDS[plan.id]);
-        return match === undefined ? plan : { ...plan, priceLabel: match.product.priceString };
-      });
+      return FALLBACK_PLANS.map((plan) =>
+        pricedPlan(
+          plan,
+          products.get(plan.productId),
+          plan.id === 'annual' ? comparison : undefined,
+        ),
+      );
     } catch {
       return FALLBACK_PLANS;
+    }
+  },
+
+  async getExitOffer(): Promise<Plan> {
+    try {
+      const products = await storeProducts();
+      const annual = products.get(PRODUCT_IDS.annual);
+
+      return pricedPlan(
+        EXIT_OFFER_PLAN,
+        products.get(EXIT_OFFER_PLAN.productId),
+        annual === undefined ? undefined : { amount: annual.price, label: annual.priceString },
+      );
+    } catch {
+      return EXIT_OFFER_PLAN;
     }
   },
 
@@ -63,7 +122,10 @@ export const revenueCatProvider: BillingProvider = {
     try {
       const { default: Purchases } = await loadPurchases();
       const offerings = await Purchases.getOfferings();
-      const target = offerings.current?.availablePackages.find(
+      // Bütün offering'lere bakılıyor, yalnızca `current`'a değil:
+      // indirimli yıllık ürün genellikle ayrı bir offering'de durur
+      // ve yalnızca current'a bakmak onu satın alınamaz yapardı.
+      const target = allPackages(offerings).find(
         (item) => item.product.identifier === PRODUCT_IDS[planId],
       );
 
