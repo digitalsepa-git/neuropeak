@@ -58,12 +58,16 @@ export function PaywallView({
   const { getString } = useRemoteConfig();
 
   const [plans, setPlans] = useState<Plan[]>([]);
+  // Çıkış teklifi de mağazadan geliyor: fiyatı katalogdan okusaydık
+  // kullanıcıya ödeyeceğinden başka bir rakam söylemiş olurduk.
+  const [exitOffer, setExitOffer] = useState<Plan>(EXIT_OFFER_PLAN);
   const [selected, setSelected] = useState<PlanId>('weekly');
   const [busy, setBusy] = useState(false);
   const [showExitOffer, setShowExitOffer] = useState(false);
 
   useEffect(() => {
     void billing.getPlans().then(setPlans);
+    void billing.getExitOffer().then(setExitOffer);
   }, []);
 
   useEffect(() => {
@@ -124,9 +128,9 @@ export function PaywallView({
   if (showExitOffer) {
     return (
       <ExitOffer
-        plan={EXIT_OFFER_PLAN}
+        plan={exitOffer}
         busy={busy}
-        onAccept={() => void buy(EXIT_OFFER_PLAN.id)}
+        onAccept={() => void buy(exitOffer.id)}
         onDismiss={onDismiss}
       />
     );

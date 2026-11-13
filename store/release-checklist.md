@@ -136,8 +136,30 @@ App Store Connect → Abonelikler altında üç ürün:
 | `neuropeak_pro_annual_offer` | Yıllık, indirimli      |
 
 Kimlikler `apps/mobile/src/lib/billing/catalog.ts` ile birebir aynı
-olmalı. Sonra RevenueCat projesinde bu ürünleri `pro` yetkisine bağla
-ve API anahtarlarını `.env`'e yaz.
+olmalı.
+
+Sonra RevenueCat projesinde:
+
+1. Üç ürünü de `pro` **entitlement**'ına bağla. Kod yalnızca bu adı
+   arıyor (`revenuecat.ts`), başka bir ad çalışmaz.
+2. **Offering düzeni:** `current` offering'de haftalık ve yıllık
+   olsun. İndirimli ürünü ayrı bir offering'e koy — `current`'a
+   koyarsan normal paywall'da da görünür. Satın alma bütün
+   offering'lere baktığı için ayrı offering sorun değil.
+3. API anahtarını **EAS ortam değişkeni** olarak tanımla, `.env`'e
+   değil:
+
+   ```bash
+   eas env:create --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --scope project
+   ```
+
+   `.env` git tarafından yok sayılıyor, dolayısıyla bulut
+   derlemesine ulaşmıyor. Yalnızca `.env`'e yazmak TestFlight
+   derlemesini etkilemez — AdMob'da tam olarak bu başımıza geldi.
+
+Fiyatlar koda yazılmıyor: üçünün de rakamı, haftalığa bölünmüş
+fiyatı ve indirim oranı mağazadan geliyor. Katalogdaki rakamlar
+yalnızca mağaza okunamadığında görünen yer tutucular.
 
 ### 5. AdMob
 

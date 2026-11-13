@@ -55,6 +55,14 @@ export type BillingProvider = {
   /** Gerçek mağaza bağlantısı var mı. */
   readonly isConfigured: boolean;
   getPlans(): Promise<Plan[]>;
+  /**
+   * Paywall kapatılırken gösterilen tek seferlik teklif.
+   *
+   * Planlardan ayrı duruyor çünkü listede gösterilmiyor ve
+   * karşılaştırması farklı: yıllık planın mağaza fiyatına göre
+   * indirim gösteriyor.
+   */
+  getExitOffer(): Promise<Plan>;
   purchase(planId: PlanId): Promise<PurchaseOutcome>;
   restore(): Promise<PurchaseOutcome>;
   getEntitlement(): Promise<Entitlement>;
