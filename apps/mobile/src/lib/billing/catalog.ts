@@ -36,8 +36,8 @@ export const EXIT_OFFER_PLAN: Plan = {
   id: 'annual_discounted',
   productId: PRODUCT_IDS.annual_discounted,
   period: 'year',
-  priceLabel: '₺199,99',
-  discountPercent: 80,
-  perWeekPrice: '₺3,85',
+  priceLabel: '₺499,99',
+  discountPercent: 50,
+  perWeekPrice: '₺9,62',
   strikethroughLabel: '₺999,99',
 };
