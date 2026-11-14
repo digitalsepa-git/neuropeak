@@ -132,11 +132,11 @@ App Store Connect'te `NeuroPeak PRO` abonelik grubu (22576766)
 altında üç ürün de hazır: ülkeler (175'i de), fiyatlar, Türkçe ve
 İngilizce adlar, grup görünen adı.
 
-| Ürün kimliği                 | Tür                    | TR fiyat  | Seviye |
-| ---------------------------- | ---------------------- | --------- | ------ |
-| `neuropeak_pro_annual`       | Yıllık                 | ₺999,99   | 1      |
-| `neuropeak_pro_weekly`       | Haftalık, 3 gün deneme | ₺349,99   | 2      |
-| `neuropeak_pro_annual_offer` | Yıllık, çıkış teklifi  | ₺199,99   | 2      |
+| Ürün kimliği                 | Tür                    | TR fiyat | Seviye |
+| ---------------------------- | ---------------------- | -------- | ------ |
+| `neuropeak_pro_annual`       | Yıllık                 | ₺999,99  | 1      |
+| `neuropeak_pro_weekly`       | Haftalık, 3 gün deneme | ₺349,99  | 2      |
+| `neuropeak_pro_annual_offer` | Yıllık, çıkış teklifi  | ₺499,99  | 2      |
 
 Yıllık en üst seviyede duruyor: haftalık aboneden yıllığa geçiş
 böylece anında yükseltme oluyor. Alttaki seviyeye koysaydık
@@ -178,9 +178,9 @@ Geriye iki şey kaldı:
    derlemesini etkilemez — AdMob'da tam olarak bu başımıza geldi.
 
 2. **İnceleme ekran görüntüsü.** Her abonelik için App Store Connect
-   bir paywall ekran görüntüsü istiyor. Anahtar derlemeye girip
-   paywall gerçek fiyatları gösterdikten sonra alınmalı; şimdi
-   alınırsa yer tutucu fiyatlar görünür.
+   bir paywall ekran görüntüsü istiyor. Anahtar derlemeye girdi ve
+   paywall simülatörde gerçek mağaza fiyatlarını gösteriyor, yani
+   görüntü artık alınabilir.
 
 Abonelikler ilk sürümle birlikte incelemeye giriyor; tek başlarına
 gönderilemiyorlar.
