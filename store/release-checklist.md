@@ -18,8 +18,9 @@ görmek için. Mağaza sürümü bunlarsız çıkmayacak.
 1. **Supabase bağlı olacak.** Şu an içerik uygulamaya gömülü
    bankadan geliyor, ilerleme cihazda kalıyor, lig rakipleri cihazda
    üretiliyor, analitik ve bildirim kapalı. → aşağıda madde 1.
-2. **Satın alma çalışacak.** RevenueCat anahtarları boş; paywall
-   görünüyor ama satın alma açılmıyor. → madde 4.
+2. **Satın alma çalışacak.** Ürünler ve RevenueCat kurulumu bitti;
+   geriye yalnızca API anahtarının derlemeye girmesi kaldı. Anahtar
+   girmeden paywall görünüyor ama satın alma açılmıyor. → madde 4.
 3. **Reklamlar olacak.** AdMob kimlikleri derlemeye girmedi;
    uygulama reklamsız derlendi. → madde 5.
 
@@ -125,41 +126,64 @@ Alan adı yoksa en hızlı yol belgeleri GitHub Pages'e koyup
 - `eas.json` içindeki `ascAppId` ve `appleTeamId` yer tutucularını
   gerçek değerlerle doldur.
 
-### 4. Abonelik ürünleri
+### 4. Abonelik ürünleri — **kuruldu**
 
-App Store Connect → Abonelikler altında üç ürün:
+App Store Connect'te `NeuroPeak PRO` abonelik grubu (22576766)
+altında üç ürün de hazır: ülkeler (175'i de), fiyatlar, Türkçe ve
+İngilizce adlar, grup görünen adı.
 
-| Ürün kimliği                 | Tür                    |
-| ---------------------------- | ---------------------- |
-| `neuropeak_pro_weekly`       | Haftalık, 3 gün deneme |
-| `neuropeak_pro_annual`       | Yıllık                 |
-| `neuropeak_pro_annual_offer` | Yıllık, indirimli      |
+| Ürün kimliği                 | Tür                    | TR fiyat  | Seviye |
+| ---------------------------- | ---------------------- | --------- | ------ |
+| `neuropeak_pro_annual`       | Yıllık                 | ₺999,99   | 1      |
+| `neuropeak_pro_weekly`       | Haftalık, 3 gün deneme | ₺349,99   | 2      |
+| `neuropeak_pro_annual_offer` | Yıllık, çıkış teklifi  | ₺199,99   | 2      |
 
-Kimlikler `apps/mobile/src/lib/billing/catalog.ts` ile birebir aynı
-olmalı.
+Yıllık en üst seviyede duruyor: haftalık aboneden yıllığa geçiş
+böylece anında yükseltme oluyor. Alttaki seviyeye koysaydık
+değişiklik ancak bir sonraki yenilemede yürürlüğe girerdi, yani
+kullanıcı "yıllığa geçtim" dedikten bir hafta sonra.
 
-Sonra RevenueCat projesinde:
+Fiyatlar koda yazılmıyor: üçünün de rakamı, haftalığa bölünmüş
+fiyatı ve indirim oranı mağazadan geliyor. Katalogdaki rakamlar
+yalnızca mağaza okunamadığında görünen yer tutucular.
 
-1. Üç ürünü de `pro` **entitlement**'ına bağla. Kod yalnızca bu adı
-   arıyor (`revenuecat.ts`), başka bir ad çalışmaz.
-2. **Offering düzeni:** `current` offering'de haftalık ve yıllık
-   olsun. İndirimli ürünü ayrı bir offering'e koy — `current`'a
-   koyarsan normal paywall'da da görünür. Satın alma bütün
-   offering'lere baktığı için ayrı offering sorun değil.
-3. API anahtarını **EAS ortam değişkeni** olarak tanımla, `.env`'e
-   değil:
+RevenueCat projesi (`NeuroPeak`, `fa3de935`) de kurulu:
+
+- App Store uygulaması `com.neuropeak.iqarena` bağlı. Satın alma
+  anahtarı olarak hesapta duran `U35J7S3K6Y` seçildi; satın alma
+  anahtarları uygulamaya değil Apple ekibine ait, issuer kimliği de
+  App Store Connect'tekiyle aynı.
+- `pro` **entitlement**'ı açık, üç ürün de bağlı. Kod yalnızca bu
+  adı arıyor (`revenuecat.ts`), başka bir ad çalışmaz.
+- `default` offering (current): `$rc_weekly` + `$rc_annual`.
+- `exit_offer` offering: indirimli ürün. Ayrı duruyor çünkü
+  `current`'a koyarsak normal paywall'da da görünür. Satın alma
+  bütün offering'lere baktığı için ayrı offering sorun değil.
+
+Geriye iki şey kaldı:
+
+1. **API anahtarı.** RevenueCat → Project settings → API keys'teki
+   App Store **public** anahtarını (`appl_` ile başlar) EAS ortam
+   değişkeni olarak tanımla, `.env`'e değil:
 
    ```bash
-   eas env:create --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --scope project
+   cd apps/mobile && npx eas-cli@latest env:create \
+     --scope project --name EXPO_PUBLIC_REVENUECAT_IOS_KEY \
+     --type string --visibility plaintext \
+     --environment production --environment preview --environment development
    ```
 
    `.env` git tarafından yok sayılıyor, dolayısıyla bulut
    derlemesine ulaşmıyor. Yalnızca `.env`'e yazmak TestFlight
    derlemesini etkilemez — AdMob'da tam olarak bu başımıza geldi.
 
-Fiyatlar koda yazılmıyor: üçünün de rakamı, haftalığa bölünmüş
-fiyatı ve indirim oranı mağazadan geliyor. Katalogdaki rakamlar
-yalnızca mağaza okunamadığında görünen yer tutucular.
+2. **İnceleme ekran görüntüsü.** Her abonelik için App Store Connect
+   bir paywall ekran görüntüsü istiyor. Anahtar derlemeye girip
+   paywall gerçek fiyatları gösterdikten sonra alınmalı; şimdi
+   alınırsa yer tutucu fiyatlar görünür.
+
+Abonelikler ilk sürümle birlikte incelemeye giriyor; tek başlarına
+gönderilemiyorlar.
 
 ### 5. AdMob
 
