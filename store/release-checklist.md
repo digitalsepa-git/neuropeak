@@ -207,48 +207,44 @@ Geriye iki şey kaldı:
 Abonelikler ilk sürümle birlikte incelemeye giriyor; tek başlarına
 gönderilemiyorlar.
 
-### 5. AdMob — **hesap henüz açılmadı**
+### 5. AdMob — **kuruldu**
 
-24 Kasım 2026'da bakıldığında `digitalsepa@gmail.com` hesabının
-AdMob kaydı yoktu; panel kayıt formunu gösteriyor. Form üç şey
-istiyor ve üçü de senin kararın: AdSense sözleşmesini kabul etmek,
-**ödeme ülkesini** seçmek (form "sonradan değiştiremezsiniz" diye
-uyarıyor) ve reCAPTCHA.
+Hesap `digitalsepa@gmail.com` altında açık, yayıncı kimliği
+`5819737950881065`. İki uygulama ve dört reklam birimi hazır:
 
-Hesap açıldıktan sonra panelde iki uygulama (iOS + Android) ve her
-biri için ikişer reklam birimi (geçiş + ödüllü) açılacak. **İkisi
-birden gerekiyor:** `app-ids.ts` yalnızca iki uygulama kimliği de
-doluyken `isReal` diyor, tek platformun kimliğiyle derlemek diğerini
-çöken hâline bırakacağı için böyle. Yani iOS'tan önce çıkılsa bile
-Android uygulaması da AdMob'da kayıtlı olmalı.
+| Uygulama          | Platform | Birimler       |
+| ----------------- | -------- | -------------- |
+| NeuroPeak iOS     | iOS      | Geçiş + ödüllü |
+| NeuroPeak Android | Android  | Geçiş + ödüllü |
 
-Altı kimlik şunlar:
+**İkisi birden gerekiyordu:** `app-ids.ts` yalnızca iki uygulama
+kimliği de doluyken `isReal` diyor, tek platformun kimliğiyle
+derlemek diğerini çöken hâline bırakacağı için böyle. Yani iOS'tan
+önce çıkılsa bile Android uygulaması AdMob'da kayıtlı olmalı.
 
-| Ortam değişkeni                          | Nereden           |
-| ---------------------------------------- | ----------------- |
-| `EXPO_PUBLIC_ADMOB_IOS_APP_ID`           | Uygulama ayarları |
-| `EXPO_PUBLIC_ADMOB_ANDROID_APP_ID`       | Uygulama ayarları |
-| `EXPO_PUBLIC_ADMOB_IOS_INTERSTITIAL`     | Reklam birimi     |
-| `EXPO_PUBLIC_ADMOB_ANDROID_INTERSTITIAL` | Reklam birimi     |
-| `EXPO_PUBLIC_ADMOB_IOS_REWARDED`         | Reklam birimi     |
-| `EXPO_PUBLIC_ADMOB_ANDROID_REWARDED`     | Reklam birimi     |
+Altı kimlik `apps/mobile/.env`'e **ve EAS ortam değişkenlerine**
+(üç ortamda da) yazıldı. EAS kısmı önemli: `.env` git tarafından yok
+sayılıyor, dolayısıyla EAS sunucusuna gitmiyor ve yalnızca `.env`'e
+yazmak bulut derlemesini etkilemiyor — daha önce tam burada hata
+yapılmıştı. Kimlikler depoya yazılmadı; uygulama ikilisinde zaten
+görünüyorlar ama herkese açık bir dosyada listelemek geçersiz
+tıklama trafiğini davet ediyor.
 
-Kimlikleri `.env`'e **ve EAS ortam değişkenlerine** yaz. `.env` git
-tarafından yok sayılıyor, dolayısıyla EAS sunucusuna gitmiyor;
-yalnızca `.env`'e yazmak bulut derlemesini etkilemez. Şu an `.env`'de
-Google'ın herkese açık test kimlikleri duruyor, EAS'te ise AdMob
-değişkeni hiç yok.
+Reklamlar henüz yayınlanmıyor, iki sebepten:
 
-Kimlikler boşken uygulama reklamsız derleniyor: reklam birimi
+1. **Ödeme profili tamamlanmadı.** AdMob panelinde kırmızı uyarı
+   duruyor; vergi ve ödeme bilgileri girilmeden inceleme başlamıyor.
+2. **Uygulamalar mağazaya bağlı değil.** İkisi de "Requires review —
+   limited ad serving" durumunda. Uygulama App Store'da yayımlandıktan
+   sonra AdMob'da "Add store" ile bağlanması gerekiyor; inceleme
+   birkaç gün sürüyor.
+
+Yeni reklam birimlerinin sunmaya başlaması bir saati bulabiliyor.
+Kimlikler boşken uygulama reklamsız derleniyordu: reklam birimi
 kimliği olmayınca `admob.ts` hiç reklam istemiyor. Uygulama
 kimliğinin kendisi yine de derlemeye giriyor — yoksa Google'ın
 SDK'sı açılışta uygulamayı düşürüyor — ve gerçek kimlik verilmemişse
-Google'ın örnek kimliği yazılıyor. Mağaza sürümünde bunun gerçek
-kimlikle değişmesi gerekiyor; `src/lib/ads/app-ids.ts` bunu
-`isReal` ile ayırt ediyor.
-
-İlk TestFlight yüklemesini reklamsız göndermek bir seçenek, hatta
-daha az değişken demek.
+Google'ın örnek kimliği yazılıyordu.
 
 ### 6. İlk TestFlight yüklemesi
 
