@@ -83,8 +83,8 @@ NeuroPeak testleri eğlence ve zihinsel egzersiz amaçlıdır. Klinik veya
 psikometrik bir teşhis aracı değildir ve sağlıkla ilgili bir karar
 için kullanılmamalıdır.
 
-Gizlilik: https://neuropeak.app/privacy
-Kullanım şartları: https://neuropeak.app/terms
+Gizlilik: https://digitalsepa-git.github.io/neuropeak/privacy/
+Kullanım şartları: https://digitalsepa-git.github.io/neuropeak/terms/
 Destek: destek@neuropeak.app
 ```
 
@@ -105,10 +105,11 @@ ve haftalık lig. Türkçe ve İngilizce.
 
 ## Destek ve pazarlama adresleri
 
-- Destek: `https://neuropeak.app/support` — **henüz yok**
-- Pazarlama: `https://neuropeak.app` — **henüz yok**
-- Gizlilik: `https://neuropeak.app/privacy` — **henüz yok**, Apple bunu
-  zorunlu tutuyor
+- Destek: `destek@neuropeak.app` — kutu **henüz açılmadı**
+- Pazarlama: `https://neuropeak.app` — **henüz yok**, zorunlu değil
+- Gizlilik: `https://digitalsepa-git.github.io/neuropeak/privacy/` — **canlı**; Apple bunu
+  zorunlu tutuyor. Alan adı alınırsa Pages'e özel alan adı tanımlanıp
+  adres `https://neuropeak.app/privacy` olur.
 
 ## Yaş sınırı
 

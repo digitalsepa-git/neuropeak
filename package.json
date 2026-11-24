@@ -25,9 +25,12 @@
     "db:verify": "./scripts/verify-schema.sh",
     "db:types": "./scripts/generate-db-types.sh",
     "db:types:check": "./scripts/generate-db-types.sh --check",
-    "db:seed": "./scripts/seed-content.sh"
+    "db:seed": "./scripts/seed-content.sh",
+    "legal:build": "./scripts/build-legal-site.sh",
+    "legal:check": "./scripts/build-legal-site.sh --check"
   },
   "devDependencies": {
+    "marked": "^18.3.0",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",
     "vitest": "^5.0.4"

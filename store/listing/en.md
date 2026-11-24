@@ -85,8 +85,8 @@ NeuroPeak tests are for entertainment and mental exercise. They are
 not a clinical or psychometric diagnostic tool and should not be used
 for any health decision.
 
-Privacy: https://neuropeak.app/privacy
-Terms: https://neuropeak.app/terms
+Privacy: https://digitalsepa-git.github.io/neuropeak/en/privacy/
+Terms: https://digitalsepa-git.github.io/neuropeak/en/terms/
 Support: destek@neuropeak.app
 ```
 
@@ -109,7 +109,7 @@ a weekly league. English and Turkish.
 
 - Support: `https://neuropeak.app/support` — **does not exist yet**
 - Marketing: `https://neuropeak.app` — **does not exist yet**
-- Privacy: `https://neuropeak.app/privacy` — **does not exist yet**,
+- Privacy: `https://digitalsepa-git.github.io/neuropeak/en/privacy/` — **live**,
   and Apple requires it
 
 ## Age rating
