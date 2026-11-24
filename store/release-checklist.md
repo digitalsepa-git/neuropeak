@@ -104,19 +104,27 @@ Uygulama çalışmaya devam ediyor ama her şey cihazda kalıyor.
 5. Kendi kullanıcını `public.admins` tablosuna ekle; panel yönetici
    olmayan hesaba veri göstermiyor.
 
-### 2. Adresleri canlıya al — **Apple bunu şart koşuyor**
+### 2. Adresleri canlıya al — **kısmen tamam**
 
-`legal/` altındaki iki belge şu adreslerden erişilebilir olmalı:
+`legal/` altındaki belgeler artık bir siteye dönüşüyor:
+`scripts/build-legal-site.sh` onları `docs/` altına yazıyor, GitHub
+Pages de `main` dalının o klasörünü sunuyor. Dört sayfa, iki dil:
 
-- <https://neuropeak.app/privacy>
-- <https://neuropeak.app/terms>
+- <https://digitalsepa-git.github.io/neuropeak/privacy/>
+- <https://digitalsepa-git.github.io/neuropeak/terms/>
+- <https://digitalsepa-git.github.io/neuropeak/en/privacy/>
+- <https://digitalsepa-git.github.io/neuropeak/en/terms/>
 
-Apple gizlilik politikası adresine erişemezse inceleme reddediliyor.
-Alan adı yoksa en hızlı yol belgeleri GitHub Pages'e koyup
-`links.ts` ile mağaza kaydındaki adresleri oraya çevirmek.
+Belgeler değişirse CI uyarıyor (`npm run legal:check`); siteyi
+yeniden üretmek için `npm run legal:build`.
 
-`destek@neuropeak.app` kutusu da açılmalı; şu an yalnızca
-`links.ts` ve mağaza metinlerinde yazılı.
+Apple gizlilik politikası adresine erişemezse inceleme reddediliyor,
+o yüzden bu adres **Pages açık kaldığı sürece** geçerli. Alan adı
+alınırsa Pages'e özel alan adı tanımlanır ve `links.ts` ile mağaza
+metinlerindeki adresler `https://neuropeak.app/...` olur.
+
+`destek@neuropeak.app` kutusu hâlâ açılmadı; şu an yalnızca
+`links.ts`, site altlığı ve mağaza metinlerinde yazılı.
 
 ### 3. Apple Developer Program
 

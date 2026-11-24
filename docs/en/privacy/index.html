@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy · NeuroPeak</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f5fb;
+        --surface: #ffffff;
+        --text: #120e20;
+        --muted: #6f6a80;
+        --line: #dcd9e8;
+        --accent: #6c3bf4;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #120e20;
+          --surface: #272047;
+          --text: #ffffff;
+          --muted: #a8a2c4;
+          --line: #272047;
+          --accent: #a88df9;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0 16px 64px;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          17px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          Arial,
+          sans-serif;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      .wrap {
+        max-width: 68ch;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 32px 0 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      h1 {
+        font-size: 32px;
+        line-height: 1.2;
+        margin: 32px 0 8px;
+      }
+      h2 {
+        font-size: 22px;
+        line-height: 1.3;
+        margin: 40px 0 8px;
+      }
+      h3 {
+        font-size: 18px;
+        margin: 28px 0 8px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      main :is(ul, ol) {
+        padding-left: 1.3em;
+      }
+      main li {
+        margin: 6px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 15px;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        text-align: left;
+      }
+      th {
+        background: var(--surface);
+      }
+
+      code {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.9em;
+      }
+
+      footer {
+        margin-top: 56px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 27px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="../../">NeuroPeak</a>
+        <nav><a href="../../">Documents</a> · <a href="../../privacy/">Türkçe</a></nav>
+      </header>
+      <main>
+        <h1>NeuroPeak Privacy Policy</h1>
+        <p><strong>Last updated:</strong> 24 October 2026</p>
+        <p>
+          NeuroPeak: IQ Arena (the &quot;app&quot;) offers mini games and tests for mental exercise
+          and entertainment. This document explains what the app collects, why, and how long it is
+          kept.
+        </p>
+        <p>
+          In short:
+          <strong>there is no account, and we never ask for your name or email.</strong> The app
+          knows you by a random identifier generated on your device the first time you open it. That
+          identifier exists only to keep your own progress consistent; it is not tied to a person, a
+          phone, or an advertising identifier.
+        </p>
+        <h2>What we collect</h2>
+        <h3>1. Stays on your device</h3>
+        <p>
+          The following is kept in your device&#39;s own storage. It is not sent to any server and
+          disappears when you delete the app.
+        </p>
+        <ul>
+          <li>Your language preference</li>
+          <li>Your onboarding answers (a copy may also go to the server, below)</li>
+          <li>XP, level, stars, streak, daily tasks</li>
+          <li>Brain map scores and the last seven days of activity</li>
+          <li>League standing and weekly XP</li>
+          <li>A local copy of your test results</li>
+        </ul>
+        <h3>2. Sent to the server</h3>
+        <p>
+          When the app is connected to a Supabase database, the following is sent together with your
+          random identifier:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>What it contains</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Push token</td>
+              <td>
+                If you turned notifications on: your device&#39;s push token, platform and language
+              </td>
+              <td>To send reminders</td>
+            </tr>
+            <tr>
+              <td>Onboarding answers</td>
+              <td>
+                Age <strong>range</strong> (not a date of birth), focus areas, daily goal, the area
+                you struggle with, exercise habit, notification permission
+              </td>
+              <td>To build your daily plan and starting difficulty</td>
+            </tr>
+            <tr>
+              <td>Test results</td>
+              <td>
+                Test id, raw score, IQ score, percentile, correct/answered counts, sub-dimension
+                scores, duration, date
+              </td>
+              <td>To show your history and compare with your age group</td>
+            </tr>
+            <tr>
+              <td>Progress</td>
+              <td>
+                XP, level, current streak, longest streak, last active day, streak freezes left
+              </td>
+              <td>So your progress survives a change of device</td>
+            </tr>
+            <tr>
+              <td>Usage events</td>
+              <td>
+                Event name (app open, test start/finish, game finish, paywall view, ad watched), the
+                fields that come with it (game id, category, difficulty, level, test id, IQ score,
+                correct count), platform (iOS/Android) and a timestamp
+              </td>
+              <td>To see which games get played and where people get stuck</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          None of these records contain a name, email, phone number, location, contacts, photos, or
+          a device identifier.
+        </p>
+        <h3>3. Third-party services</h3>
+        <ul>
+          <li>
+            <strong>Google AdMob</strong> — when ads are on. Google collects its own data to serve
+            and measure ads (device type, approximate location, advertising identifier and similar).
+            On iOS you are asked for tracking permission; if you decline, ads are not personalised
+            and no feature of the app is withheld. Google&#39;s policy:
+            <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>
+          </li>
+          <li>
+            <strong>RevenueCat</strong> — when subscriptions are on. Processes the subscription
+            information that comes from the store to verify your purchase.
+            <a href="https://www.revenuecat.com/privacy">https://www.revenuecat.com/privacy</a>
+          </li>
+          <li>
+            <strong>Apple App Store / Google Play</strong> — you buy through the store; we never see
+            your card details.
+          </li>
+          <li>
+            <strong>Supabase</strong> — the database provider that stores the data above.
+            <a href="https://supabase.com/privacy">https://supabase.com/privacy</a>
+          </li>
+        </ul>
+        <h3>4. Notifications</h3>
+        <p>
+          Notifications are off by default. When you turn them on in Settings — and only then — your
+          device is asked for notification permission, and if you grant it your device&#39;s
+          <strong>push token</strong> is stored on our server. What is stored is a string that
+          addresses the device; it contains neither your name, nor your email, nor your location.
+        </p>
+        <p>
+          When you turn notifications off the record is not deleted but deactivated, so the same
+          device is recognised if you turn them back on. If you want the record gone entirely,
+          deleting your account removes the push token with it.
+        </p>
+        <p>
+          <strong>This release does not send notifications yet:</strong> the token is stored but the
+          sending infrastructure is not in place. When sending begins, this document will be updated
+          and the date at the top will change.
+        </p>
+        <h2>What we do not do</h2>
+        <ul>
+          <li>We do not sell your data.</li>
+          <li>We do not share it with anyone other than the ad network above.</li>
+          <li>We do not build a profile to advertise to you outside the app.</li>
+          <li>
+            This is not an app for children, and we do not knowingly collect data from anyone under
+            13.
+          </li>
+        </ul>
+        <h2>How long we keep it</h2>
+        <p>
+          Test results and progress are kept for at most 24 months after you stop using the app.
+          Usage events are deleted after 14 months. Data on your device goes when you delete the
+          app.
+        </p>
+        <h2>Exercising your rights</h2>
+        <p>
+          Because there is no account, we find your data by your random identifier. Write to
+          <a href="mailto:destek@neuropeak.app">destek@neuropeak.app</a> to request a copy or
+          deletion; the <strong>Settings → Email support</strong> row in the app opens that address.
+          We answer within 30 days. If we do not know your random identifier we may not be able to
+          match the data — and if you have already deleted the app, the identifier is gone with it.
+        </p>
+        <h2>These tests are not a diagnosis</h2>
+        <p>
+          The IQ tests and measures such as &quot;brain age&quot; in this app are for entertainment
+          and mental exercise. They are not a clinical or psychometric diagnostic tool and should
+          not be used for any health decision.
+        </p>
+        <h2>Changes</h2>
+        <p>
+          If this policy changes, the date at the top is updated. For a significant change we will
+          also tell you inside the app.
+        </p>
+        <h2>Contact</h2>
+        <p><a href="mailto:destek@neuropeak.app">destek@neuropeak.app</a></p>
+      </main>
+      <footer>Questions: <a href="mailto:destek@neuropeak.app">destek@neuropeak.app</a>.</footer>
+    </div>
+  </body>
+</html>
