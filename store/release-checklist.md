@@ -81,28 +81,42 @@ görmek için. Mağaza sürümü bunlarsız çıkmayacak.
 
 ## Senin yapman gerekenler
 
-### 1. Supabase projesi
+### 1. Supabase projesi — **proje açıldı, şema uygulanmadı**
 
 Panel, senkronizasyon, analitik ve bildirim bu olmadan açılmıyor.
 Uygulama çalışmaya devam ediyor ama her şey cihazda kalıyor.
 
-1. supabase.com'da proje aç.
+Proje `digitalsepa-git's Org` altında duruyor: adı `nuropeak`
+(yazımda "e" eksik, ref `moocxozyxxiljugvnigf`), bölge
+eu-central-1. İçi **boş** — hiç migration uygulanmadı.
 
-   **Önce yer aç.** Ücretsiz planda aynı anda yalnızca **iki aktif
-   proje** tutulabiliyor ve sınır hesap genelinde, organizasyon
-   başına değil. 29 Ekim 2026'da ikisi de doluydu: `octopuspick`
-   (digitalsepa-git's Org) ve `Borcama` (Zeroceko's Org). Birini
-   duraklatman, silmen ya da Pro'ya geçmen gerekiyor. Duraklatmak
-   veriyi silmiyor ama o projenin API'sini durduruyor.
+**Şu an duraklatılmış.** Ücretsiz planda aynı anda yalnızca **iki
+aktif proje** tutulabiliyor ve bir haftalık hareketsizlikten sonra
+proje kendiliğinden duraklıyor. 24 Kasım 2026'da iki aktif slotu
+`octopuspick` ve `kakuro` tutuyordu; `nuropeak` duraklayınca yeri
+kakuro almıştı. Devam ettirmek için birini duraklatmak ya da Pro'ya
+geçmek gerekiyor — Pro ayrıca duraklamayı tamamen kaldırıyor, ki
+inceleme sırasında veritabanının uyur halde olması tek başına risk.
 
-2. `supabase/migrations/` altındaki dosyaları sırayla uygula
-   (Supabase CLI ya da SQL editörü).
+Kalan adımlar:
+
+1. Projeyi devam ettir (Pro'ya geçildiyse zaten uyumuyor).
+2. `supabase/migrations/` altındaki on dosyayı sırayla uygula.
+   Doğrudan bağlantı IPv6 üzerinden çalışıyor:
+   `postgresql://postgres:ŞİFRE@db.moocxozyxxiljugvnigf.supabase.co:5432/postgres`
 3. `npm run db:seed` ile içeriği yaz.
-4. Project Settings → API'deki iki değeri hem `apps/mobile/.env`'e
-   hem panelin ortamına yaz (`apps/mobile/.env.example` alanları
-   gösteriyor).
-5. Kendi kullanıcını `public.admins` tablosuna ekle; panel yönetici
-   olmayan hesaba veri göstermiyor.
+4. Kendi kullanıcını `public.admins` tablosuna ekle; panel yönetici
+   olmayan hesaba veri göstermiyor. Satır `auth.users`'a bağlı, yani
+   önce projede bir auth hesabın olması gerekiyor.
+
+Şema ve seed yerelde baştan sona doğrulandı (`npm run db:verify`):
+on migration, RLS testleri, ardından 29 oyun, 7 test, 182 soru,
+42 rozet, 9 görev.
+
+Bağlantı bilgileri yazıldı: `apps/mobile/.env`, `apps/admin/.env` ve
+**EAS ortam değişkenleri** (üç ortamda da). Proje yeni anahtar
+biçimini kullanıyor (`sb_publishable_…`); supabase-js 2.118 bunu
+destekliyor.
 
 ### 2. Adresleri canlıya al — **kısmen tamam**
 
@@ -193,23 +207,44 @@ Geriye iki şey kaldı:
 Abonelikler ilk sürümle birlikte incelemeye giriyor; tek başlarına
 gönderilemiyorlar.
 
-### 5. AdMob
+### 5. AdMob — **kuruldu**
 
-AdMob panelinde uygulama ve reklam birimleri açıp kimlikleri
-`.env`'e **ve EAS ortam değişkenlerine** yaz. `.env` git tarafından
-yok sayılıyor, dolayısıyla EAS sunucusuna gitmiyor; yalnızca `.env`'e
-yazmak bulut derlemesini etkilemez.
+Hesap `digitalsepa@gmail.com` altında açık, yayıncı kimliği
+`5819737950881065`. İki uygulama ve dört reklam birimi hazır:
 
-Kimlikler boşken uygulama reklamsız derleniyor: reklam birimi
+| Uygulama          | Platform | Birimler       |
+| ----------------- | -------- | -------------- |
+| NeuroPeak iOS     | iOS      | Geçiş + ödüllü |
+| NeuroPeak Android | Android  | Geçiş + ödüllü |
+
+**İkisi birden gerekiyordu:** `app-ids.ts` yalnızca iki uygulama
+kimliği de doluyken `isReal` diyor, tek platformun kimliğiyle
+derlemek diğerini çöken hâline bırakacağı için böyle. Yani iOS'tan
+önce çıkılsa bile Android uygulaması AdMob'da kayıtlı olmalı.
+
+Altı kimlik `apps/mobile/.env`'e **ve EAS ortam değişkenlerine**
+(üç ortamda da) yazıldı. EAS kısmı önemli: `.env` git tarafından yok
+sayılıyor, dolayısıyla EAS sunucusuna gitmiyor ve yalnızca `.env`'e
+yazmak bulut derlemesini etkilemiyor — daha önce tam burada hata
+yapılmıştı. Kimlikler depoya yazılmadı; uygulama ikilisinde zaten
+görünüyorlar ama herkese açık bir dosyada listelemek geçersiz
+tıklama trafiğini davet ediyor.
+
+Reklamlar henüz yayınlanmıyor, iki sebepten:
+
+1. **Ödeme profili tamamlanmadı.** AdMob panelinde kırmızı uyarı
+   duruyor; vergi ve ödeme bilgileri girilmeden inceleme başlamıyor.
+2. **Uygulamalar mağazaya bağlı değil.** İkisi de "Requires review —
+   limited ad serving" durumunda. Uygulama App Store'da yayımlandıktan
+   sonra AdMob'da "Add store" ile bağlanması gerekiyor; inceleme
+   birkaç gün sürüyor.
+
+Yeni reklam birimlerinin sunmaya başlaması bir saati bulabiliyor.
+Kimlikler boşken uygulama reklamsız derleniyordu: reklam birimi
 kimliği olmayınca `admob.ts` hiç reklam istemiyor. Uygulama
 kimliğinin kendisi yine de derlemeye giriyor — yoksa Google'ın
 SDK'sı açılışta uygulamayı düşürüyor — ve gerçek kimlik verilmemişse
-Google'ın örnek kimliği yazılıyor. Mağaza sürümünde bunun gerçek
-kimlikle değişmesi gerekiyor; `src/lib/ads/app-ids.ts` bunu
-`isReal` ile ayırt ediyor.
-
-İlk TestFlight yüklemesini reklamsız göndermek bir seçenek, hatta
-daha az değişken demek.
+Google'ın örnek kimliği yazılıyordu.
 
 ### 6. İlk TestFlight yüklemesi
 
